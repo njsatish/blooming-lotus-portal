@@ -1,0 +1,39 @@
+# Credentials and local configuration
+.env
+.env.*
+!.env.example
+.aws/
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Customer and operational data
+backups/
+data/
+exports/
+*.ddb.json
+*appointment*backup*.json
+*customer*.csv
+
+# Build, cache, and temporary files
+.DS_Store
+__pycache__/
+*.py[cod]
+*.log
+*.tmp
+*.swp
+.cache/
+node_modules/
+dist/
+build/
+coverage/
+
+# Generated archives
+*.zip
+*.tar
+*.tar.gz
+
+# IDE files
+.vscode/
+.idea/

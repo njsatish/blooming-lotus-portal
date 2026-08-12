@@ -1,0 +1,487 @@
+<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Blooming Lotus Front Desk</title>
+<style>:root{--p:#5b163f;--r:#c42e72;--bg:#f7f4ee;--b:#e3d9cf;--t:#372820;--m:#77675e}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font-family:system-ui,sans-serif}header{background:linear-gradient(135deg,#42102e,var(--p));color:#fff;padding:18px 5%;display:flex;justify-content:space-between;align-items:center}h1,h2{font-family:Georgia,serif}main{width:min(1400px,94%);margin:28px auto}.toolbar,.card,.detail{background:#fff;border:1px solid var(--b);border-radius:16px;box-shadow:0 12px 30px #402a1d18}.toolbar{padding:16px;display:flex;gap:12px;flex-wrap:wrap}.toolbar input,.toolbar select,button,textarea{padding:11px;border:1px solid var(--b);border-radius:10px;font:inherit}button{cursor:pointer;font-weight:700}.primary{background:var(--r);color:#fff;border:0}.grid{display:grid;grid-template-columns:1fr 380px;gap:20px;margin-top:20px}.list{display:grid;gap:12px}.card{padding:17px;display:grid;grid-template-columns:1fr auto;gap:10px;cursor:pointer}.name{font-weight:800}.muted{color:var(--m);font-size:13px}.badge{padding:6px 10px;border-radius:999px;background:#fff7dc;color:#8a5e00;font-size:11px;font-weight:800}.detail{padding:22px;position:sticky;top:20px}.detail textarea{width:100%;min-height:120px}.actions{display:grid;gap:9px;margin-top:14px}.hidden{display:none}.notice{padding:30px;text-align:center}@media(max-width:900px){.grid{grid-template-columns:1fr}.detail{position:static}}/* BLOOMING_SPECIAL_NOTES_V4_BEGIN */
+.special-request{margin:16px 0;padding:15px;border:1px solid #ead28a;border-radius:12px;background:#fff9e8}
+.special-request-label{margin:0 0 7px;font-weight:800;color:#684900}
+.special-request-text{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5;color:#493b32}
+/* BLOOMING_SPECIAL_NOTES_V4_END */</style>
+<style>
+.status-btn.current{outline:4px solid #d7ab4b;background:#5b163f!important;color:#fff}.status-btn:disabled{opacity:.42;cursor:not-allowed}.save-note{width:100%;margin:10px 0;background:#fff;border:1px solid #5b163f;color:#5b163f}.flash{position:fixed;right:20px;bottom:20px;z-index:99;padding:14px 18px;border-radius:12px;background:#2d2420;color:#fff;box-shadow:0 12px 30px #0004}.modalx{position:fixed;inset:0;background:#21151db8;display:none;place-items:center;z-index:100;padding:18px}.modalx.open{display:grid}.modalbox{background:#fff;width:min(560px,100%);max-height:90vh;overflow:auto;border-radius:18px;padding:22px}.modalbox input,.modalbox select,.modalbox textarea{width:100%;padding:10px;margin:6px 0 12px;border:1px solid #ddd0c5;border-radius:8px}.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:15px}
+</style>
+  <!-- BLOOMING_AUTH_VISIBILITY_V8_STYLE -->
+  <style>
+    html:not([data-front-desk-auth="authenticated"]) #logout,
+    html:not([data-front-desk-auth="authenticated"]) #refresh {
+      display: none !important;
+    }
+  </style>
+<!-- BLOOMING_DATE_FILTER_STYLE_V10 --><style>#date-controls-v10{display:flex;align-items:end;gap:8px;flex-wrap:wrap}#date-controls-v10 select,#date-controls-v10 input{padding:10px;border:1px solid #e3d9cf;border-radius:9px;background:#fff}#date-controls-v10>label{font-weight:700}#custom-v10{display:flex;gap:8px;flex-wrap:wrap}#custom-v10[hidden]{display:none!important}#date-summary-v10{margin:10px 0;padding:10px 14px;border-radius:10px;background:#fff;color:#665247;font-size:13px}.date-hidden-v10{display:none!important}@media print{header,.toolbar,#date-summary-v10,.detail{display:none!important}.date-hidden-v10{display:none!important}.grid{display:block!important}}</style>
+<!-- BLOOMING_STATUS_ICON_FIX_V12_STYLE -->
+<style>
+  .card img:not([src]),
+  .card img[src=""],
+  .card img[src="#"],
+  .appointment img:not([src]),
+  .appointment img[src=""],
+  .appointment img[src="#"],
+  .status img:not([src]),
+  .status img[src=""],
+  .status img[src="#"],
+  .badge img:not([src]),
+  .badge img[src=""],
+  .badge img[src="#"] {
+    display: none !important;
+  }
+
+  /* Keep status labels aligned after the placeholder is removed. */
+  .status,
+  .badge,
+  .appointment-state {
+    vertical-align: middle;
+  }
+</style>
+
+<!-- BLOOMING_STATUS_PILLS_V13_STYLE -->
+<style>
+  /* Appointment status labels must size to their text, not to the card. */
+  .card .badge,
+  .card .status,
+  .appointment .badge,
+  .appointment .status,
+  .appointment-state .badge,
+  .appointment-state .status,
+  [data-status-pill-v13] {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 auto !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-width: 100% !important;
+    aspect-ratio: auto !important;
+    padding: 6px 11px !important;
+    margin: 0 !important;
+    border-radius: 999px !important;
+    white-space: nowrap !important;
+    line-height: 1.15 !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.2px !important;
+    text-align: center !important;
+    overflow: visible !important;
+  }
+
+  /* Keep the status at the upper-right without expanding the status column. */
+  .card > .badge,
+  .card > .status,
+  .appointment-state {
+    align-self: start !important;
+    justify-self: end !important;
+  }
+
+  /* Readable status colors. */
+  [data-status-pill-v13="REQUESTED"] {
+    background: #fff4cf !important;
+    color: #805700 !important;
+  }
+  [data-status-pill-v13="CONTACTED"] {
+    background: #e8f3ff !important;
+    color: #245d91 !important;
+  }
+  [data-status-pill-v13="CONFIRMED"] {
+    background: #e8f7ef !important;
+    color: #1f704d !important;
+  }
+  [data-status-pill-v13="RESCHEDULE_NEEDED"] {
+    background: #fff0d9 !important;
+    color: #8a4d00 !important;
+  }
+  [data-status-pill-v13="CANCELLED"],
+  [data-status-pill-v13="NO_SHOW"] {
+    background: #fff0f0 !important;
+    color: #9b3535 !important;
+  }
+  [data-status-pill-v13="COMPLETED"] {
+    background: #eee9f8 !important;
+    color: #5b3c88 !important;
+  }
+
+  @media (max-width: 640px) {
+    .card .badge,
+    .card .status,
+    [data-status-pill-v13] {
+      padding: 5px 9px !important;
+      font-size: 11px !important;
+      white-space: normal !important;
+    }
+  }
+</style>
+
+<!-- BLOOMING_DETAIL_ACTIONS_V14_STYLE -->
+<style>
+  .detail-action-group-v14 {
+    margin: 20px 0 8px;
+    padding: 16px;
+    border: 1px solid #e3d9cf;
+    border-radius: 14px;
+    background: #fbf8f3;
+  }
+  .detail-action-heading-v14 {
+    margin: 0 0 12px;
+    color: #493528;
+    font-size: 16px;
+  }
+  .detail-action-grid-v14 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+  .detail-action-grid-v14 button[data-detail-action-v14="true"] {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 100% !important;
+    min-height: 44px;
+    margin: 0 !important;
+    padding: 10px 12px !important;
+    border: 1px solid #cdbeb2;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #493528;
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1.2;
+    white-space: normal;
+    cursor: pointer;
+  }
+  .detail-action-grid-v14 button[data-status="CONFIRMED"] {
+    border-color: #9fd2b9;
+    background: #eaf7f0;
+    color: #1f704d;
+  }
+  .detail-action-grid-v14 button[data-status="CONTACTED"] {
+    border-color: #a9cce9;
+    background: #edf6ff;
+    color: #245d91;
+  }
+  .detail-action-grid-v14 button[data-status="RESCHEDULE_NEEDED"] {
+    border-color: #e8cd83;
+    background: #fff7dc;
+    color: #805700;
+  }
+  .detail-action-grid-v14 button[data-status="CANCELLED"],
+  .detail-action-grid-v14 button[data-status="NO_SHOW"] {
+    border-color: #e9b3b3;
+    background: #fff0f0;
+    color: #9b3535;
+  }
+  .detail-action-grid-v14 button[data-status="COMPLETED"] {
+    border-color: #c7b6df;
+    background: #f1ecf8;
+    color: #5b3c88;
+  }
+  .detail-action-grid-v14 button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 13px rgba(64, 42, 29, 0.12);
+  }
+  .detail-action-grid-v14 button:disabled {
+    opacity: 0.42;
+    cursor: not-allowed;
+    filter: grayscale(0.35);
+  }
+  @media (max-width: 520px) {
+    .detail-action-grid-v14 { grid-template-columns: 1fr; }
+    .detail-action-grid-v14 button[data-detail-action-v14="true"] { min-height: 48px; }
+  }
+</style>
+<!-- BLOOMING_PRINT_V16_STYLE --><style>
+#print-sheet-v16{display:none}
+@page{size:Letter portrait;margin:.42in}
+@media print{
+  html.printing-day-sheet-v16 body>*:not(#print-sheet-v16){display:none!important}
+  html.printing-day-sheet-v16 #print-sheet-v16{display:block!important;color:#2f241f;font:10pt Arial,sans-serif}
+  #print-sheet-v16 header{display:flex!important;justify-content:space-between;align-items:flex-start;padding-bottom:10px;border-bottom:3px solid #5b163f;background:none!important;color:#2f241f!important}
+  #print-sheet-v16 h1{margin:0;color:#5b163f;font:700 23pt Georgia,serif}#print-sheet-v16 h2{margin:3px 0;font-size:11pt}
+  .print-meta-v16{text-align:right;color:#665247;font-size:8.5pt}.print-filters-v16{margin:9px 0;padding:7px;border:1px solid #ddd0c5;background:#faf7f2;font-size:8pt}
+  #print-sheet-v16 table{width:100%;border-collapse:collapse;table-layout:fixed}#print-sheet-v16 th{padding:6px;background:#5b163f;color:white;text-align:left;font-size:8pt}
+  #print-sheet-v16 td{padding:7px 5px;border:1px solid #ddd0c5;vertical-align:top;overflow-wrap:anywhere}#print-sheet-v16 tr{break-inside:avoid;page-break-inside:avoid}
+  #print-sheet-v16 th:nth-child(1){width:14%}#print-sheet-v16 th:nth-child(2){width:18%}#print-sheet-v16 th:nth-child(3){width:25%}#print-sheet-v16 th:nth-child(4){width:9%}#print-sheet-v16 th:nth-child(5){width:14%}#print-sheet-v16 th:nth-child(6){width:20%}
+  #print-sheet-v16 footer{display:flex;justify-content:space-between;margin-top:10px;color:#76675f;font-size:8pt}
+}
+</style><!-- BLOOMING_V22_STYLE --><style>.admin-brand-v22{display:flex;align-items:center;gap:14px}.admin-brand-v22 img{width:68px;height:68px;object-fit:contain;border-radius:18px;background:#fff}.admin-brand-title-v22{color:#fff;font:700 32px Georgia,serif}.admin-brand-sub-v22{color:#ead8e3;font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase}.print-logo-v22{width:58px;height:58px;object-fit:contain;margin-right:12px;border-radius:12px}@media(max-width:640px){.admin-brand-v22 img{width:50px;height:50px}.admin-brand-title-v22{font-size:22px}}@media print{.print-logo-v22{display:block!important}}</style><!-- BLOOMING_SHARED_FAVICON_V27 -->
+<link rel="icon" href="/assets/blooming-lotus-shared-logo-ba9081f00745.png?v=27">
+<link rel="shortcut icon" href="/assets/blooming-lotus-shared-logo-ba9081f00745.png?v=27">
+<link rel="apple-touch-icon" href="/assets/blooming-lotus-shared-logo-ba9081f00745.png?v=27">
+<!-- BLOOMING_LOGO_DEDUPE_V28_STYLE --><style>
+.admin-logo-v28{width:68px;height:68px;object-fit:contain;border-radius:18px;background:#fff;margin-right:16px;box-shadow:0 8px 22px rgba(55,22,42,.18);flex:0 0 68px}
+.print-logo-v28{width:58px;height:58px;object-fit:contain;border-radius:12px;margin-right:14px;flex:0 0 58px}
+@media(max-width:640px){.admin-logo-v28{width:50px;height:50px;flex-basis:50px;margin-right:10px}}
+@media print{.print-logo-v28{display:block!important}}
+</style><style>.announcement-banner-v29{margin:14px auto;padding:14px 18px;border-radius:12px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}.announcement-banner-v29.closure{background:#fff0f0;color:#8d2929}.announcement-banner-v29.important{background:#fff7dc;color:#805700}.announcement-banner-v29.info{background:#edf6ff;color:#245d91}.ann-back-v29{position:fixed;inset:0;background:#21151db8;z-index:300;display:grid;place-items:center;padding:20px}.ann-box-v29{width:min(600px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:18px;padding:22px}.ann-box-v29 label{display:block;margin:10px 0;font-weight:700}.ann-box-v29 input,.ann-box-v29 textarea,.ann-box-v29 select{width:100%;padding:9px;border:1px solid #ddd0c5;border-radius:8px}.ann-box-v29 input[type=checkbox]{width:auto}.ann-actions-v29{display:flex;justify-content:flex-end;gap:10px}</style>
+<!-- BLOOMING_SLIM_ANNOUNCEMENT_V30_STYLE -->
+<style>
+  .slim-announcement-stack-v30 {
+    position: relative;
+    z-index: 30;
+    width: 100%;
+  }
+  .slim-announcement-v30 {
+    color: #fff;
+    box-shadow: 0 8px 22px rgba(64, 15, 43, 0.12);
+  }
+  .slim-closure-v30 {
+    background: linear-gradient(90deg, #5b163f, #a61f61);
+  }
+  .slim-important-v30 {
+    background: linear-gradient(90deg, #744808, #b07818);
+  }
+  .slim-info-v30 {
+    background: linear-gradient(90deg, #24527a, #327ca4);
+  }
+  .slim-announcement-inner-v30 {
+    width: min(1200px, calc(100% - 28px));
+    min-height: 58px;
+    margin: 0 auto;
+    padding: 9px 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .slim-announcement-badge-v30 {
+    flex: 0 0 auto;
+    padding: 5px 9px;
+    border-radius: 999px;
+    background: #f2c95e;
+    color: #4c3510;
+    font-size: 11px;
+    font-weight: 850;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+  }
+  .slim-announcement-v30 p {
+    flex: 1;
+    margin: 0;
+    line-height: 1.42;
+  }
+  .slim-announcement-v30 p strong {
+    margin-right: 6px;
+  }
+  .slim-announcement-dates-v30 {
+    margin-right: 8px;
+    font-weight: 750;
+    color: #ffe7a0;
+  }
+  .slim-announcement-link-v30 {
+    flex: 0 0 auto;
+    color: #fff;
+    font-weight: 750;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    white-space: nowrap;
+  }
+  .slim-announcement-dismiss-v30 {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    border: 0;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: rgba(255,255,255,.16);
+    color: #fff;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .slim-announcement-dismiss-v30:hover {
+    background: rgba(255,255,255,.26);
+  }
+  @media (max-width: 720px) {
+    .slim-announcement-inner-v30 {
+      padding: 11px 0;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 9px 12px;
+    }
+    .slim-announcement-v30 p {
+      flex: 1 1 calc(100% - 110px);
+      font-size: 14px;
+    }
+    .slim-announcement-link-v30 {
+      margin-left: 58px;
+    }
+    .slim-announcement-dismiss-v30 {
+      position: absolute;
+      right: 12px;
+    }
+  }
+</style>
+
+<!-- BLOOMING_ANNOUNCEMENT_MANAGER_V31_STYLE -->
+<style>
+  .ann-manager-button-v31 {
+    padding: 11px 15px;
+    border: 1px solid #5b163f;
+    border-radius: 10px;
+    background: #fff;
+    color: #5b163f;
+    font-weight: 800;
+    cursor: pointer;
+  }
+  .ann-manager-backdrop-v31 {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    padding: 18px;
+    background: rgba(33, 18, 27, .68);
+  }
+  .ann-manager-v31 {
+    width: min(1060px, 100%);
+    max-height: calc(100vh - 36px);
+    overflow: hidden;
+    border-radius: 22px;
+    background: #fff;
+    box-shadow: 0 30px 90px rgba(0,0,0,.32);
+  }
+  .ann-manager-header-v31 {
+    padding: 19px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #42102e, #6f194d);
+    color: #fff;
+  }
+  .ann-manager-header-v31 p {
+    margin: 0 0 4px;
+    color: #ead8e3;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+  }
+  .ann-manager-header-v31 h2 { margin: 0; font: 700 27px Georgia, serif; }
+  .ann-manager-header-v31 button {
+    width: 38px;
+    height: 38px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,.14);
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+  }
+  .ann-manager-tools-v31 {
+    padding: 13px 18px;
+    border-bottom: 1px solid #eadfd7;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fbf8f4;
+  }
+  .ann-manager-tools-v31 label { font-weight: 800; }
+  .ann-manager-tools-v31 select,
+  .ann-manager-tools-v31 button {
+    padding: 9px 11px;
+    border: 1px solid #d8c8bd;
+    border-radius: 9px;
+    background: #fff;
+  }
+  .ann-manager-body-v31 {
+    min-height: 470px;
+    max-height: calc(100vh - 190px);
+    display: grid;
+    grid-template-columns: minmax(310px, .85fr) minmax(0, 1.15fr);
+  }
+  .ann-list-v31 {
+    padding: 14px;
+    border-right: 1px solid #eadfd7;
+    overflow: auto;
+    background: #faf7f2;
+  }
+  .ann-row-v31 {
+    width: 100%;
+    margin-bottom: 9px;
+    padding: 13px;
+    border: 1px solid #e3d6cc;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: #fff;
+    color: #3f2e27;
+    text-align: left;
+    cursor: pointer;
+  }
+  .ann-row-v31.selected { border-color: #bd2465; box-shadow: inset 4px 0 #bd2465; }
+  .ann-row-main-v31 { min-width: 0; display: grid; gap: 4px; }
+  .ann-row-main-v31 strong { overflow-wrap: anywhere; }
+  .ann-row-main-v31 small { color: #7a685f; overflow-wrap: anywhere; }
+  .ann-status-v31 {
+    flex: 0 0 auto;
+    padding: 5px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 850;
+  }
+  .ann-status-published { background: #e7f6ee; color: #20704e; }
+  .ann-status-draft { background: #fff4d2; color: #805700; }
+  .ann-status-archived { background: #eee9e5; color: #65554c; }
+  .ann-details-v31 { padding: 22px; overflow: auto; }
+  .ann-detail-heading-v31 h3 { margin: 10px 0 18px; color: #4f1837; font: 700 27px Georgia, serif; }
+  .ann-detail-grid-v31 { margin: 0; display: grid; grid-template-columns: 130px minmax(0,1fr); gap: 9px 14px; }
+  .ann-detail-grid-v31 dt { color: #7a675d; font-size: 13px; }
+  .ann-detail-grid-v31 dd { margin: 0; font-weight: 650; overflow-wrap: anywhere; }
+  .ann-message-v31 { white-space: pre-wrap; line-height: 1.5; }
+  .ann-detail-actions-v31 { margin-top: 22px; display: flex; flex-wrap: wrap; gap: 10px; }
+  .ann-detail-actions-v31 button { padding: 11px 15px; border-radius: 9px; font-weight: 800; cursor: pointer; }
+  .ann-danger-v31 { border: 1px solid #d89b9b; background: #fff0f0; color: #943535; }
+  .ann-primary-v31 { border: 0; background: #bd2465; color: #fff; }
+  .ann-secondary-v31 { border: 1px solid #cdbdb2; background: #fff; color: #49382e; }
+  .ann-action-result-v31 { min-height: 24px; margin-top: 12px; color: #5b493f; font-weight: 700; }
+  .ann-empty-v31 { padding: 30px 18px; color: #79685f; text-align: center; }
+  @media (max-width: 760px) {
+    .ann-manager-body-v31 { grid-template-columns: 1fr; overflow: auto; }
+    .ann-list-v31 { max-height: 260px; border-right: 0; border-bottom: 1px solid #eadfd7; }
+    .ann-details-v31 { overflow: visible; }
+    .ann-detail-grid-v31 { grid-template-columns: 1fr; gap: 3px; }
+    .ann-detail-grid-v31 dd { margin-bottom: 9px; }
+  }
+</style>
+</head>
+<body><header><div><h1 style="margin:0">Blooming Lotus</h1><small>Front-Desk Dashboard</small></div><div><button id="refresh">Refresh</button> <button id="logout">Sign out</button></div></header><main><div id="login" class="notice"><h2>Front-desk sign in required</h2><button class="primary" id="signin">Sign in securely</button></div><div id="app" class="hidden"><div class="toolbar"><input id="search" placeholder="Search name, phone, email"><select id="filter"><option value="">All statuses</option><option>REQUESTED</option><option>CONTACTED</option><option>CONFIRMED</option><option>RESCHEDULE_NEEDED</option><option>CANCELLED</option><option>COMPLETED</option><option>NO_SHOW</option></select><button onclick="print()">Print</button></div><div class="grid"><section class="list" id="list"></section><aside class="detail" id="detail"><h2>Select an appointment</h2></aside></div></div></main>
+<div id="action-modal" class="modalx"><div class="modalbox"><h2 id="modal-title">Update appointment</h2><div id="modal-fields"></div><label><input id="notify" type="checkbox"> Email customer about this update</label><label>Customer message</label><textarea id="customer-message" rows="4"></textarea><div class="modal-actions"><button id="modal-cancel">Cancel</button><button id="modal-save" class="primary">Save update</button></div></div></div><div id="flash" class="flash hidden"></div>
+<script src="/admin/logo-dedupe-v28.js?v=28"></script>
+<script src="/phone-dashes-v18.js?v=18"></script>
+<script src="/admin/auth-session-guard.js?v=17"></script>
+<script src="/admin/print-day-sheet-v16.js?v=16"></script>
+<script src="/admin/date-filters.js?v=10"></script>
+<script>
+const CFG={api:"https://zy28vr7v2h.execute-api.us-east-1.amazonaws.com",client:"1cf50fvbqs3j7v9qemfm7id3t2",cognito:"https://bloominglotus-frontdesk-460425809139.auth.us-east-1.amazoncognito.com",redirect:location.origin+'/admin/index.html',ses:false};
+let token=sessionStorage.getItem('bl_access'),items=[],selected=null,pendingStatus=null;
+const $=id=>document.getElementById(id), b64=x=>btoa(String.fromCharCode(...new Uint8Array(x))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+const transitions={REQUESTED:['CONTACTED','CONFIRMED','RESCHEDULE_NEEDED','CANCELLED'],CONTACTED:['CONTACTED','CONFIRMED','RESCHEDULE_NEEDED','CANCELLED'],RESCHEDULE_NEEDED:['CONTACTED','CONFIRMED','RESCHEDULE_NEEDED','CANCELLED'],CONFIRMED:['CONFIRMED','RESCHEDULE_NEEDED','CANCELLED','COMPLETED','NO_SHOW'],CANCELLED:[],COMPLETED:[],NO_SHOW:[]};
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function flash(m){$('flash').textContent=m;$('flash').classList.remove('hidden');setTimeout(()=>$('flash').classList.add('hidden'),4500)}
+async function startSecureSignIn(){let v=b64(crypto.getRandomValues(new Uint8Array(32))),c=b64(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(v)));sessionStorage.setItem('bl_verifier',v);location.href=CFG.cognito+'/oauth2/authorize?'+new URLSearchParams({client_id:CFG.client,response_type:'code',scope:'openid email',redirect_uri:CFG.redirect,code_challenge_method:'S256',code_challenge:c})}
+async function callback(){let code=new URLSearchParams(location.search).get('code');if(!code)return;let body=new URLSearchParams({grant_type:'authorization_code',client_id:CFG.client,code,redirect_uri:CFG.redirect,code_verifier:sessionStorage.getItem('bl_verifier')});let r=await fetch(CFG.cognito+'/oauth2/token',{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body}),d=await r.json();if(!r.ok)throw Error(d.error_description||'Login failed');token=d.access_token;sessionStorage.setItem('bl_access',token);history.replaceState({},'',CFG.redirect)}
+async function call(path='',opt={}){let r=await fetch(CFG.api+'/admin/appointments'+path,{...opt,headers:{authorization:'Bearer '+token,'content-type':'application/json'}}),d=await r.json();if(!r.ok)throw Error(d.message||'Request failed');return d}
+function render(){let q=$('search').value.toLowerCase(),f=$('filter').value;let view=items.filter(x=>(!f||x.status==f)&&JSON.stringify(x).toLowerCase().includes(q));$('list').innerHTML=view.map(x=>`<article class="card" data-id="${esc(x.appointmentId)}"><div><div class="name">${esc(x.customerName||x.name||'Customer')}</div><div>${esc(x.preferredDate||x.date||'')} ${esc(x.preferredTime||x.time||'')}</div><div class="muted">${esc(x.phone||'')} · ${esc(x.email||'')}</div>${x.notes?`<div class="muted"><b>Special request:</b> ${esc(x.notes)}</div>`:''}</div><span class="badge">${esc(x.status||'REQUESTED')}</span></article>`).join('')||'<div class="notice">No appointments found.</div>';document.querySelectorAll('.card').forEach(e=>e.onclick=()=>show(e.dataset.id))}
+function show(id){selected=items.find(x=>x.appointmentId==id);let st=selected.status||'REQUESTED',allowed=transitions[st]||[];$('detail').innerHTML=`<h2>${esc(selected.customerName||selected.name||'Customer')}</h2><p><b>Request:</b> ${esc(id)}</p><p><b>Phone:</b> <a href="tel:${esc(selected.phone||'')}">${esc(selected.phone||'—')}</a></p><p><b>Email:</b> <a href="mailto:${esc(selected.email||'')}">${esc(selected.email||'—')}</a></p><p><b>Service:</b> ${esc(selected.service||'—')}</p><p><b>Therapist:</b> ${esc(selected.therapist||'No preference')}</p><p><b>Preferred date:</b> ${esc(selected.preferredDate||selected.date||'—')}</p><p><b>Preferred time:</b> ${esc(selected.preferredTime||selected.time||'—')}</p><p><b>Session length:</b> ${esc(selected.sessionLength||selected.length||'—')}</p><section class="special-request"><p class="special-request-label">Special request notes</p><p class="special-request-text">${esc(selected.notes||'No special request notes were provided.')}</p></section><label>Private front-desk notes</label><textarea id="notes">${esc(selected.frontDeskNotes||'')}</textarea><button id="save-notes" class="save-note">Save private notes</button><div class="actions">${['CONTACTED','CONFIRMED','RESCHEDULE_NEEDED','CANCELLED','COMPLETED','NO_SHOW'].map(x=>`<button class="status-btn ${x==st?'current':''}" data-status="${x}" ${x!=st&&!allowed.includes(x)?'disabled':''}>${x.replaceAll('_',' ')}</button>`).join('')}</div><h3>Activity history</h3>${(selected.activityHistory||[]).slice().reverse().map(h=>`<div class="muted">${esc(h.status)} · ${esc(h.at)} · ${esc(h.by)}</div>`).join('')||'<div class="muted">No status history yet.</div>'}`;$('save-notes').onclick=()=>saveNotes();document.querySelectorAll('[data-status]').forEach(b=>b.onclick=()=>openAction(b.dataset.status))}
+async function saveNotes(){let d=await call('/'+encodeURIComponent(selected.appointmentId),{method:'PATCH',body:JSON.stringify({status:selected.status||'REQUESTED',frontDeskNotes:$('notes').value})});Object.assign(selected,d.appointment);render();show(selected.appointmentId);flash('Private notes saved.')}
+function openAction(status){pendingStatus=status;let html='';if(status=='CONTACTED')html='<label>Contact method</label><select id="contact-method"><option>Phone</option><option>Email</option><option>Voicemail</option><option>In person</option></select>';if(status=='CONFIRMED')html='<label>Confirmed date</label><input id="confirmed-date" type="date"><label>Confirmed time</label><input id="confirmed-time" type="time">';if(status=='RESCHEDULE_NEEDED')html='<label>Proposed date</label><input id="proposed-date" type="date"><label>Proposed time</label><input id="proposed-time" type="time">';if(['CANCELLED','COMPLETED','NO_SHOW'].includes(status))html='<label>Reason / completion note</label><textarea id="reason" rows="3"></textarea>';$('modal-title').textContent=status.replaceAll('_',' ');$('modal-fields').innerHTML=html;$('notify').checked=CFG.ses&&['CONFIRMED','RESCHEDULE_NEEDED','CANCELLED'].includes(status);$('notify').disabled=!CFG.ses;$('customer-message').value=defaultMessage(status);$('action-modal').classList.add('open')}
+function defaultMessage(s){if(s=='CONFIRMED')return 'Your Blooming Lotus appointment has been confirmed.';if(s=='RESCHEDULE_NEEDED')return 'Please contact Blooming Lotus regarding a proposed appointment time.';if(s=='CANCELLED')return 'Your Blooming Lotus appointment request has been cancelled.';return ''}
+async function saveAction(){let payload={status:pendingStatus,frontDeskNotes:$('notes').value,notifyCustomer:$('notify').checked,customerMessage:$('customer-message').value};for(let [id,key] of [['contact-method','contactMethod'],['confirmed-date','confirmedDate'],['confirmed-time','confirmedTime'],['proposed-date','proposedDate'],['proposed-time','proposedTime'],['reason','reason']])if($(id))payload[key]=$(id).value;try{let d=await call('/'+encodeURIComponent(selected.appointmentId),{method:'PATCH',body:JSON.stringify(payload)});Object.assign(selected,d.appointment);render();show(selected.appointmentId);$('action-modal').classList.remove('open');flash('Status updated.'+(d.notification?.sent?' Customer email sent.':payload.notifyCustomer?' Customer email was not sent.':''))}catch(e){alert(e.message)}}
+async function load(){let d=await call();items=d.appointments||[];render();if(selected){let same=items.find(x=>x.appointmentId==selected.appointmentId);if(same)show(same.appointmentId)}}
+$('signin').addEventListener('click',startSecureSignIn);$('logout').onclick=()=>{sessionStorage.clear();location.href=CFG.cognito+'/logout?'+new URLSearchParams({client_id:CFG.client,logout_uri:location.origin+'/'})};$('refresh').onclick=load;$('search').oninput=render;$('filter').onchange=render;$('modal-cancel').onclick=()=>$('action-modal').classList.remove('open');$('modal-save').onclick=saveAction;(async()=>{try{await callback();if(token){$('login').classList.add('hidden');$('app').classList.remove('hidden');await load()}}catch(e){alert(e.message)}})();
+</script><script defer src="/admin/phone-appointments.js?v=6"></script>  <script defer src="/admin/auth-visibility.js?v=8"></script>
+<script defer src="/admin/status-icon-fix.js?v=12"></script>
+<script defer src="/admin/status-pills.js?v=13"></script>
+<script defer src="/admin/detail-actions.js?v=14"></script>
+<script defer src="/announcements-v29.js?v=29"></script>
+<script defer src="/admin/admin-announcements-v29.js?v=29"></script>
+<script defer src="/slim-announcements-v30.js?v=30"></script>
+<script defer src="/admin/announcement-manager-v31.js?v=31"></script>
+</body></html>

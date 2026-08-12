@@ -1,0 +1,7 @@
+/* BLOOMING_LOGO_DEDUPE_V28 */
+(()=>{'use strict';if(window.__BL_LOGO_DEDUPE_V28__)return;window.__BL_LOGO_DEDUPE_V28__=true;const LOGO="/assets/blooming-lotus-shared-logo-ba9081f00745.png";
+function candidates(root){return [...root.querySelectorAll('img')].filter(i=>{let text=(i.className+' '+i.alt+' '+i.id).toLowerCase();return text.includes('logo')||text.includes('lotus')||i.src.includes('blooming-lotus')})}
+function keepOne(container,kind){if(!container)return;let imgs=candidates(container);let keep=imgs.find(i=>i.classList.contains(kind))||imgs[0];imgs.forEach(i=>{if(i!==keep)i.remove()});if(!keep){keep=document.createElement('img');keep.src=LOGO;keep.alt='Blooming Lotus logo';container.prepend(keep)}keep.src=LOGO;keep.alt='Blooming Lotus logo';keep.className=kind}
+function admin(){if(!document.getElementById('signin'))return;keepOne(document.querySelector('header'),'admin-logo-v28')}
+function printSheet(root=document){root.querySelectorAll?.('#print-sheet-v16 header').forEach(h=>keepOne(h,'print-logo-v28'))}
+function run(root=document){admin();printSheet(root)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>run(),{once:true});else run();new MutationObserver(ms=>{if(ms.some(m=>[...m.addedNodes].some(n=>n instanceof Element)))requestAnimationFrame(()=>run())}).observe(document.documentElement,{childList:true,subtree:true});})();
