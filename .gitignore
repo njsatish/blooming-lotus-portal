@@ -37,3 +37,4 @@ coverage/
 # IDE files
 .vscode/
 .idea/
+production-sync/
