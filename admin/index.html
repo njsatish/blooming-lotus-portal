@@ -469,11 +469,67 @@ async function startSecureSignIn(){let v=b64(crypto.getRandomValues(new Uint8Arr
 async function callback(){let code=new URLSearchParams(location.search).get('code');if(!code)return;let body=new URLSearchParams({grant_type:'authorization_code',client_id:CFG.client,code,redirect_uri:CFG.redirect,code_verifier:sessionStorage.getItem('bl_verifier')});let r=await fetch(CFG.cognito+'/oauth2/token',{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body}),d=await r.json();if(!r.ok)throw Error(d.error_description||'Login failed');token=d.access_token;sessionStorage.setItem('bl_access',token);history.replaceState({},'',CFG.redirect)}
 async function call(path='',opt={}){let r=await fetch(CFG.api+'/admin/appointments'+path,{...opt,headers:{authorization:'Bearer '+token,'content-type':'application/json'}}),d=await r.json();if(!r.ok)throw Error(d.message||'Request failed');return d}
 function render(){let q=$('search').value.toLowerCase(),f=$('filter').value;let view=items.filter(x=>(!f||x.status==f)&&JSON.stringify(x).toLowerCase().includes(q));$('list').innerHTML=view.map(x=>`<article class="card" data-id="${esc(x.appointmentId)}"><div><div class="name">${esc(x.customerName||x.name||'Customer')}</div><div>${esc(x.preferredDate||x.date||'')} ${esc(x.preferredTime||x.time||'')}</div><div class="muted">${esc(x.phone||'')} · ${esc(x.email||'')}</div>${x.notes?`<div class="muted"><b>Special request:</b> ${esc(x.notes)}</div>`:''}</div><span class="badge">${esc(x.status||'REQUESTED')}</span></article>`).join('')||'<div class="notice">No appointments found.</div>';document.querySelectorAll('.card').forEach(e=>e.onclick=()=>show(e.dataset.id))}
-function show(id){selected=items.find(x=>x.appointmentId==id);let st=selected.status||'REQUESTED',allowed=transitions[st]||[];$('detail').innerHTML=`<h2>${esc(selected.customerName||selected.name||'Customer')}</h2><p><b>Request:</b> ${esc(id)}</p><p><b>Phone:</b> <a href="tel:${esc(selected.phone||'')}">${esc(selected.phone||'—')}</a></p><p><b>Email:</b> <a href="mailto:${esc(selected.email||'')}">${esc(selected.email||'—')}</a></p><p><b>Service:</b> ${esc(selected.service||'—')}</p><p><b>Therapist:</b> ${esc(selected.therapist||'No preference')}</p><p><b>Preferred date:</b> ${esc(selected.preferredDate||selected.date||'—')}</p><p><b>Preferred time:</b> ${esc(selected.preferredTime||selected.time||'—')}</p><p><b>Session length:</b> ${esc(selected.sessionLength||selected.length||'—')}</p><section class="special-request"><p class="special-request-label">Special request notes</p><p class="special-request-text">${esc(selected.notes||'No special request notes were provided.')}</p></section><label>Private front-desk notes</label><textarea id="notes">${esc(selected.frontDeskNotes||'')}</textarea><button id="save-notes" class="save-note">Save private notes</button><div class="actions">${['CONTACTED','CONFIRMED','RESCHEDULE_NEEDED','CANCELLED','COMPLETED','NO_SHOW'].map(x=>`<button class="status-btn ${x==st?'current':''}" data-status="${x}" ${x!=st&&!allowed.includes(x)?'disabled':''}>${x.replaceAll('_',' ')}</button>`).join('')}</div><h3>Activity history</h3>${(selected.activityHistory||[]).slice().reverse().map(h=>`<div class="muted">${esc(h.status)} · ${esc(h.at)} · ${esc(h.by)}</div>`).join('')||'<div class="muted">No status history yet.</div>'}`;$('save-notes').onclick=()=>saveNotes();document.querySelectorAll('[data-status]').forEach(b=>b.onclick=()=>openAction(b.dataset.status))}
+function show(id){selected=items.find(x=>x.appointmentId==id);let st=selected.status||'REQUESTED',allowed=transitions[st]||[];$('detail').innerHTML=`<h2>${esc(selected.customerName||selected.name||'Customer')}</h2><p><b>Request:</b> ${esc(id)}</p><p><b>Phone:</b> <a href="tel:${esc(selected.phone||'')}">${esc(selected.phone||'—')}</a></p><p><b>Email:</b> <a href="mailto:${esc(selected.email||'')}">${esc(selected.email||'—')}</a></p><p><b>Service:</b> ${esc(selected.service||'—')}</p><p><b>Therapist:</b> ${esc(selected.therapist||'No preference')}</p>
+<p><b>Preferred date:</b> ${esc(selected.preferredDate||selected.date||'—')}</p>
+<p><b>Preferred time:</b> ${esc(selected.preferredTime||selected.time||'—')}</p>
+
+${selected.confirmedDate ? `
+<p style="color:#1f704d"><b>Confirmed date:</b> ${esc(selected.confirmedDate)}</p>
+` : ''}
+
+${selected.confirmedTime ? `
+<p style="color:#1f704d"><b>Confirmed time:</b> ${esc(selected.confirmedTime)}</p>
+` : ''}
+
+${selected.proposedDate ? `
+<p style="color:#8a4d00"><b>Proposed date:</b> ${esc(selected.proposedDate)}</p>
+` : ''}
+
+${selected.proposedTime ? `
+<p style="color:#8a4d00"><b>Proposed time:</b> ${esc(selected.proposedTime)}</p>
+` : ''}
+<p><b>Session length:</b> ${esc(selected.sessionLength||selected.length||'—')}</p><section class="special-request"><p class="special-request-label">Special request notes</p><p class="special-request-text">${esc(selected.notes||'No special request notes were provided.')}</p></section><label>Private front-desk notes</label><textarea id="notes">${esc(selected.frontDeskNotes||'')}</textarea><button id="save-notes" class="save-note">Save private notes</button><div class="actions">${['CONTACTED','CONFIRMED','RESCHEDULE_NEEDED','CANCELLED','COMPLETED','NO_SHOW'].map(x=>`<button class="status-btn ${x==st?'current':''}" data-status="${x}" ${x!=st&&!allowed.includes(x)?'disabled':''}>${x.replaceAll('_',' ')}</button>`).join('')}</div><h3>Activity history</h3>${(selected.activityHistory||[]).slice().reverse().map(h=>`<div class="muted">${esc(h.status)} · ${esc(h.at)} · ${esc(h.by)}</div>`).join('')||'<div class="muted">No status history yet.</div>'}`;$('save-notes').onclick=()=>saveNotes();document.querySelectorAll('[data-status]').forEach(b=>b.onclick=()=>openAction(b.dataset.status))}
 async function saveNotes(){let d=await call('/'+encodeURIComponent(selected.appointmentId),{method:'PATCH',body:JSON.stringify({status:selected.status||'REQUESTED',frontDeskNotes:$('notes').value})});Object.assign(selected,d.appointment);render();show(selected.appointmentId);flash('Private notes saved.')}
-function openAction(status){pendingStatus=status;let html='';if(status=='CONTACTED')html='<label>Contact method</label><select id="contact-method"><option>Phone</option><option>Email</option><option>Voicemail</option><option>In person</option></select>';if(status=='CONFIRMED')html='<label>Confirmed date</label><input id="confirmed-date" type="date"><label>Confirmed time</label><input id="confirmed-time" type="time">';if(status=='RESCHEDULE_NEEDED')html='<label>Proposed date</label><input id="proposed-date" type="date"><label>Proposed time</label><input id="proposed-time" type="time">';if(['CANCELLED','COMPLETED','NO_SHOW'].includes(status))html='<label>Reason / completion note</label><textarea id="reason" rows="3"></textarea>';$('modal-title').textContent=status.replaceAll('_',' ');$('modal-fields').innerHTML=html;$('notify').checked=CFG.ses&&['CONFIRMED','RESCHEDULE_NEEDED','CANCELLED'].includes(status);$('notify').disabled=!CFG.ses;$('customer-message').value=defaultMessage(status);$('action-modal').classList.add('open')}
+function openAction(status){pendingStatus=status;let html='';if(status=='CONTACTED')html='<label>Contact method</label><select id="contact-method"><option>Phone</option><option>Email</option><option>Voicemail</option><option>In person</option></select>';if(status=='CONFIRMED')html='<label>Confirmed date</label><input id="confirmed-date" type="date"><label>Confirmed time</label><input id="confirmed-time" type="time">';if(status=='RESCHEDULE_NEEDED'){
+const proposedDate=
+selected.proposedDate||
+selected.confirmedDate||
+selected.preferredDate||
+'';
+const proposedTime=
+selected.proposedTime||
+selected.confirmedTime||
+selected.preferredTime||
+'';
+html=`
+<div style="padding:12px;margin-bottom:14px;border:1px solid #ddd;border-radius:10px;background:#faf7f2">
+<div style="margin-bottom:12px"><b>Original Request</b><br>
+Date: ${selected.preferredDate||'\u2014'}<br>
+Time: ${selected.preferredTime||'\u2014'}<br>
+Therapist: ${selected.therapist||'No preference'}</div>
+${(selected.confirmedDate||selected.confirmedTime)?`<div style="margin-bottom:12px;color:#1f704d"><b>Current Confirmed Appointment</b><br>Date: ${selected.confirmedDate||'\u2014'}<br>Time: ${selected.confirmedTime||'\u2014'}</div>`:''}
+${(selected.proposedDate||selected.proposedTime)?`<div style="color:#8a4d00"><b>Current Proposed Appointment</b><br>Date: ${selected.proposedDate||'\u2014'}<br>Time: ${selected.proposedTime||'\u2014'}</div>`:''}
+</div>
+<label for="proposed-therapist">Therapist</label>
+<select id="proposed-therapist">
+<option value="Mike" ${selected.therapist==='Mike'?'selected':''}>Mike</option>
+<option value="Rose" ${selected.therapist==='Rose'?'selected':''}>Rose</option>
+<option value="Jack" ${selected.therapist==='Jack'?'selected':''}>Jack</option>
+</select>
+<label>Proposed date</label>
+<input id="proposed-date" type="date" min="${new Date().toISOString().split('T')[0]}" value="${proposedDate}">
+<small style="display:block;margin-top:6px;color:#805700">Only today and future dates may be proposed.</small>
+<label>Proposed time</label>
+<input id="proposed-time" type="time" value="${proposedTime}">
+`;
+setTimeout(()=>{
+document.getElementById('proposed-date')?.dispatchEvent(
+new Event('change',{bubbles:true})
+);
+},100);
+}if(['CANCELLED','COMPLETED','NO_SHOW'].includes(status))html='<label>Reason / completion note</label><textarea id="reason" rows="3"></textarea>';$('modal-title').textContent=status.replaceAll('_',' ');$('modal-fields').innerHTML=html;$('notify').checked=CFG.ses&&['CONFIRMED','RESCHEDULE_NEEDED','CANCELLED'].includes(status);$('notify').disabled=!CFG.ses;$('customer-message').value=defaultMessage(status);$('action-modal').classList.add('open')}
 function defaultMessage(s){if(s=='CONFIRMED')return 'Your Blooming Lotus appointment has been confirmed.';if(s=='RESCHEDULE_NEEDED')return 'Please contact Blooming Lotus regarding a proposed appointment time.';if(s=='CANCELLED')return 'Your Blooming Lotus appointment request has been cancelled.';return ''}
-async function saveAction(){let payload={status:pendingStatus,frontDeskNotes:$('notes').value,notifyCustomer:$('notify').checked,customerMessage:$('customer-message').value};for(let [id,key] of [['contact-method','contactMethod'],['confirmed-date','confirmedDate'],['confirmed-time','confirmedTime'],['proposed-date','proposedDate'],['proposed-time','proposedTime'],['reason','reason']])if($(id))payload[key]=$(id).value;try{let d=await call('/'+encodeURIComponent(selected.appointmentId),{method:'PATCH',body:JSON.stringify(payload)});Object.assign(selected,d.appointment);render();show(selected.appointmentId);$('action-modal').classList.remove('open');flash('Status updated.'+(d.notification?.sent?' Customer email sent.':payload.notifyCustomer?' Customer email was not sent.':''))}catch(e){alert(e.message)}}
+async function saveAction(){if(pendingStatus==='RESCHEDULE_NEEDED'){const date=$('proposed-date')?$('proposed-date').value:'';const time=$('proposed-time')?$('proposed-time').value:'';const therapist=$('proposed-therapist')?$('proposed-therapist').value:(selected.therapist||'');const today=new Date();today.setHours(0,0,0,0);const proposed=new Date(date+'T00:00:00');if(!date||isNaN(proposed)||proposed<today){alert('Please choose today or a future date.');return}if(time){const now=new Date();const proposedDT=new Date(date+'T'+time+':00');if(!isNaN(proposedDT)&&proposedDT<now){alert('That time has already passed today. Please choose a later time.');return}}const blAmPm=t=>{if(!t)return'';const p=t.split(':').map(Number);const h=p[0],m=p[1];const ap=h>=12?'PM':'AM';let h12=h%12;if(h12===0)h12=12;return h12+':'+String(m).padStart(2,'0')+' '+ap};const blConfirm=bodyHtml=>new Promise(resolve=>{const overlay=document.createElement('div');overlay.className='modalx open';overlay.style.zIndex='200';overlay.innerHTML='<div class="modalbox" style="max-width:400px"><h2 style="margin-top:0">Reschedule Confirmation</h2>'+bodyHtml+'<div class="modal-actions"><button id="bl-confirm-cancel">Cancel</button><button id="bl-confirm-ok" class="primary">Continue</button></div></div>';document.body.appendChild(overlay);const done=r=>{overlay.remove();resolve(r)};overlay.querySelector('#bl-confirm-cancel').onclick=()=>done(false);overlay.querySelector('#bl-confirm-ok').onclick=()=>done(true);overlay.addEventListener('click',e=>{if(e.target===overlay)done(false)})});const currentDate=selected.confirmedDate||selected.preferredDate||'';const currentTime=selected.confirmedTime||selected.preferredTime||'';const currentTherapist=selected.therapist||'No preference';const approved=await blConfirm('<div style="margin-bottom:14px"><b>Current Appointment</b><br>'+currentDate+'<br>'+blAmPm(currentTime)+'<br>'+currentTherapist+'</div><div><b>Proposed Appointment</b><br>'+date+'<br>'+blAmPm(time)+'<br>'+(therapist||'No preference')+'</div>');if(!approved)return}let payload={status:pendingStatus,frontDeskNotes:$('notes').value,notifyCustomer:$('notify').checked,customerMessage:$('customer-message').value};for(let [id,key] of [['contact-method','contactMethod'],['confirmed-date','confirmedDate'],['confirmed-time','confirmedTime'],['proposed-date','proposedDate'],['proposed-time','proposedTime'],['proposed-therapist','therapist'],['reason','reason']])if($(id))payload[key]=$(id).value;try{let d=await call('/'+encodeURIComponent(selected.appointmentId),{method:'PATCH',body:JSON.stringify(payload)});Object.assign(selected,d.appointment);render();show(selected.appointmentId);$('action-modal').classList.remove('open');flash('Status updated.'+(d.notification?.sent?' Customer email sent.':payload.notifyCustomer?' Customer email was not sent.':''))}catch(e){alert(e.message)}}
 async function load(){let d=await call();items=d.appointments||[];render();if(selected){let same=items.find(x=>x.appointmentId==selected.appointmentId);if(same)show(same.appointmentId)}}
 $('signin').addEventListener('click',startSecureSignIn);$('logout').onclick=()=>{sessionStorage.clear();location.href=CFG.cognito+'/logout?'+new URLSearchParams({client_id:CFG.client,logout_uri:location.origin+'/'})};$('refresh').onclick=load;$('search').oninput=render;$('filter').onchange=render;$('modal-cancel').onclick=()=>$('action-modal').classList.remove('open');$('modal-save').onclick=saveAction;(async()=>{try{await callback();if(token){$('login').classList.add('hidden');$('app').classList.remove('hidden');await load()}}catch(e){alert(e.message)}})();
 </script><script defer src="/admin/phone-appointments.js?v=6"></script>  <script defer src="/admin/auth-visibility.js?v=8"></script>
@@ -484,4 +540,653 @@ $('signin').addEventListener('click',startSecureSignIn);$('logout').onclick=()=>
 <script defer src="/admin/admin-announcements-v29.js?v=29"></script>
 <script defer src="/slim-announcements-v30.js?v=30"></script>
 <script defer src="/admin/announcement-manager-v31.js?v=31"></script>
+
+
+
+
+
+
+<!-- BEGIN BLOOMING_LOTUS_ADMIN_PREFILL_V18 -->
+<script id="bl-admin-prefill-v18">
+(function () {
+  'use strict';
+
+  let lastPreferredDate = '';
+  let lastPreferredTime = '';
+
+  function pageTextWithoutModal() {
+    const clone = document.body.cloneNode(true);
+    clone.querySelectorAll('input,textarea,select,button,script,style').forEach(function (node) {
+      node.remove();
+    });
+    return (clone.innerText || clone.textContent || '').replace(/\u00a0/g, ' ');
+  }
+
+  function capturePreferredValues() {
+    const text = pageTextWithoutModal();
+    const dateMatch = text.match(/Preferred\s*date\s*:\s*(\d{4}-\d{2}-\d{2})/i);
+    const timeMatch = text.match(/Preferred\s*time\s*:\s*(\d{1,2}:\d{2})/i);
+    if (dateMatch) lastPreferredDate = dateMatch[1];
+    if (timeMatch) lastPreferredTime = timeMatch[1].padStart(5, '0');
+  }
+
+  function isVisible(element) {
+    if (!element) return false;
+    const style = window.getComputedStyle(element);
+    const rect = element.getBoundingClientRect();
+    return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+  }
+
+  function nativeSet(input, value) {
+    if (!input || !value || input.value === value) return;
+    const descriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+    descriptor.set.call(input, value);
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+    input.dispatchEvent(new Event('blur', { bubbles: true }));
+  }
+
+  function fillVisibleConfirmationFields() {
+    capturePreferredValues();
+    if (!lastPreferredDate || !lastPreferredTime) return false;
+
+    const dateInputs = Array.from(document.querySelectorAll('input[type="date"]')).filter(isVisible);
+    const timeInputs = Array.from(document.querySelectorAll('input[type="time"]')).filter(isVisible);
+    if (!dateInputs.length || !timeInputs.length) return false;
+
+    const dateInput = dateInputs.find(function (input) { return !input.value; }) || dateInputs[0];
+    const timeInput = timeInputs.find(function (input) { return !input.value; }) || timeInputs[0];
+
+    const container = dateInput.closest('[role="dialog"],dialog,.modal,[class*="modal"],[class*="dialog"]') || dateInput.parentElement;
+    const context = ((container && container.textContent) || document.body.textContent || '').toUpperCase();
+    if (!context.includes('CONFIRMED')) return false;
+
+    nativeSet(dateInput, lastPreferredDate);
+    nativeSet(timeInput, lastPreferredTime);
+    return Boolean(dateInput.value && timeInput.value);
+  }
+
+  function runPrefillSequence() {
+    capturePreferredValues();
+    [0, 50, 150, 300, 600, 1000].forEach(function (delay) {
+      window.setTimeout(fillVisibleConfirmationFields, delay);
+    });
+  }
+
+  document.addEventListener('mousedown', capturePreferredValues, true);
+  document.addEventListener('click', runPrefillSequence, true);
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Enter' || event.key === ' ') runPrefillSequence();
+  }, true);
+
+  const observer = new MutationObserver(function () {
+    fillVisibleConfirmationFields();
+  });
+  observer.observe(document.documentElement, { childList: true, subtree: true });
+})();
+</script>
+<!-- END BLOOMING_LOTUS_ADMIN_PREFILL_V18 -->
+
+
+
+<!-- BEGIN BLOOMING_LOTUS_ADMIN_RESCHEDULE_SLOTS_V23 -->
+<style id="bl-admin-reschedule-slots-v23-style">
+ .bl-v23-time-select{width:100%;min-height:42px;padding:9px 12px;border:1px solid #b8bec8;border-radius:6px;background:#fff;font:inherit}
+ .bl-v23-time-note{display:block;margin-top:5px;color:#657083;font-size:12px}
+</style>
+<script id="bl-admin-reschedule-slots-v23">
+(function(){
+ 'use strict';
+ const API='https://d697dcip2i.execute-api.us-east-1.amazonaws.com';
+ let timer=0;
+
+ function visible(el){if(!el)return false;const r=el.getBoundingClientRect(),s=getComputedStyle(el);return r.width>0&&r.height>0&&s.display!=='none'&&s.visibility!=='hidden'}
+ function context(el){const box=el.closest('[role="dialog"],dialog,.modal,[class*="modal"],[class*="dialog"]')||el.parentElement;return {box:box,text:((box&&box.textContent)||'').replace(/\s+/g,' ').trim()}}
+ function isReschedule(boxText){return /RESCHEDULE[ _-]?NEEDED|reschedule|proposed date|proposed time/i.test(boxText)}
+ function fieldLabel(input){if(input.id){const l=document.querySelector('label[for="'+CSS.escape(input.id)+'"]');if(l)return l.textContent||''}const l=input.closest('label');return l?l.textContent||'':''}
+ function durationFromPage(box){const text=((box&&box.textContent)||document.body.textContent||'');const m=text.match(/(?:session length|duration)\s*:?\s*(60|90|120)\s*minutes?/i);return m?m[1]:'60'}
+ function therapistFromPage(box){
+  const select=box&&Array.from(box.querySelectorAll('select')).find(x=>/therapist/i.test(fieldLabel(x)));
+  if(select&&select.value)return select.value;
+  const text=document.body.textContent||'';const m=text.match(/Therapist\s*:\s*(Jack|Rose|Mike)/i);return m?m[1]:'';
+ }
+ function dateInputFor(box){return Array.from(box.querySelectorAll('input[type="date"]')).find(visible)||null}
+ function originalTimeInputFor(box){return Array.from(box.querySelectorAll('input[type="time"]')).find(i=>visible(i)&&!i.dataset.blV23Hidden)||null}
+ function nativeSet(input,value){const d=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value');d.set.call(input,value);input.dispatchEvent(new Event('input',{bubbles:true}));input.dispatchEvent(new Event('change',{bubbles:true}))}
+ function formatTime(value){const p=value.split(':').map(Number);return new Date(2000,0,1,p[0],p[1]).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})}
+ async function loadSlots(box,dateInput,timeInput,select,note){
+  const date=dateInput.value;if(!date){select.innerHTML='<option value="">Choose proposed date first</option>';select.disabled=true;note.textContent='Select a proposed date to load available times.';return}
+  const duration=durationFromPage(box),therapist=therapistFromPage(box);select.disabled=true;select.innerHTML='<option value="">Loading available times...</option>';note.textContent='Checking therapist availability...';
+  try{
+   const response=await fetch(API+'/availability?date='+encodeURIComponent(date)+'&duration='+encodeURIComponent(duration));
+   const data=await response.json();if(!response.ok)throw new Error(data.message||'Unable to load available times.');
+   const current=timeInput.value;const now=new Date();const todayLocal=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');const nowHM=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');const slots=(data.slots||[]).filter(s=>!s.fullyBooked&&(!therapist||s.therapists.includes(therapist))&&(date!==todayLocal||s.time>=nowHM));
+   select.innerHTML='<option value="">Select proposed time</option>'+slots.map(s=>'<option value="'+s.time+'">'+formatTime(s.time)+' \u2014 '+s.availableTherapists+' therapist'+(s.availableTherapists===1?'':'s')+' available</option>').join('');
+   if(current&&slots.some(s=>s.time===current))select.value=current;
+   select.disabled=false;note.textContent=therapist?('Showing 15-minute starts where '+therapist+' is available.'):'Showing available 15-minute starts from 10:00 AM to 8:00 PM.';
+  }catch(err){select.innerHTML='<option value="">Unable to load times</option>';note.textContent=err.message;}
+ }
+ function install(){
+  document.querySelectorAll('input[type="time"]').forEach(function(timeInput){
+   if(timeInput.dataset.blV23Hidden)return;const c=context(timeInput);if(!visible(timeInput)||!isReschedule(c.text))return;
+   const dateInput=dateInputFor(c.box);if(!dateInput)return;
+   const select=document.createElement('select');select.className='bl-v23-time-select';select.setAttribute('aria-label','Proposed time');select.name=(timeInput.name||'proposedTime')+'Display';
+   const note=document.createElement('small');note.className='bl-v23-time-note';
+   timeInput.dataset.blV23Hidden='true';timeInput.style.position='absolute';timeInput.style.opacity='0';timeInput.style.pointerEvents='none';timeInput.style.width='1px';timeInput.style.height='1px';
+   timeInput.insertAdjacentElement('afterend',select);select.insertAdjacentElement('afterend',note);
+   select.addEventListener('change',()=>nativeSet(timeInput,select.value));dateInput.addEventListener('change',()=>loadSlots(c.box,dateInput,timeInput,select,note));
+   c.box.addEventListener('change',e=>{if(e.target!==select&&/therapist/i.test(fieldLabel(e.target)))loadSlots(c.box,dateInput,timeInput,select,note)});
+   loadSlots(c.box,dateInput,timeInput,select,note);
+  });
+ }
+ function schedule(){clearTimeout(timer);timer=setTimeout(install,30)}
+ new MutationObserver(schedule).observe(document.documentElement,{childList:true,subtree:true});document.addEventListener('click',()=>{setTimeout(install,0);setTimeout(install,200)},true);document.addEventListener('change',schedule,true);install();
+})();
+</script>
+<!-- END BLOOMING_LOTUS_ADMIN_RESCHEDULE_SLOTS_V23 -->
+
+
+<!-- BEGIN BLOOMING_ANNOUNCEMENTS_V24_ENHANCEMENTS -->
+
+<style id="bl-announcements-v24-style">
+  .ann-delete-v24 {
+    padding: 11px 15px;
+    border: 1px solid #bd3c3c !important;
+    border-radius: 9px;
+    background: #fff0f0 !important;
+    color: #922f2f !important;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .ann-delete-v24:hover {
+    background: #ffe1e1 !important;
+  }
+
+  .ann-validation-v24 {
+    margin: 10px 0;
+    padding: 10px 12px;
+    border: 1px solid #e1a5a5;
+    border-radius: 9px;
+    background: #fff0f0;
+    color: #922f2f;
+    font-weight: 700;
+  }
+
+  .ann-warning-v24 {
+    margin: 10px 0;
+    padding: 10px 12px;
+    border: 1px solid #e8cd83;
+    border-radius: 9px;
+    background: #fff7dc;
+    color: #805700;
+    font-weight: 700;
+  }
+</style>
+
+<script id="bl-announcements-v24">
+(function () {
+  "use strict";
+
+  const API =
+    "https://w61mphhi00.execute-api.us-east-1.amazonaws.com";
+
+  function getToken() {
+    return sessionStorage.getItem("bl_access") || "";
+  }
+
+  function findLabelInput(pattern) {
+    const labels = Array.from(
+      document.querySelectorAll(".ann-box-v29 label")
+    );
+
+    const label = labels.find(function (item) {
+      return pattern.test(item.textContent || "");
+    });
+
+    if (!label) {
+      return null;
+    }
+
+    return label.querySelector("input, select, textarea");
+  }
+
+  function clearValidationMessages(box) {
+    box
+      .querySelectorAll(".ann-validation-v24")
+      .forEach(function (element) {
+        element.remove();
+      });
+  }
+
+  function addValidationMessage(box, messages) {
+    const message = document.createElement("div");
+
+    message.className = "ann-validation-v24";
+    message.setAttribute("role", "alert");
+    message.textContent = messages.join(" ");
+
+    const actions = box.querySelector(".ann-actions-v29");
+
+    if (actions) {
+      actions.before(message);
+    } else {
+      box.appendChild(message);
+    }
+  }
+
+  function validateAnnouncementForm() {
+    const box = document.querySelector(".ann-box-v29");
+
+    if (!box) {
+      return true;
+    }
+
+    clearValidationMessages(box);
+
+    const displayFrom = findLabelInput(/display from/i);
+    const displayUntil = findLabelInput(/display until/i);
+    const closureBegins = findLabelInput(/closure begins/i);
+    const closureEnds = findLabelInput(/closure ends/i);
+    const type = findLabelInput(/^type/i);
+    const blockDates = findLabelInput(/block appointment dates/i);
+
+    const errors = [];
+
+    if (
+      displayFrom &&
+      displayUntil &&
+      displayFrom.value &&
+      displayUntil.value
+    ) {
+      const from = new Date(displayFrom.value);
+      const until = new Date(displayUntil.value);
+
+      if (
+        Number.isNaN(from.getTime()) ||
+        Number.isNaN(until.getTime())
+      ) {
+        errors.push(
+          "Display from and Display until must be valid dates and times."
+        );
+      } else if (until <= from) {
+        errors.push(
+          "Display until must be later than Display from."
+        );
+      }
+    }
+
+    const requiresClosureDates =
+      (type && type.value === "CLOSURE") ||
+      (blockDates && blockDates.checked) ||
+      (closureBegins && closureBegins.value) ||
+      (closureEnds && closureEnds.value);
+
+    if (requiresClosureDates) {
+      if (
+        !closureBegins ||
+        !closureBegins.value ||
+        !closureEnds ||
+        !closureEnds.value
+      ) {
+        errors.push(
+          "Closure start and closure end dates are required."
+        );
+      } else if (closureEnds.value < closureBegins.value) {
+        errors.push(
+          "Closure end date cannot be before closure start date."
+        );
+      }
+    }
+
+    if (errors.length) {
+      addValidationMessage(box, errors);
+      return false;
+    }
+
+    return true;
+  }
+
+  /*
+   * Run validation before the existing announcement form saves.
+   */
+  document.addEventListener(
+    "click",
+    function (event) {
+      const button = event.target.closest(
+        ".ann-box-v29 .ann-actions-v29 button"
+      );
+
+      if (!button) {
+        return;
+      }
+
+      const text = (button.textContent || "").trim();
+
+      if (/cancel|close/i.test(text)) {
+        return;
+      }
+
+      if (!validateAnnouncementForm()) {
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+      }
+    },
+    true
+  );
+
+  /*
+   * Attempt to get the announcement ID from the selected row.
+   * Different versions of the manager may use different data attributes,
+   * so several possible attribute names are checked.
+   */
+  function selectedAnnouncementId() {
+    const selected = document.querySelector(
+      ".ann-row-v31.selected"
+    );
+
+    if (!selected) {
+      return "";
+    }
+
+    return (
+      selected.dataset.id ||
+      selected.dataset.announcementId ||
+      selected.getAttribute("data-announcement-id") ||
+      ""
+    );
+  }
+
+  async function resolveArchivedAnnouncementId() {
+    let announcementId = selectedAnnouncementId();
+
+    if (announcementId) {
+      return announcementId;
+    }
+
+    /*
+     * If the existing manager did not place the ID on the selected row,
+     * locate it by matching the displayed title against archived records.
+     */
+    const title =
+      document
+        .querySelector(".ann-details-v31 h3")
+        ?.textContent?.trim() || "";
+
+    if (!title) {
+      return "";
+    }
+
+    const response = await fetch(
+      API + "/admin/announcements",
+      {
+        headers: {
+          authorization: "Bearer " + getToken()
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.message || "Unable to retrieve announcements."
+      );
+    }
+
+    const matches = (data.announcements || []).filter(
+      function (announcement) {
+        return (
+          announcement.status === "ARCHIVED" &&
+          announcement.title === title
+        );
+      }
+    );
+
+    if (matches.length === 1) {
+      return matches[0].announcementId;
+    }
+
+    return "";
+  }
+
+  async function deleteArchivedAnnouncement() {
+    let announcementId;
+
+    try {
+      announcementId =
+        await resolveArchivedAnnouncementId();
+    } catch (error) {
+      alert(error.message);
+      return;
+    }
+
+    if (!announcementId) {
+      alert(
+        "Unable to identify the archived announcement. " +
+        "Refresh the announcement manager and try again."
+      );
+      return;
+    }
+
+    const approved = window.confirm(
+      "Permanently delete this archived announcement?\n\n" +
+      "This action cannot be undone."
+    );
+
+    if (!approved) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        API +
+          "/admin/announcements/" +
+          encodeURIComponent(announcementId),
+        {
+          method: "DELETE",
+          headers: {
+            authorization: "Bearer " + getToken(),
+            "content-type": "application/json"
+          }
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+          "Unable to delete the archived announcement."
+        );
+      }
+
+      alert("Archived announcement deleted.");
+
+      /*
+       * Close and reopen the manager so the list is reloaded
+       * from the announcements API.
+       */
+      document
+        .querySelector(".ann-manager-backdrop-v31")
+        ?.remove();
+
+      window.setTimeout(function () {
+        document
+          .querySelector(".ann-manager-button-v31")
+          ?.click();
+      }, 100);
+    } catch (error) {
+      alert(error.message);
+    }
+  }
+
+  function isArchivedDetailsView(details) {
+    const explicitStatus = Array.from(
+      details.querySelectorAll(
+        ".ann-status-v31, dd"
+      )
+    ).some(function (element) {
+      return (
+        (element.textContent || "")
+          .trim()
+          .toUpperCase() === "ARCHIVED"
+      );
+    });
+
+    return explicitStatus;
+  }
+
+  function installArchivedDeleteButton() {
+    const details = document.querySelector(
+      ".ann-details-v31"
+    );
+
+    if (!details) {
+      return;
+    }
+
+    const archived = isArchivedDetailsView(details);
+    let button = details.querySelector(".ann-delete-v24");
+
+    if (!archived) {
+      if (button) {
+        button.remove();
+      }
+
+      return;
+    }
+
+    if (button) {
+      return;
+    }
+
+    button = document.createElement("button");
+    button.type = "button";
+    button.className = "ann-delete-v24";
+    button.textContent =
+      "Delete archived announcement";
+    button.addEventListener(
+      "click",
+      deleteArchivedAnnouncement
+    );
+
+    const actions = details.querySelector(
+      ".ann-detail-actions-v31"
+    );
+
+    if (actions) {
+      actions.appendChild(button);
+    } else {
+      details.appendChild(button);
+    }
+  }
+
+  /*
+   * The announcement manager renders dynamically, so monitor the page
+   * and install the archived-only delete button when appropriate.
+   */
+  const observer = new MutationObserver(function () {
+    window.requestAnimationFrame(
+      installArchivedDeleteButton
+    );
+  });
+
+  observer.observe(document.documentElement, {
+    childList: true,
+    subtree: true
+  });
+
+  installArchivedDeleteButton();
+})();
+</script>
+
+<!-- END BLOOMING_ANNOUNCEMENTS_V24_ENHANCEMENTS -->
+
+<!-- BEGIN BLOOMING_V28_DETAIL_DISPLAY -->
+<script>
+(function(){
+  function applyV28(){
+    if(!window.selected || !document.getElementById('detail')) return;
+
+    const detail=document.getElementById('detail');
+
+    let existing=document.getElementById('bl-v28-dates');
+    if(existing) existing.remove();
+
+    const s=window.selected;
+
+    const hasConfirmed=s.confirmedDate||s.confirmedTime;
+    const hasProposed=s.proposedDate||s.proposedTime;
+
+    if(!hasConfirmed && !hasProposed) return;
+
+    const block=document.createElement('div');
+    block.id='bl-v28-dates';
+    block.style.margin='12px 0';
+    block.style.padding='12px';
+    block.style.border='1px solid #ddd0c5';
+    block.style.borderRadius='10px';
+    block.style.background='#faf7f2';
+
+    let html='';
+
+    if(hasConfirmed){
+      html += `
+      <div style="color:#1f704d;margin-bottom:8px">
+        <strong>Confirmed Appointment</strong><br>
+        Date: ${s.confirmedDate || '—'}<br>
+        Time: ${s.confirmedTime || '—'}
+      </div>`;
+    }
+
+    if(hasProposed){
+      html += `
+      <div style="color:#8a4d00">
+        <strong>Proposed Reschedule</strong><br>
+        Date: ${s.proposedDate || '—'}<br>
+        Time: ${s.proposedTime || '—'}
+      </div>`;
+    }
+
+    block.innerHTML=html;
+
+    const special=
+      detail.querySelector('.special-request');
+
+    if(special){
+      special.before(block);
+    }else{
+      detail.prepend(block);
+    }
+
+    const notes=document.getElementById('notes');
+    if(notes && !notes.value.trim()){
+      notes.placeholder='No private notes saved.';
+    }
+  }
+
+  const originalShow=window.show;
+
+  window.show=function(id){
+    originalShow(id);
+    setTimeout(applyV28,50);
+  };
+
+  document.addEventListener('click',()=>{
+    setTimeout(applyV28,150);
+  },true);
+})();
+</script>
+<!-- END BLOOMING_V28_DETAIL_DISPLAY -->
+
+
+
+
+
+
+
+
+
 </body></html>
