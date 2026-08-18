@@ -491,6 +491,332 @@ footer{padding:56px 0 28px;background:linear-gradient(180deg,#4f1d3b,#41152f);co
     .booking-transition-v36 a { text-align: center; }
   }
 </style>
+<!-- BLOOMING_VISIT_CLEANUP_V50_STYLE -->
+<style>
+  #visit-v50 {
+    scroll-margin-top: 118px;
+    margin-bottom: 28px !important;
+  }
+  #visit-v50 + #contact {
+    margin-top: 0 !important;
+  }
+</style>
+
+
+<!-- BEGIN BLOOMING_MOBILE_TABLET_HERO_V33 -->
+<style id="blooming-mobile-tablet-hero-v33">
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/*
+ * Phones and iPads:
+ * Target the actual production hero selectors directly.
+ */
+@media screen and (max-width: 1180px) {
+
+  .hero {
+    padding: 42px 0 92px !important;
+    overflow: hidden !important;
+  }
+
+  .hero > .container.hero-grid {
+    width: min(100% - 32px, 820px) !important;
+    max-width: 820px !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: none !important;
+    gap: 28px !important;
+    align-items: stretch !important;
+  }
+
+  .hero-grid > .hero-copy,
+  .hero-grid > .hero-visual {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    transform: none !important;
+  }
+
+  .hero-copy {
+    order: 1 !important;
+    padding: 0 !important;
+  }
+
+  .hero-visual {
+    order: 2 !important;
+    min-height: 0 !important;
+    display: block !important;
+  }
+
+  .hero-copy h1 {
+    max-width: 100% !important;
+    margin: 0 !important;
+    font-size: clamp(54px, 10vw, 82px) !important;
+    line-height: .96 !important;
+    letter-spacing: -.045em !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+  }
+
+  .hero-copy > p:not(.kicker) {
+    max-width: 720px !important;
+    margin-top: 20px !important;
+    font-size: 18px !important;
+    line-height: 1.65 !important;
+    color: var(--muted) !important;
+  }
+
+  .hero-copy .actions {
+    margin-top: 26px !important;
+  }
+
+  .hero-copy .trust {
+    margin-top: 24px !important;
+  }
+
+  .hero-card {
+    width: 100% !important;
+    max-width: 720px !important;
+    min-height: 0 !important;
+    margin: 0 auto !important;
+    padding: 26px !important;
+    border-radius: 30px !important;
+  }
+
+  .logo-stage {
+    height: min(48vw, 360px) !important;
+    min-height: 260px !important;
+  }
+
+  .logo-large {
+    width: min(70%, 310px) !important;
+  }
+
+  .visual-copy {
+    padding: 22px 8px 6px !important;
+  }
+
+  .visual-copy h2 {
+    font-size: clamp(34px, 6vw, 50px) !important;
+  }
+
+  .float-badge {
+    position: static !important;
+    width: 100% !important;
+    max-width: 720px !important;
+    margin: 16px auto 0 !important;
+  }
+}
+
+/* Mobile phones */
+@media screen and (max-width: 620px) {
+
+  body {
+    padding-bottom: 76px !important;
+  }
+
+  .preview {
+    display: none !important;
+  }
+
+  header {
+    position: sticky !important;
+    top: 0 !important;
+  }
+
+  .nav {
+    min-height: 78px !important;
+    gap: 12px !important;
+  }
+
+  .brand {
+    min-width: 0 !important;
+    gap: 10px !important;
+  }
+
+  .logo-small {
+    width: 54px !important;
+    height: 54px !important;
+    flex: 0 0 54px !important;
+  }
+
+  .brand-name {
+    font-size: clamp(20px, 6.4vw, 28px) !important;
+    white-space: nowrap !important;
+  }
+
+  .brand-sub {
+    font-size: 8px !important;
+    letter-spacing: .18em !important;
+    white-space: nowrap !important;
+  }
+
+  .menu {
+    flex: 0 0 auto !important;
+  }
+
+  .hero {
+    padding: 30px 0 42px !important;
+  }
+
+  .hero > .container.hero-grid {
+    width: calc(100% - 28px) !important;
+    gap: 20px !important;
+  }
+
+  .hero-copy .kicker {
+    margin-bottom: 12px !important;
+    font-size: 10px !important;
+    line-height: 1.45 !important;
+    letter-spacing: .16em !important;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(46px, 14vw, 66px) !important;
+    line-height: .92 !important;
+  }
+
+  .hero-copy > p:not(.kicker) {
+    margin-top: 18px !important;
+    font-size: 16px !important;
+    line-height: 1.58 !important;
+  }
+
+  .hero-copy .actions {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    margin-top: 22px !important;
+  }
+
+  .hero-copy .actions .btn {
+    width: 100% !important;
+    min-height: 52px !important;
+    padding: 0 16px !important;
+  }
+
+  .hero-copy .trust {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    margin-top: 20px !important;
+  }
+
+  .hero-copy .trust-card {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 13px 15px !important;
+  }
+
+  .hero-card {
+    padding: 18px !important;
+    border-radius: 24px !important;
+  }
+
+  .logo-stage {
+    height: 250px !important;
+    min-height: 0 !important;
+    border-radius: 22px !important;
+  }
+
+  .logo-large {
+    width: min(78%, 240px) !important;
+  }
+
+  .visual-copy {
+    padding: 18px 4px 4px !important;
+  }
+
+  .visual-label {
+    font-size: 9px !important;
+  }
+
+  .visual-copy h2 {
+    font-size: 36px !important;
+    line-height: 1.02 !important;
+  }
+
+  .visual-copy p {
+    font-size: 14px !important;
+    line-height: 1.55 !important;
+  }
+
+  .float-badge {
+    padding: 16px !important;
+    border-radius: 18px !important;
+  }
+
+  .mobile-bar {
+    height: 66px !important;
+  }
+
+  /* Avoid duplicate Contact controls on mobile. */
+  .bl-contact-floating {
+    display: none !important;
+  }
+}
+
+/* iPad portrait */
+@media screen and (min-width: 621px) and (max-width: 900px) {
+
+  .hero > .container.hero-grid {
+    width: min(100% - 48px, 760px) !important;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(64px, 10vw, 84px) !important;
+  }
+
+  .hero-card {
+    max-width: 680px !important;
+  }
+}
+
+/* iPad landscape */
+@media screen
+  and (min-width: 901px)
+  and (max-width: 1180px)
+  and (orientation: landscape) {
+
+  .hero > .container.hero-grid {
+    width: min(100% - 48px, 1080px) !important;
+    max-width: 1080px !important;
+    display: grid !important;
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(0, .88fr) !important;
+    gap: 36px !important;
+    align-items: center !important;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(58px, 6.5vw, 78px) !important;
+  }
+
+  .hero-card {
+    padding: 22px !important;
+  }
+
+  .logo-stage {
+    height: 300px !important;
+    min-height: 0 !important;
+  }
+
+  .float-badge {
+    max-width: 100% !important;
+  }
+}
+
+</style>
+<!-- END BLOOMING_MOBILE_TABLET_HERO_V33 -->
+
 </head>
 <body>
 <div class="preview"><strong>Concept Preview</strong> — unofficial demo for Blooming Lotus Oriental Massage. Confirm business details before launch.</div>
@@ -577,7 +903,10 @@ footer{padding:56px 0 28px;background:linear-gradient(180deg,#4f1d3b,#41152f);co
 <section class="ratings">
   <div class="container rating-grid">
     <div class="rating-box"><div class="rating-num">4.9</div><div><div class="stars">★★★★★</div><strong>125+ Google ratings</strong><p>A strong reputation deserves a professional home online.</p></div></div>
-    <p class="quote">“A colorful, polished website can turn an already strong local reputation into an easier path to new appointments.”<small>Concept message for the demo — replace with an approved customer testimonial before launch.</small></p>
+    <div class="quotes-wrap">
+      <p class="quote">“I haven't felt this much relief in years. I felt comfortable with the staff and the environment — they were all extremely knowledgeable.”<small>Lauren Kasper · Google review</small></p>
+      <p class="quote" style="margin-top:28px">“Extremely clean, warmly greeted, and Rose was an excellent masseuse. This is truly a Roanoke secret.”<small>Arlene · Google review</small></p>
+    </div>
   </div>
 </section>
 
@@ -699,4 +1028,134 @@ form?.addEventListener('submit',async e=>{
 <script defer src="/booking-preview-v32.js?v=32"></script>
 <script defer src="/service-gallery-v34.js?v=34"></script><script defer src="/remove-old-services-v35.js?v=35"></script>
 <script defer src="/section-order-v36.js?v=36"></script>
+<script defer src="/visit-cleanup-v50.js?v=50"></script>
+<script defer src="/remove-data-flow-v51.js?v=51"></script>
+
+
+
+
+<!-- BEGIN BLOOMING_LOTUS_BOOKING_V14 -->
+<style id="bl-booking-v14-style">
+  #bl-booking-v14{max-width:1080px;margin:44px auto;padding:28px;background:#fffdf9;border:1px solid #eadfd3;border-radius:22px;box-shadow:0 14px 38px rgba(72,44,28,.12);font-family:inherit;color:#392d28}
+  #bl-booking-v14 *{box-sizing:border-box}
+  #bl-booking-v14 .bl-head{text-align:center;margin-bottom:24px}
+  #bl-booking-v14 .bl-head h2{margin:0 0 8px;font-size:clamp(1.8rem,4vw,2.6rem);color:#563d32}
+  #bl-booking-v14 .bl-head p{margin:0;color:#765f54}
+  #bl-booking-v14 .bl-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+  #bl-booking-v14 label{display:block;font-weight:700;margin-bottom:7px;color:#563d32}
+  #bl-booking-v14 select,#bl-booking-v14 input,#bl-booking-v14 textarea{width:100%;padding:13px 14px;border:1px solid #ccbcb0;border-radius:12px;background:#fff;color:#352b27;font:inherit}
+  #bl-booking-v14 select:focus,#bl-booking-v14 input:focus,#bl-booking-v14 textarea:focus{outline:3px solid rgba(155,105,81,.16);border-color:#9b6951}
+  #bl-booking-v14 .bl-status{margin:20px 0 12px;padding:13px 15px;border-radius:12px;background:#f5eee8;color:#604b41}
+  #bl-booking-v14 .bl-status.error{background:#fff0f0;color:#8b2525}
+  #bl-booking-v14 .bl-status.success{background:#edf8ef;color:#215e2f}
+  #bl-booking-v14 .bl-slots{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:12px}
+  #bl-booking-v14 .bl-slot{padding:11px 7px;border:1px solid #bda99b;border-radius:12px;background:#fff;color:#4b3830;cursor:pointer;font:inherit}
+  #bl-booking-v14 .bl-slot:hover{background:#f7eee8;border-color:#9b6951}
+  #bl-booking-v14 .bl-slot.selected{background:#7a4f3b;color:#fff;border-color:#7a4f3b}
+  #bl-booking-v14 .bl-slot[disabled]{cursor:not-allowed;opacity:.42;text-decoration:line-through}
+  #bl-booking-v14 .bl-small{display:block;font-size:.74rem;margin-top:3px}
+  #bl-booking-v14 .bl-details{margin-top:24px;padding-top:22px;border-top:1px solid #eadfd3}
+  #bl-booking-v14 .bl-details-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+  #bl-booking-v14 .bl-span-2{grid-column:span 2}
+  #bl-booking-v14 .bl-submit{margin-top:18px;width:100%;padding:14px 20px;border:0;border-radius:13px;background:#7a4f3b;color:#fff;font:700 1rem inherit;cursor:pointer}
+  #bl-booking-v14 .bl-submit:disabled{opacity:.55;cursor:not-allowed}
+  #bl-booking-v14 .bl-summary{margin-top:14px;padding:13px;border-radius:12px;background:#faf5f1}
+  @media(max-width:760px){#bl-booking-v14{margin:24px 12px;padding:20px}#bl-booking-v14 .bl-grid,#bl-booking-v14 .bl-details-grid{grid-template-columns:1fr}#bl-booking-v14 .bl-span-2{grid-column:span 1}#bl-booking-v14 .bl-slots{grid-template-columns:repeat(3,minmax(0,1fr))}}
+</style>
+<section id="bl-booking-v14" aria-labelledby="bl-booking-title">
+  <div class="bl-head">
+    <h2 id="bl-booking-title">Book Your Massage</h2>
+    <p>Choose a date, duration, time, and an available therapist.</p>
+  </div>
+  <div class="bl-grid">
+    <div><label for="bl-date">Appointment date</label><input id="bl-date" type="date" required></div>
+    <div><label for="bl-duration">Session length</label><select id="bl-duration"><option value="60">60 Minutes</option><option value="90">90 Minutes</option><option value="120">120 Minutes</option></select></div>
+    <div><label for="bl-service">Service</label><select id="bl-service"><option>Deep Tissue Massage</option><option>Hot Stone Massage</option><option>Relaxing / Full Body Massage</option><option>Couples Massage</option><option>Foot Massage / Reflexology</option><option>Acupressure / Cupping</option><option>Other / Ask front desk</option></select></div>
+  </div>
+  <div id="bl-status" class="bl-status">Select a date to view available appointments.</div>
+  <div id="bl-slots" class="bl-slots" aria-live="polite"></div>
+  <div class="bl-details">
+    <div class="bl-details-grid">
+      <div><label for="bl-therapist">Therapist</label><select id="bl-therapist" disabled><option value="">Select a time first</option></select></div>
+      <div><label for="bl-name">Name</label><input id="bl-name" autocomplete="name" required></div>
+      <div><label for="bl-phone">Phone</label><input id="bl-phone" type="tel" autocomplete="tel" required></div>
+      <div><label for="bl-email">Email</label><input id="bl-email" type="email" autocomplete="email"></div>
+      <div class="bl-span-2"><label for="bl-notes">Notes</label><textarea id="bl-notes" rows="3" placeholder="Pressure preference or other details"></textarea></div>
+    </div>
+    <div id="bl-summary" class="bl-summary">No appointment time selected.</div>
+    <button id="bl-submit" class="bl-submit" type="button" disabled>Request Appointment</button>
+  </div>
+</section>
+<script id="bl-booking-v14-script">
+(function(){
+  const API='https://d697dcip2i.execute-api.us-east-1.amazonaws.com';
+  const $=id=>document.getElementById(id);
+  const date=$('bl-date'),duration=$('bl-duration'),service=$('bl-service'),slots=$('bl-slots'),status=$('bl-status'),therapist=$('bl-therapist'),summary=$('bl-summary'),submit=$('bl-submit');
+  let selectedTime='',slotMap={};
+  const localToday=()=>{const d=new Date();const y=d.getFullYear();const m=String(d.getMonth()+1).padStart(2,'0');const day=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${day}`};
+  date.min=localToday();
+  const prettyTime=t=>{const [h,m]=t.split(':').map(Number);return new Date(2000,0,1,h,m).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})};
+  function setStatus(message,type=''){status.textContent=message;status.className='bl-status'+(type?' '+type:'')}
+  function resetSelection(){selectedTime='';slotMap={};therapist.innerHTML='<option value="">Select a time first</option>';therapist.disabled=true;submit.disabled=true;summary.textContent='No appointment time selected.'}
+  function updateSummary(){if(!selectedTime||!therapist.value){submit.disabled=true;return;}summary.textContent=`${service.value} — ${date.value} at ${prettyTime(selectedTime)} with ${therapist.value} (${duration.value} minutes)`;submit.disabled=false}
+  async function loadAvailability(){
+    resetSelection();slots.innerHTML='';if(!date.value){setStatus('Select a date to view available appointments.');return}
+    setStatus('Loading available appointments...');
+    try{
+      const response=await fetch(`${API}/availability?date=${encodeURIComponent(date.value)}&duration=${encodeURIComponent(duration.value)}`);
+      const data=await response.json();if(!response.ok)throw new Error(data.message||'Unable to load availability.');
+      data.slots.forEach(item=>{slotMap[item.time]=item;const b=document.createElement('button');b.type='button';b.className='bl-slot';b.disabled=item.fullyBooked;b.dataset.time=item.time;b.innerHTML=`${prettyTime(item.time)}<span class="bl-small">${item.availableTherapists} available</span>`;b.addEventListener('click',()=>selectSlot(item,b));slots.appendChild(b)});
+      setStatus(`${data.slots.filter(x=>!x.fullyBooked).length} appointment times available for a ${duration.value}-minute session.`,'success');
+    }catch(error){setStatus(error.message,'error')}
+  }
+  function selectSlot(item,button){document.querySelectorAll('#bl-slots .bl-slot').forEach(x=>x.classList.remove('selected'));button.classList.add('selected');selectedTime=item.time;therapist.innerHTML='<option value="">Choose an available therapist</option>'+item.therapists.map(name=>`<option value="${name}">${name}</option>`).join('')+'<option value="No preference">First available / No preference</option>';therapist.disabled=false;summary.textContent=`Selected ${date.value} at ${prettyTime(selectedTime)}. Choose a therapist.`;submit.disabled=true}
+  async function sendRequest(){
+    const name=$('bl-name').value.trim(),phone=$('bl-phone').value.trim();if(!name||!phone||!selectedTime||!therapist.value){setStatus('Please provide your name, phone, time, and therapist.','error');return}
+    submit.disabled=true;submit.textContent='Sending request...';
+    const payload={name,phone,email:$('bl-email').value.trim(),date:date.value,time:selectedTime,service:service.value,therapist:therapist.value,length:`${duration.value} Minutes`,notes:$('bl-notes').value.trim(),website:''};
+    try{const response=await fetch(`${API}/appointments`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)});const data=await response.json();if(!response.ok)throw new Error(data.message||'Unable to send appointment request.');setStatus(`${data.message} Request number: ${data.appointmentId}`,'success');submit.textContent='Request Sent';summary.textContent=`Request ${data.appointmentId} submitted for ${date.value} at ${prettyTime(selectedTime)}.`}
+    catch(error){setStatus(error.message,'error');submit.disabled=false;submit.textContent='Request Appointment'}
+  }
+  date.addEventListener('change',loadAvailability);duration.addEventListener('change',loadAvailability);service.addEventListener('change',updateSummary);therapist.addEventListener('change',updateSummary);submit.addEventListener('click',sendRequest);
+})();
+</script>
+<!-- END BLOOMING_LOTUS_BOOKING_V14 -->
+<!-- BEGIN BLOOMING_LOTUS_BOOKING_V15_HELPER -->
+<script id="bl-booking-v15-placement-helper">
+document.addEventListener('DOMContentLoaded', function () {
+  const newBooking = document.getElementById('bl-booking-v14');
+  if (!newBooking) return;
+
+  const oldTimeSelect = Array.from(document.querySelectorAll('select')).find(function (select) {
+    const values = Array.from(select.options).map(function (option) {
+      return option.textContent.trim().toLowerCase();
+    });
+    return values.includes('morning') && values.includes('afternoon') && values.includes('evening');
+  });
+
+  if (!oldTimeSelect) return;
+
+  const oldForm = oldTimeSelect.closest('form');
+  if (!oldForm) return;
+
+  oldForm.parentNode.insertBefore(newBooking, oldForm);
+  oldForm.style.display = 'none';
+  oldForm.setAttribute('aria-hidden', 'true');
+
+  const oldHeading = Array.from(oldForm.parentElement.querySelectorAll('h1,h2,h3,h4')).find(function (heading) {
+    return /appointment|book|request/i.test(heading.textContent || '');
+  });
+  if (oldHeading && !newBooking.contains(oldHeading)) {
+    oldHeading.style.display = 'none';
+    oldHeading.setAttribute('aria-hidden', 'true');
+  }
+});
+</script>
+<!-- END BLOOMING_LOTUS_BOOKING_V15_HELPER -->
+
+
+
+
+
+
 </body></html>

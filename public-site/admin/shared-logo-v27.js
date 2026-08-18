@@ -1,0 +1,5 @@
+/* BLOOMING_SHARED_LOGO_V27 */
+(()=>{'use strict';if(window.__BL_SHARED_LOGO_V27__)return;window.__BL_SHARED_LOGO_V27__=true;const LOGO="/assets/blooming-lotus-shared-logo-ba9081f00745.png";
+function admin(){if(!document.getElementById('signin'))return;const h=document.querySelector('header');if(!h)return;let i=h.querySelector('.admin-shared-logo-v27');if(!i){i=document.createElement('img');i.className='admin-shared-logo-v27';i.alt='Blooming Lotus logo';i.src=LOGO;h.prepend(i)}}
+function printLogo(root=document){root.querySelectorAll?.('#print-sheet-v16 header').forEach(h=>{let i=h.querySelector('.print-shared-logo-v27');if(!i){i=document.createElement('img');i.className='print-shared-logo-v27';i.alt='Blooming Lotus logo';i.src=LOGO;h.prepend(i)}})}
+function run(root=document){admin();printLogo(root)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>run(),{once:true});else run();new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n instanceof Element)run(n)}))).observe(document.documentElement,{childList:true,subtree:true});})();

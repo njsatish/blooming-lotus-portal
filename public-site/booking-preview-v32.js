@@ -10,14 +10,26 @@
 
   function findPreviewCard() {
     const candidates = [...document.querySelectorAll('div, aside, article, section')];
-    return candidates
-      .filter(element => {
-        const text = normalizedText(element);
-        return text.includes('booking preview') &&
-          text.includes('choose your therapist') &&
-          element.children.length <= 10;
-      })
-      .sort((a, b) => a.getBoundingClientRect().width - b.getBoundingClientRect().width)[0] || null;
+    const matches = candidates.filter(element => {
+      const text = normalizedText(element);
+      return text.includes('booking preview') &&
+        text.includes('choose your therapist') &&
+        element.children.length <= 10;
+    });
+
+    // Width can no longer disambiguate once the badge and its ancestors
+    // (hero / hero-grid / hero-visual) render at the same full-bleed width
+    // on mobile — that previously let this pick the hero-grid *container*
+    // instead of the badge, ripping it out of `.hero` and silently breaking
+    // every `.hero > .container.hero-grid` mobile stacking rule downstream.
+    // Instead, only keep matches that are not an ancestor of another match —
+    // this guarantees the innermost (actual badge) element wins regardless
+    // of rendered width.
+    const innermost = matches.filter(
+      el => !matches.some(other => other !== el && el.contains(other))
+    );
+
+    return innermost.sort((a, b) => a.getBoundingClientRect().width - b.getBoundingClientRect().width)[0] || null;
   }
 
   function findHeroSection(card) {
