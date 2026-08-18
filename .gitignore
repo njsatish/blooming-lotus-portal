@@ -38,3 +38,6 @@ coverage/
 .vscode/
 .idea/
 production-sync/
+
+# Local infrastructure troubleshooting backups
+infrastructure/*.before-*
