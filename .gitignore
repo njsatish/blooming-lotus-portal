@@ -15,7 +15,6 @@ exports/
 *.ddb.json
 *appointment*backup*.json
 *customer*.csv
-
 # Build, cache, and temporary files
 .DS_Store
 __pycache__/
@@ -28,16 +27,16 @@ node_modules/
 dist/
 build/
 coverage/
-
 # Generated archives
 *.zip
 *.tar
 *.tar.gz
-
 # IDE files
 .vscode/
 .idea/
 production-sync/
-
 # Local infrastructure troubleshooting backups
 infrastructure/*.before-*
+# Local feature rollback files
+.last-*-backup
+public-site/index.html.before-*

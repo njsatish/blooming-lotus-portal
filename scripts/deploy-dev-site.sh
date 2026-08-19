@@ -43,6 +43,9 @@ aws s3 sync \
   --region "$REGION" \
   --delete \
   --exclude ".DS_Store" \
+  --exclude "index.html.before-*" \
+  --exclude "*.backup" \
+  --exclude "*.bak" \
   --exclude "*.backup" \
   --exclude "*.bak" \
   --cache-control "no-cache, no-store, must-revalidate"

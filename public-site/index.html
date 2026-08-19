@@ -817,6 +817,21 @@ body {
 </style>
 <!-- END BLOOMING_MOBILE_TABLET_HERO_V33 -->
 
+
+<!-- BEGIN BL_THERAPIST_FIRST_V1 -->
+<style id="bl-therapist-first-v1">
+#bl-booking-v14 .bl-grid{display:flex!important;flex-direction:column!important;gap:14px!important}
+#bl-booking-v14 .bl-grid>div:has(#bl-date){order:1}
+#bl-booking-v14 .bl-grid>div:has(#bl-duration){order:2}
+#bl-booking-v14 .bl-grid>div:has(#bl-service){order:3}
+#bl-booking-v14 .bl-grid>div:has(#bl-therapist){order:4;padding:15px;border:1px solid #ead4df;border-radius:16px;background:#f8eef3}
+#bl-booking-v14 #bl-periods-v1{order:5}
+#bl-booking-v14 #bl-slots{order:6;grid-template-columns:repeat(3,minmax(0,1fr));max-height:330px;overflow:auto}
+#bl-booking-v14 #bl-status{order:7}
+.bl-periods-v1{margin-top:3px}.bl-periods-v1>strong{display:block;margin-bottom:8px}.bl-periods-v1>div{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.bl-periods-v1 button{min-height:52px;border:1px solid #d8bdc9;border-radius:14px;background:#fff;color:#571137;font-weight:800}.bl-periods-v1 button.active{background:#571137;color:#fff;border-color:#571137}.bl-periods-v1 small{display:block;font-size:10px;margin-top:2px;opacity:.75}
+@media(max-width:680px){#bl-booking-v14 #bl-slots{grid-template-columns:repeat(2,minmax(0,1fr))}.bl-periods-v1>div{grid-template-columns:1fr}}
+</style>
+<!-- END BL_THERAPIST_FIRST_V1 -->
 </head>
 <body>
 <div class="preview"><strong>Concept Preview</strong> — unofficial demo for Blooming Lotus Oriental Massage. Confirm business details before launch.</div>
@@ -1091,24 +1106,54 @@ form?.addEventListener('submit',async e=>{
   const API='https://d697dcip2i.execute-api.us-east-1.amazonaws.com';
   const $=id=>document.getElementById(id);
   const date=$('bl-date'),duration=$('bl-duration'),service=$('bl-service'),slots=$('bl-slots'),status=$('bl-status'),therapist=$('bl-therapist'),summary=$('bl-summary'),submit=$('bl-submit');
+  let allSlots=[],selectedPeriod='morning';
+  const periodFor=time=>{const parts=String(time).split(':').map(Number),mins=parts[0]*60+parts[1];return mins<720?'morning':mins<1020?'afternoon':'evening'};
+  const periodName={morning:'Morning',afternoon:'Afternoon',evening:'Evening'};
+  function ensurePeriodControls(){
+    let box=$('bl-periods-v1');
+    if(box)return box;
+    box=document.createElement('div');box.id='bl-periods-v1';box.className='bl-periods-v1';box.hidden=true;
+    box.innerHTML='<strong>Time of day</strong><div><button type="button" data-period="morning" class="active">Morning<small>Before 12 PM</small></button><button type="button" data-period="afternoon">Afternoon<small>12 PM–4:59 PM</small></button><button type="button" data-period="evening">Evening<small>5 PM or later</small></button></div>';
+    slots.parentNode.insertBefore(box,slots);
+    box.querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>{box.querySelectorAll('button').forEach(x=>x.classList.remove('active'));button.classList.add('active');selectedPeriod=button.dataset.period;renderTimes()}));
+    return box;
+  }
+  function uniqueTherapists(items){const result=[];items.forEach(item=>(item.therapists||[]).forEach(name=>{if(name&&!result.includes(name))result.push(name)}));return result;}
+  function populateTherapists(){
+    const names=uniqueTherapists(allSlots);
+    therapist.innerHTML='<option value="">Choose Massage Therapist</option>'+names.map(name=>`<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('')+'<option value="No preference">First available / No preference</option>';
+    therapist.disabled=!names.length;
+  }
+  function slotMatchesTherapist(item){return therapist.value==='No preference'?!item.fullyBooked:(item.therapists||[]).includes(therapist.value)}
+  function renderTimes(){
+    selectedTime='';slots.innerHTML='';submit.disabled=true;summary.textContent='No appointment time selected.';
+    const periods=ensurePeriodControls();
+    if(!therapist.value){periods.hidden=true;setStatus('Choose a Massage Therapist to view available times.');return}
+    periods.hidden=false;
+    const visible=allSlots.filter(item=>!item.fullyBooked&&slotMatchesTherapist(item)&&periodFor(item.time)===selectedPeriod);
+    visible.forEach(item=>{slotMap[item.time]=item;const button=document.createElement('button');button.type='button';button.className='bl-slot';button.dataset.time=item.time;button.innerHTML=`${prettyTime(item.time)}<span class="bl-small">${therapist.value==='No preference'?item.availableTherapists+' available':escapeHtml(therapist.value)}</span>`;button.addEventListener('click',()=>selectSlot(item,button));slots.appendChild(button)});
+    if(!visible.length){setStatus(`No ${periodName[selectedPeriod].toLowerCase()} times are available for ${therapist.value}. Try another period or therapist.`,'error');return}
+    setStatus(`${visible.length} ${periodName[selectedPeriod].toLowerCase()} times available for ${therapist.value}.`,'success');
+  }
   let selectedTime='',slotMap={};
   const localToday=()=>{const d=new Date();const y=d.getFullYear();const m=String(d.getMonth()+1).padStart(2,'0');const day=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${day}`};
   date.min=localToday();
   const prettyTime=t=>{const [h,m]=t.split(':').map(Number);return new Date(2000,0,1,h,m).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})};
   function setStatus(message,type=''){status.textContent=message;status.className='bl-status'+(type?' '+type:'')}
-  function resetSelection(){selectedTime='';slotMap={};therapist.innerHTML='<option value="">Select a time first</option>';therapist.disabled=true;submit.disabled=true;summary.textContent='No appointment time selected.'}
+  function resetSelection(){selectedTime='';slotMap={};allSlots=[];slots.innerHTML='';therapist.innerHTML='<option value="">Choose Massage Therapist</option>';therapist.disabled=true;ensurePeriodControls().hidden=true;submit.disabled=true;summary.textContent='No appointment time selected.'}
   function updateSummary(){if(!selectedTime||!therapist.value){submit.disabled=true;return;}summary.textContent=`${service.value} — ${date.value} at ${prettyTime(selectedTime)} with ${therapist.value} (${duration.value} minutes)`;submit.disabled=false}
   async function loadAvailability(){
-    resetSelection();slots.innerHTML='';if(!date.value){setStatus('Select a date to view available appointments.');return}
-    setStatus('Loading available appointments...');
+    resetSelection();if(!date.value){setStatus('Select a date to view available appointments.');return}
+    setStatus('Loading available massage therapists...');
     try{
-      const response=await fetch(`${API}/availability?date=${encodeURIComponent(date.value)}&duration=${encodeURIComponent(duration.value)}`);
+      const response=await fetch(`${API}/availability?date=${encodeURIComponent(date.value)}&duration=${encodeURIComponent(duration.value)}&service=${encodeURIComponent(service.value)}`);
       const data=await response.json();if(!response.ok)throw new Error(data.message||'Unable to load availability.');
-      data.slots.forEach(item=>{slotMap[item.time]=item;const b=document.createElement('button');b.type='button';b.className='bl-slot';b.disabled=item.fullyBooked;b.dataset.time=item.time;b.innerHTML=`${prettyTime(item.time)}<span class="bl-small">${item.availableTherapists} available</span>`;b.addEventListener('click',()=>selectSlot(item,b));slots.appendChild(b)});
-      setStatus(`${data.slots.filter(x=>!x.fullyBooked).length} appointment times available for a ${duration.value}-minute session.`,'success');
-    }catch(error){setStatus(error.message,'error')}
+      allSlots=data.slots||[];allSlots.forEach(item=>{slotMap[item.time]=item});populateTherapists();
+      if(!uniqueTherapists(allSlots).length){setStatus('No massage therapists are available for this date and session length.','error');return}
+      setStatus('Choose a Massage Therapist to view available times.','success');
+    }catch(error){setStatus(error.message||'Unable to load availability.','error')}
   }
-  function selectSlot(item,button){document.querySelectorAll('#bl-slots .bl-slot').forEach(x=>x.classList.remove('selected'));button.classList.add('selected');selectedTime=item.time;therapist.innerHTML='<option value="">Choose an available therapist</option>'+item.therapists.map(name=>`<option value="${name}">${name}</option>`).join('')+'<option value="No preference">First available / No preference</option>';therapist.disabled=false;summary.textContent=`Selected ${date.value} at ${prettyTime(selectedTime)}. Choose a therapist.`;submit.disabled=true}
+  function selectSlot(item,button){document.querySelectorAll('#bl-slots .bl-slot').forEach(x=>x.classList.remove('selected'));button.classList.add('selected');selectedTime=item.time;updateSummary()}
   async function sendRequest(){
     const name=$('bl-name').value.trim(),phone=$('bl-phone').value.trim();if(!name||!phone||!selectedTime||!therapist.value){setStatus('Please provide your name, phone, time, and therapist.','error');return}
     submit.disabled=true;submit.textContent='Sending request...';
@@ -1116,7 +1161,7 @@ form?.addEventListener('submit',async e=>{
     try{const response=await fetch(`${API}/appointments`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)});const data=await response.json();if(!response.ok)throw new Error(data.message||'Unable to send appointment request.');setStatus(`${data.message} Request number: ${data.appointmentId}`,'success');submit.textContent='Request Sent';summary.textContent=`Request ${data.appointmentId} submitted for ${date.value} at ${prettyTime(selectedTime)}.`}
     catch(error){setStatus(error.message,'error');submit.disabled=false;submit.textContent='Request Appointment'}
   }
-  date.addEventListener('change',loadAvailability);duration.addEventListener('change',loadAvailability);service.addEventListener('change',updateSummary);therapist.addEventListener('change',updateSummary);submit.addEventListener('click',sendRequest);
+  date.addEventListener('change',loadAvailability);duration.addEventListener('change',loadAvailability);service.addEventListener('change',loadAvailability);therapist.addEventListener('change',renderTimes);submit.addEventListener('click',sendRequest);
 })();
 </script>
 <!-- END BLOOMING_LOTUS_BOOKING_V14 -->
