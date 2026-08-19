@@ -2104,4 +2104,37 @@ let attempts=0,timer=setInterval(()=>{attempts++;if(install()||attempts>=60)clea
 })();
 </script>
 <!-- END BL_REQUEST_LINKS_V17 -->
+
+<!-- BEGIN BL_REMOVE_BOOKING_PREVIEW_V18 -->
+<style id="bl-remove-booking-preview-v18-style">
+.bl-booking-preview-removed-v18{display:none!important}
+</style>
+<script id="bl-remove-booking-preview-v18-script">
+(function(){
+'use strict';
+if(window.__BL_REMOVE_BOOKING_PREVIEW_V18__)return;
+window.__BL_REMOVE_BOOKING_PREVIEW_V18__=true;
+const normalize=value=>String(value||'').replace(/\s+/g,' ').trim().toLowerCase();
+function isTarget(node){
+ const text=normalize(node&&node.textContent);
+ return text.includes('booking preview')&&
+        text.includes('choose your therapist')&&
+        (text.includes('jack')||text.includes('rose'))&&
+        (text.includes('no preference')||text.includes('first available'));
+}
+function install(){
+ const matches=[...document.querySelectorAll('section,aside,article,div')].filter(isTarget);
+ if(!matches.length)return false;
+ const target=matches.sort((a,b)=>a.textContent.length-b.textContent.length)[0];
+ target.classList.add('bl-booking-preview-removed-v18');
+ target.setAttribute('aria-hidden','true');
+ target.remove();
+ document.documentElement.dataset.bookingPreviewV18='removed';
+ return true;
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
+let attempts=0,timer=setInterval(()=>{attempts++;if(install()||attempts>=60)clearInterval(timer)},150);
+})();
+</script>
+<!-- END BL_REMOVE_BOOKING_PREVIEW_V18 -->
 </body></html>
