@@ -832,6 +832,69 @@ body {
 @media(max-width:680px){#bl-booking-v14 #bl-slots{grid-template-columns:repeat(2,minmax(0,1fr))}.bl-periods-v1>div{grid-template-columns:1fr}}
 </style>
 <!-- END BL_THERAPIST_FIRST_V1 -->
+
+<!-- BEGIN BL_BOOKING_CONTAINER_ALIGNMENT_V9_1 -->
+<style id="bl-booking-container-alignment-v9-1-style">
+/* Match the booking heading and booking cards to the standard site content width. */
+.bl-v9-section .bl-v9-heading-wrap,
+.bl-v9-section > .container,
+.bl-v9-section > [class*="container"]{
+  width:min(1520px,calc(100% - 64px))!important;
+  max-width:1520px!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+}
+#bl-booking-v14{
+  width:min(1520px,calc(100% - 64px))!important;
+  max-width:1520px!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+  padding-left:0!important;
+  padding-right:0!important;
+}
+#bl-booking-v14>.bl-grid{
+  width:100%!important;
+  max-width:100%!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  gap:26px!important;
+}
+#bl-booking-v14 #bl-date-calendar-v2,
+#bl-booking-v14>.bl-grid>.bl-v3-right-panel{
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  overflow:hidden!important;
+}
+/* Keep fields and slot grids inside the right card instead of extending beyond it. */
+#bl-booking-v14 .bl-v5-preferences,
+#bl-booking-v14 .bl-v3-right-panel .bl-details-grid{
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+}
+#bl-booking-v14 .bl-v5-preferences>div,
+#bl-booking-v14 .bl-v5-preferences select,
+#bl-booking-v14 .bl-v3-right-panel input,
+#bl-booking-v14 .bl-v3-right-panel select,
+#bl-booking-v14 .bl-v3-right-panel textarea{
+  min-width:0!important;
+  max-width:100%!important;
+}
+@media(max-width:1120px){
+  .bl-v9-section .bl-v9-heading-wrap,
+  .bl-v9-section > .container,
+  .bl-v9-section > [class*="container"],
+  #bl-booking-v14{width:min(900px,calc(100% - 28px))!important}
+  #bl-booking-v14>.bl-grid{grid-template-columns:1fr!important}
+}
+@media(max-width:680px){
+  .bl-v9-section .bl-v9-heading-wrap,
+  .bl-v9-section > .container,
+  .bl-v9-section > [class*="container"],
+  #bl-booking-v14{width:calc(100% - 18px)!important}
+}
+</style>
+<!-- END BL_BOOKING_CONTAINER_ALIGNMENT_V9_1 -->
 </head>
 <body>
 <div class="preview"><strong>Concept Preview</strong> — unofficial demo for Blooming Lotus Oriental Massage. Confirm business details before launch.</div>
