@@ -1996,4 +1996,40 @@ let attempts=0,timer=setInterval(()=>{attempts++;if(install()||attempts>=50)clea
 })();
 </script>
 <!-- END BL_REVIEW_GALLERY_V16 -->
+
+<!-- BEGIN BL_RHONDA_REVIEW_V16_1 -->
+<style id="bl-rhonda-review-v16-1-style">
+.bl-review-gallery-v16-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+.bl-review-gallery-v16-card{min-width:0!important}
+.bl-review-gallery-v16-quote{overflow-wrap:anywhere!important}
+@media(max-width:1100px){.bl-review-gallery-v16-grid{grid-template-columns:1fr 1fr!important}.bl-review-gallery-v16-card:last-child{grid-column:1/-1!important}}
+@media(max-width:760px){.bl-review-gallery-v16-grid{grid-template-columns:1fr!important}.bl-review-gallery-v16-card:last-child{grid-column:auto!important}}
+</style>
+<script id="bl-rhonda-review-v16-1-script">
+(function(){
+'use strict';
+if(window.__BL_RHONDA_REVIEW_V16_1__)return;
+window.__BL_RHONDA_REVIEW_V16_1__=true;
+function install(){
+ const grid=document.querySelector('.bl-review-gallery-v16-grid');
+ if(!grid)return false;
+ if(grid.querySelector('[data-review-id="rhonda-conner"]'))return true;
+ const card=document.createElement('article');
+ card.className='bl-review-gallery-v16-card';
+ card.dataset.reviewId='rhonda-conner';
+ card.innerHTML=`
+   <div>
+     <span class="bl-review-gallery-v16-source">Google review · 4 months ago</span>
+     <div class="bl-review-gallery-v16-card-stars" aria-label="5 out of 5 stars">★★★★★</div>
+     <blockquote class="bl-review-gallery-v16-quote">“Great price. Jackie was the masseuse and wow, what a great experience. Polite, professional, and gave me one of the best massages I've had in awhile. Went in with stiff muscles and came out relaxed and so calm. Try this place out, you won't be sorry.”</blockquote>
+   </div>
+   <div class="bl-review-gallery-v16-reviewer">Rhonda Conner · 7 reviews</div>`;
+ grid.appendChild(card);
+ return true;
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
+let attempts=0,timer=setInterval(()=>{attempts++;if(install()||attempts>=50)clearInterval(timer)},150);
+})();
+</script>
+<!-- END BL_RHONDA_REVIEW_V16_1 -->
 </body></html>
