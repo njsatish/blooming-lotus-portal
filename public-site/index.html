@@ -1115,14 +1115,15 @@ form?.addEventListener('submit',async e=>{
     box=document.createElement('div');box.id='bl-periods-v1';box.className='bl-periods-v1';box.hidden=true;
     box.innerHTML='<strong>Time of day</strong><div><button type="button" data-period="morning" class="active">Morning<small>Before 12 PM</small></button><button type="button" data-period="afternoon">Afternoon<small>12 PM–4:59 PM</small></button><button type="button" data-period="evening">Evening<small>5 PM or later</small></button></div>';
     slots.parentNode.insertBefore(box,slots);
-    box.querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>{box.querySelectorAll('button').forEach(x=>x.classList.remove('active'));button.classList.add('active');selectedPeriod=button.dataset.period;renderTimes()}));
+    box.querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>{box.querySelectorAll('button').forEach(x=>x.classList.remove('active'));button.classList.add('active');selectedPeriod=button.dataset.period;selectedTime='';renderTimes()}));
     return box;
   }
   function uniqueTherapists(items){const result=[];items.forEach(item=>(item.therapists||[]).forEach(name=>{if(name&&!result.includes(name))result.push(name)}));return result;}
   function populateTherapists(){
     const names=uniqueTherapists(allSlots);
-    therapist.innerHTML='<option value="">Choose Massage Therapist</option>'+names.map(name=>`<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('')+'<option value="No preference">First available / No preference</option>';
+    therapist.innerHTML='<option value="No preference">First available / No preference</option>'+names.map(name=>`<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('');
     therapist.disabled=!names.length;
+    therapist.value='No preference';
   }
   function slotMatchesTherapist(item){return therapist.value==='No preference'?!item.fullyBooked:(item.therapists||[]).includes(therapist.value)}
   function businessNow(){
@@ -1158,7 +1159,7 @@ form?.addEventListener('submit',async e=>{
     try{
       const response=await fetch(`${API}/availability?date=${encodeURIComponent(date.value)}&duration=${encodeURIComponent(duration.value)}&service=${encodeURIComponent(service.value)}`);
       const data=await response.json();if(!response.ok)throw new Error(data.message||'Unable to load availability.');
-      allSlots=data.slots||[];allSlots.forEach(item=>{slotMap[item.time]=item});populateTherapists();
+      allSlots=data.slots||[];allSlots.forEach(item=>{slotMap[item.time]=item});populateTherapists();renderTimes();
       if(!uniqueTherapists(allSlots).length){setStatus('No massage therapists are available for this date and session length.','error');return}
       setStatus('Choose a Massage Therapist to view available times.','success');
     }catch(error){setStatus(error.message||'Unable to load availability.','error')}
@@ -1481,4 +1482,8 @@ let attempts=0,timer=setInterval(()=>{attempts++;if(install()||attempts>=50)clea
 <!-- BEGIN BL_HIDE_PAST_TIMES_V7 -->
 <!-- Same-day elapsed appointment times are filtered using the business timezone: America/New_York. -->
 <!-- END BL_HIDE_PAST_TIMES_V7 -->
+
+<!-- BEGIN BL_DEFAULT_NO_PREFERENCE_V8 -->
+<!-- Massage Therapist defaults to First available / No preference and renders matching times immediately. -->
+<!-- END BL_DEFAULT_NO_PREFERENCE_V8 -->
 </body></html>
