@@ -1257,7 +1257,7 @@ form?.addEventListener('submit',async e=>{
   function uniqueTherapists(items){const result=[];items.forEach(item=>(item.therapists||[]).forEach(name=>{if(name&&!result.includes(name))result.push(name)}));return result;}
   function populateTherapists(){
     const names=uniqueTherapists(allSlots);
-    therapist.innerHTML='<option value="No preference">First available / No preference</option>'+names.map(name=>`<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('');
+    therapist.innerHTML='<option value="No preference" selected>First available / No preference</option>'+names.map(name=>`<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('');
     therapist.disabled=!names.length;
     therapist.value='No preference';
   }
@@ -2170,4 +2170,8 @@ if(document.readyState==='loading'){
 })();
 </script>
 <!-- END BL_V19_PART1_1_REMOVE_CTA -->
+
+<!-- BEGIN BL_V19_PART2_THERAPIST_DEFAULT -->
+<!-- Therapist options are generated with First available / No preference selected by the existing populateTherapists function. No polling or observers. -->
+<!-- END BL_V19_PART2_THERAPIST_DEFAULT -->
 </body></html>
