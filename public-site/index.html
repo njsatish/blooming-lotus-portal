@@ -2218,4 +2218,39 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 </script>
 <!-- END BL_V19_REPAIR_V2 -->
+
+<!-- BEGIN BL_REMOVE_STANDALONE_CTA_V19_3 -->
+<style id="bl-remove-standalone-cta-v19-3-style">
+.bl-standalone-request-cta-v19-3{display:none!important}
+</style>
+<script id="bl-remove-standalone-cta-v19-3-script">
+(function(){
+'use strict';
+if(window.__BL_REMOVE_STANDALONE_CTA_V19_3__)return;
+window.__BL_REMOVE_STANDALONE_CTA_V19_3__=true;
+const clean=value=>String(value||'').replace(/\s+/g,' ').trim().toLowerCase();
+function removeStandaloneCta(){
+ const services=document.getElementById('massage-services-gallery-v34');
+ if(!services)return;
+ const controls=[...document.querySelectorAll('a,button')].filter(control=>{
+   const label=clean(control.textContent||control.getAttribute('aria-label'));
+   return label==='request an appointment'&&!control.closest('#bl-booking-v14');
+ });
+ controls.forEach(control=>{
+   let shell=control.parentElement;
+   let node=control.parentElement;
+   while(node&&node.parentElement&&node.parentElement!==document.body){
+     const parent=node.parentElement;
+     const parentText=clean(parent.textContent);
+     if(parent.contains(services)||parentText.includes('massage services')||parentText.includes('choose the experience that fits your visit'))break;
+     if(parent.querySelectorAll('a,button').length===1&&parentText==='request an appointment')shell=parent;
+     node=parent;
+   }
+   if(shell){shell.classList.add('bl-standalone-request-cta-v19-3');shell.setAttribute('aria-hidden','true');}
+ });
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',removeStandaloneCta,{once:true});else removeStandaloneCta();
+})();
+</script>
+<!-- END BL_REMOVE_STANDALONE_CTA_V19_3 -->
 </body></html>
