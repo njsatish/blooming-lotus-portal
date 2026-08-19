@@ -1409,4 +1409,62 @@ let attempts=0,timer=setInterval(()=>{attempts++;if(install()||attempts>=50)clea
 })();
 </script>
 <!-- END BL_EQUAL_PANEL_BOOKING_V5 -->
+
+<!-- BEGIN BL_BOOKING_ALIGNMENT_V6 -->
+<style id="bl-booking-alignment-v6-style">
+/* Remove the narrow legacy outer grid and let the booking experience use the page width. */
+.bl-v6-booking-section{width:100%!important;max-width:none!important;padding-left:0!important;padding-right:0!important}
+.bl-v6-booking-section>.container,.bl-v6-booking-section>[class*="container"]{width:min(1420px,calc(100% - 44px))!important;max-width:1420px!important;margin-left:auto!important;margin-right:auto!important}
+.bl-v6-booking-shell{display:block!important;grid-template-columns:1fr!important;width:100%!important;max-width:none!important;gap:0!important}
+.bl-v6-booking-column{width:100%!important;max-width:none!important;min-width:0!important;grid-column:1/-1!important}
+.bl-v6-removed-copy,.bl-v6-empty-side{display:none!important}
+
+/* Strong final layout override. */
+#bl-booking-v14{width:100%!important;max-width:1280px!important;margin:26px auto 0!important;padding:30px!important;overflow:visible!important}
+#bl-booking-v14>.bl-grid{display:grid!important;grid-template-columns:minmax(520px,1fr) minmax(560px,1fr)!important;gap:28px!important;align-items:stretch!important;width:100%!important;max-width:none!important}
+#bl-booking-v14 #bl-date-calendar-v2{grid-column:1!important;grid-row:1!important;width:100%!important;min-width:0!important;min-height:860px!important;height:100%!important;margin:0!important;padding:32px!important;position:static!important}
+#bl-booking-v14>.bl-grid>.bl-v3-right-panel{grid-column:2!important;grid-row:1!important;width:100%!important;min-width:0!important;min-height:860px!important;height:100%!important;margin:0!important;padding:32px!important;overflow:hidden!important}
+#bl-booking-v14 .bl-v5-preferences{display:grid!important;grid-template-columns:1fr 1fr!important;gap:16px!important;width:100%!important}
+#bl-booking-v14 .bl-v5-preferences>div,#bl-booking-v14 .bl-v5-preferences select{min-width:0!important;width:100%!important;max-width:none!important}
+#bl-booking-v14 .bl-v3-right-panel #bl-slots{grid-template-columns:repeat(3,minmax(0,1fr))!important;max-height:285px!important;overflow-y:auto!important}
+#bl-booking-v14 .bl-v3-right-panel .bl-details-grid{grid-template-columns:1fr 1fr!important}
+#bl-booking-v14 .bl-v3-right-panel .bl-span-2{grid-column:1/-1!important}
+
+@media(max-width:1120px){
+ .bl-v6-booking-section>.container,.bl-v6-booking-section>[class*="container"]{width:min(900px,calc(100% - 28px))!important}
+ #bl-booking-v14>.bl-grid{grid-template-columns:1fr!important}
+ #bl-booking-v14 #bl-date-calendar-v2,#bl-booking-v14>.bl-grid>.bl-v3-right-panel{grid-column:1!important;grid-row:auto!important;min-height:0!important;height:auto!important}
+}
+@media(max-width:680px){
+ #bl-booking-v14{padding:18px!important}
+ #bl-booking-v14 .bl-v5-preferences,#bl-booking-v14 .bl-v3-right-panel .bl-details-grid{grid-template-columns:1fr!important}
+ #bl-booking-v14 .bl-v3-right-panel #bl-slots{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #bl-booking-v14 .bl-v3-right-panel .bl-span-2{grid-column:auto!important}
+}
+</style>
+<script id="bl-booking-alignment-v6-script">
+(function(){
+'use strict';
+if(window.__BL_BOOKING_ALIGNMENT_V6__)return;window.__BL_BOOKING_ALIGNMENT_V6__=true;
+const norm=v=>String(v||'').replace(/\s+/g,' ').trim().toLowerCase();
+function smallestByText(fragments){
+ const nodes=[...document.querySelectorAll('p,aside,article,div,section')].filter(node=>{const t=norm(node.textContent);return fragments.every(x=>t.includes(x))});
+ return nodes.sort((a,b)=>a.textContent.length-b.textContent.length)[0]||null;
+}
+function install(){
+ const booking=document.getElementById('bl-booking-v14');if(!booking)return false;
+ const section=booking.closest('section')||booking.parentElement;section.classList.add('bl-v6-booking-section');
+ let column=booking.parentElement;column.classList.add('bl-v6-booking-column');
+ let shell=column.parentElement;if(shell){shell.classList.add('bl-v6-booking-shell');[...shell.children].forEach(child=>{if(child!==column&&norm(child.textContent).includes('built around the team'))child.classList.add('bl-v6-empty-side')})}
+ const infrastructure=smallestByText(['this deployed demo stores appointment requests','amazon dynamodb','api gateway and lambda','requests remain pending']);
+ if(infrastructure){infrastructure.classList.add('bl-v6-removed-copy');infrastructure.setAttribute('aria-hidden','true')}
+ const demoFlow=smallestByText(['demo workflow','demo database','not a confirmed appointment']);
+ if(demoFlow){demoFlow.classList.add('bl-v6-removed-copy');demoFlow.setAttribute('aria-hidden','true')}
+ return true;
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
+let attempts=0,timer=setInterval(()=>{attempts++;if(install()||attempts>=50)clearInterval(timer)},100);
+})();
+</script>
+<!-- END BL_BOOKING_ALIGNMENT_V6 -->
 </body></html>
