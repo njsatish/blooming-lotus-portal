@@ -1194,7 +1194,9 @@ form?.addEventListener('submit',async e=>{
   </div>
   <div class="bl-grid">
     <div><label for="bl-date">Appointment date</label><input id="bl-date" type="date" required></div>
-    <div><label for="bl-duration">Session length</label><select id="bl-duration"><option value="60">60 Minutes</option><option value="90">90 Minutes</option><option value="120">120 Minutes</option></select></div>
+    <div><label for="bl-duration">Session length</label><select id="bl-duration">
+<option value="45">45 Minutes</option>
+<option selected value="60">60 Minutes</option><option value="90">90 Minutes</option><option value="120">120 Minutes</option></select></div>
     <div><label for="bl-service">Service</label><select id="bl-service"><option>Deep Tissue Massage</option><option>Hot Stone Massage</option><option>Relaxing / Full Body Massage</option><option>Couples Massage</option><option>Foot Massage / Reflexology</option><option>Acupressure / Cupping</option><option>Other / Ask front desk</option></select></div>
   </div>
   <div id="bl-status" class="bl-status">Select a date to view available appointments.</div>
@@ -1872,4 +1874,32 @@ let attempts=0,timer=setInterval(()=>{attempts++;if(install()||attempts>=40)clea
 })();
 </script>
 <!-- END BL_CONTACT_BUTTON_PINK_V14_1 -->
+
+<!-- BEGIN BL_45_MINUTE_OPTION_V15 -->
+<script id="bl-45-minute-option-v15-script">
+(function(){
+'use strict';
+if(window.__BL_45_MINUTE_OPTION_V15__)return;
+window.__BL_45_MINUTE_OPTION_V15__=true;
+function apply(){
+ const select=document.getElementById('bl-duration');
+ if(!select)return false;
+ [...select.querySelectorAll('option[value="45"]')].slice(1).forEach(option=>option.remove());
+ if(!select.querySelector('option[value="45"]')){
+   const option=document.createElement('option');
+   option.value='45';option.textContent='45 Minutes';
+   const sixty=select.querySelector('option[value="60"]');
+   select.insertBefore(option,sixty||select.firstChild);
+ }
+ if(!select.dataset.durationDefaultV15){
+   select.value='60';
+   select.dataset.durationDefaultV15='true';
+ }
+ return true;
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});else apply();
+let attempts=0,timer=setInterval(()=>{attempts++;if(apply()||attempts>=40)clearInterval(timer)},150);
+})();
+</script>
+<!-- END BL_45_MINUTE_OPTION_V15 -->
 </body></html>
