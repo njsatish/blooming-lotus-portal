@@ -1537,4 +1537,67 @@ let attempts=0,timer=setInterval(()=>{apply();if(++attempts>=30)clearInterval(ti
 })();
 </script>
 <!-- END BL_REMOVE_SERVICES_V11 -->
+
+<!-- BEGIN BL_RATING_ALIGNMENT_V12 -->
+<style id="bl-rating-alignment-v12-style">
+/* Keep the rating/review feature aligned with the same centered page scope. */
+.bl-rating-aligned-v12{
+  width:min(1520px,calc(100% - 64px))!important;
+  max-width:1520px!important;
+  margin:42px auto!important;
+  border-radius:28px!important;
+  overflow:hidden!important;
+  box-sizing:border-box!important;
+}
+.bl-rating-aligned-v12 > .container,
+.bl-rating-aligned-v12 > [class*="container"],
+.bl-rating-aligned-v12 .bl-rating-inner-v12{
+  width:min(1180px,calc(100% - 56px))!important;
+  max-width:1180px!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+  box-sizing:border-box!important;
+}
+@media(max-width:1120px){
+  .bl-rating-aligned-v12{width:min(900px,calc(100% - 28px))!important;margin:30px auto!important}
+  .bl-rating-aligned-v12 > .container,
+  .bl-rating-aligned-v12 > [class*="container"],
+  .bl-rating-aligned-v12 .bl-rating-inner-v12{width:calc(100% - 32px)!important}
+}
+@media(max-width:680px){
+  .bl-rating-aligned-v12{width:calc(100% - 18px)!important;border-radius:20px!important}
+  .bl-rating-aligned-v12 > .container,
+  .bl-rating-aligned-v12 > [class*="container"],
+  .bl-rating-aligned-v12 .bl-rating-inner-v12{width:calc(100% - 24px)!important}
+}
+</style>
+<script id="bl-rating-alignment-v12-script">
+(function(){
+'use strict';
+if(window.__BL_RATING_ALIGNMENT_V12__)return;
+window.__BL_RATING_ALIGNMENT_V12__=true;
+const clean=value=>String(value||'').replace(/\s+/g,' ').trim().toLowerCase();
+function install(){
+ const candidates=[...document.querySelectorAll('section,aside,article,div')].filter(node=>{
+   const text=clean(node.textContent);
+   return text.includes('4.9') && text.includes('google ratings') &&
+     text.includes("i haven't felt this much relief in years") &&
+     text.includes('extremely clean, warmly greeted');
+ });
+ const section=candidates.sort((a,b)=>a.textContent.length-b.textContent.length)[0]||null;
+ if(!section)return false;
+ section.classList.add('bl-rating-aligned-v12');
+ const direct=[...section.children].find(child=>{
+   const text=clean(child.textContent);
+   return text.includes('4.9') && text.includes('google ratings') &&
+     text.includes('extremely clean, warmly greeted');
+ });
+ if(direct)direct.classList.add('bl-rating-inner-v12');
+ return true;
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
+let attempts=0,timer=setInterval(()=>{attempts++;if(install()||attempts>=40)clearInterval(timer)},150);
+})();
+</script>
+<!-- END BL_RATING_ALIGNMENT_V12 -->
 </body></html>
