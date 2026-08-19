@@ -2137,4 +2137,37 @@ let attempts=0,timer=setInterval(()=>{attempts++;if(install()||attempts>=60)clea
 })();
 </script>
 <!-- END BL_REMOVE_BOOKING_PREVIEW_V18 -->
+
+<!-- BEGIN BL_V19_PART1_1_REMOVE_CTA -->
+<style id="bl-v19-part1-remove-cta-style">
+.bl-v19-part1-redundant-cta{display:none!important}
+</style>
+<script id="bl-v19-part1-remove-cta-script">
+(function(){
+'use strict';
+if(window.__BL_V19_PART1_1_REMOVE_CTA__)return;
+window.__BL_V19_PART1_1_REMOVE_CTA__=true;
+const normalize=value=>String(value||'').replace(/\s+/g,' ').trim().toLowerCase();
+function removeCallout(){
+ const matches=[...document.querySelectorAll('section,aside,article,div')].filter(node=>{
+   const text=normalize(node.textContent);
+   return text.includes('ready to schedule?')&&
+          text.includes('request your appointment')&&
+          text.includes('choose a preferred date and time')&&
+          text.includes('confirm availability');
+ });
+ if(!matches.length)return false;
+ const target=matches.sort((a,b)=>a.textContent.length-b.textContent.length)[0];
+ target.classList.add('bl-v19-part1-redundant-cta');
+ target.setAttribute('aria-hidden','true');
+ return true;
+}
+if(document.readyState==='loading'){
+ document.addEventListener('DOMContentLoaded',removeCallout,{once:true});
+}else{
+ removeCallout();
+}
+})();
+</script>
+<!-- END BL_V19_PART1_1_REMOVE_CTA -->
 </body></html>
