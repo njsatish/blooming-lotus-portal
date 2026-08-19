@@ -253,6 +253,92 @@ def send_customer_acknowledgement(item):
     except Exception as exc:
         print("Customer acknowledgement email failed:",repr(exc)); return False,str(exc)
 
+def business_notification_subject(appointment_id):
+    flower = "\U0001F338"
+    return f"{flower} Blooming Lotus — New Appointment Request — {appointment_id} {flower}"
+
+def business_notification_text(item):
+    return (
+        "New Blooming Lotus appointment request\n\n"
+        + "Request number: " + str(item.get("appointmentId") or "") + "\n"
+        + "Status: Requested / Pending confirmation\n"
+        + "Customer: " + str(item.get("customerName") or "") + "\n"
+        + "Phone: " + str(item.get("phone") or "") + "\n"
+        + "Email: " + str(item.get("email") or "") + "\n"
+        + "Service: " + str(item.get("service") or "") + "\n"
+        + "Date: " + str(item.get("preferredDate") or "") + "\n"
+        + "Time: " + str(item.get("preferredTime") or "") + "\n"
+        + "Session length: " + str(item.get("sessionLength") or "") + "\n"
+        + "Assigned therapist: " + str(item.get("therapist") or "") + "\n"
+        + "Notes: " + str(item.get("notes") or "") + "\n\n"
+        + "Action required: review and confirm this request.\n"
+    )
+
+def business_notification_html(item):
+    esc = lambda value: html.escape(str(value or ""))
+    rows = [
+        ("Request number", item.get("appointmentId")),
+        ("Status", "Requested / Pending confirmation"),
+        ("Service", item.get("service")),
+        ("Date", item.get("preferredDate")),
+        ("Time", item.get("preferredTime")),
+        ("Session length", item.get("sessionLength")),
+        ("Assigned therapist", item.get("therapist")),
+        ("Customer name", item.get("customerName")),
+        ("Phone", item.get("phone")),
+        ("Email", item.get("email")),
+        ("Notes", item.get("notes")),
+        ("Submitted", item.get("createdAt")),
+    ]
+    details = "".join(
+        "<tr><td style='padding:12px 16px;color:#806b75;font-weight:bold;border-top:1px solid #efe2e8'>" + esc(label) + "</td>"
+        "<td style='padding:12px 16px;color:#49333d;border-top:1px solid #efe2e8'>" + esc(value) + "</td></tr>"
+        for label, value in rows if value
+    )
+    flower = "&#127800;"
+    return (
+        "<!doctype html><html><body style='margin:0;background:#f3edf0;font-family:Arial,sans-serif;color:#49333d'>"
+        "<div style='display:none;max-height:0;overflow:hidden'>New appointment request requiring review and confirmation.</div>"
+        "<div style='max-width:720px;margin:24px auto;background:#fff;border:1px solid #e6d4dc;border-radius:22px;overflow:hidden'>"
+        "<div style='padding:28px 34px;background:#581638;color:#fff'>"
+        "<table role='presentation' style='width:100%'><tr><td style='font-size:40px'>" + flower + "</td>"
+        "<td><h1 style='margin:0;font-family:Georgia,serif;font-size:28px'>Blooming Lotus</h1>"
+        "<div style='color:#e8cbd8;font-size:12px;letter-spacing:2px'>BUSINESS APPOINTMENT NOTIFICATION</div></td>"
+        "<td style='text-align:right'><span style='padding:8px 12px;border-radius:999px;background:#bd3c71;font-size:11px;font-weight:bold'>ACTION REQUIRED</span></td></tr></table></div>"
+        "<div style='height:7px;background:#bd3c71'></div>"
+        "<div style='padding:34px'><div style='color:#bd3c71;font-weight:bold;font-size:12px;letter-spacing:2px'>NEW APPOINTMENT REQUEST</div>"
+        "<h2 style='margin:8px 0 12px;color:#581638;font-family:Georgia,serif;font-size:30px'>Review and confirm this request</h2>"
+        "<p style='line-height:1.6'>A customer submitted a new appointment request. The requested therapist and time are being held pending confirmation.</p>"
+        "<div style='margin:20px 0;padding:15px;background:#fff1f6;color:#8f2555;font-weight:bold;border:1px solid #eed0dd'>Requested / Pending confirmation</div>"
+        "<table role='presentation' style='width:100%;border-collapse:collapse;border:1px solid #ead9e1'>" + details + "</table>"
+        "<div style='margin-top:22px;padding:18px;border:1px solid #d8e7c8;background:#f3f9ed;color:#426c35;line-height:1.6'>"
+        "<strong>Recommended next steps</strong><ol style='margin-bottom:0'><li>Review the request in the admin dashboard.</li><li>Confirm the therapist and requested time.</li><li>Contact the customer if another time is needed.</li><li>Update the request status.</li></ol></div>"
+        "<div style='text-align:center;margin-top:26px'><a href='https://bloominglotus.denduluru.com/admin' style='display:inline-block;padding:14px 24px;border-radius:999px;background:#bd3c71;color:#fff;text-decoration:none;font-weight:bold'>Open Admin Dashboard</a></div>"
+        "<div style='margin-top:22px;padding:15px;border-left:5px solid #d2a13b;background:#fff8e8;color:#6b592f'>The customer has received an acknowledgement stating that the appointment is not confirmed yet.</div>"
+        "</div><div style='padding:22px;text-align:center;background:#f7f0f3;color:#816e77;font-size:12px'>Blooming Lotus Oriental Massage · Roanoke, Virginia</div>"
+        "</div></body></html>"
+    )
+
+def send_business_html_notification(item):
+    business_email = "njsatish@gmail.com"
+    try:
+        result = ses.send_email(
+            Source=business_email,
+            Destination={"ToAddresses": [business_email]},
+            ReplyToAddresses=[business_email],
+            Message={
+                "Subject": {"Data": business_notification_subject(item["appointmentId"]), "Charset": "UTF-8"},
+                "Body": {
+                    "Text": {"Data": business_notification_text(item), "Charset": "UTF-8"},
+                    "Html": {"Data": business_notification_html(item), "Charset": "UTF-8"},
+                },
+            },
+        )
+        return True, result.get("MessageId")
+    except Exception as exc:
+        print("Business HTML email failed:", repr(exc))
+        return False, str(exc)
+
 def serialize_item(item):
     return {key: serializer.serialize(value) for key, value in item.items()}
 
@@ -375,8 +461,9 @@ def handle_appointment(event):
     published=True
     try:sns.publish(TopicArn=notification_topic_arn,Subject="Blooming Lotus - New Appointment Request",Message=f"Request #: {aid}\nCustomer: {name}\nTherapist: {saved['therapist']}\nDate: {date}\nTime: {preferred_time}\nLength: {saved['sessionLength']}")
     except Exception as exc:print("SNS publish failed:",repr(exc));published=False
+    business_email_sent,business_email_result=send_business_html_notification(saved)
     customer_email_sent,customer_email_result=send_customer_acknowledgement(saved)
-    return response(201,{"customerEmailSent":customer_email_sent,"customerEmailResult":customer_email_result,"appointmentId":aid,"status":"REQUESTED","therapist":saved["therapist"],"notificationPublished":published,"message":"Appointment request received and the selected time is being held pending confirmation."})
+    return response(201,{"businessEmailSent":business_email_sent,"businessEmailResult":business_email_result,"customerEmailSent":customer_email_sent,"customerEmailResult":customer_email_result,"appointmentId":aid,"status":"REQUESTED","therapist":saved["therapist"],"notificationPublished":published,"message":"Appointment request received and the selected time is being held pending confirmation."})
 
 def handler(event, context):
     method = request_method(event)
