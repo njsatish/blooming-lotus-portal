@@ -1125,12 +1125,22 @@ form?.addEventListener('submit',async e=>{
     therapist.disabled=!names.length;
   }
   function slotMatchesTherapist(item){return therapist.value==='No preference'?!item.fullyBooked:(item.therapists||[]).includes(therapist.value)}
+  function businessNow(){
+    const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date()).reduce((result,part)=>(result[part.type]=part.value,result),{});
+    return {date:`${parts.year}-${parts.month}-${parts.day}`,minutes:Number(parts.hour)*60+Number(parts.minute)};
+  }
+  function isElapsedToday(time){
+    if(date.value!==businessNow().date)return false;
+    const pieces=String(time||'').split(':').map(Number);
+    if(pieces.length<2||Number.isNaN(pieces[0])||Number.isNaN(pieces[1]))return false;
+    return pieces[0]*60+pieces[1]<=businessNow().minutes;
+  }
   function renderTimes(){
     selectedTime='';slots.innerHTML='';submit.disabled=true;summary.textContent='No appointment time selected.';
     const periods=ensurePeriodControls();
     if(!therapist.value){periods.hidden=true;setStatus('Choose a Massage Therapist to view available times.');return}
     periods.hidden=false;
-    const visible=allSlots.filter(item=>!item.fullyBooked&&slotMatchesTherapist(item)&&periodFor(item.time)===selectedPeriod);
+    const visible=allSlots.filter(item=>!item.fullyBooked&&!isElapsedToday(item.time)&&slotMatchesTherapist(item)&&periodFor(item.time)===selectedPeriod);
     visible.forEach(item=>{slotMap[item.time]=item;const button=document.createElement('button');button.type='button';button.className='bl-slot';button.dataset.time=item.time;button.innerHTML=`${prettyTime(item.time)}<span class="bl-small">${therapist.value==='No preference'?item.availableTherapists+' available':escapeHtml(therapist.value)}</span>`;button.addEventListener('click',()=>selectSlot(item,button));slots.appendChild(button)});
     if(!visible.length){setStatus(`No ${periodName[selectedPeriod].toLowerCase()} times are available for ${therapist.value}. Try another period or therapist.`,'error');return}
     setStatus(`${visible.length} ${periodName[selectedPeriod].toLowerCase()} times available for ${therapist.value}.`,'success');
@@ -1467,4 +1477,8 @@ let attempts=0,timer=setInterval(()=>{attempts++;if(install()||attempts>=50)clea
 })();
 </script>
 <!-- END BL_BOOKING_ALIGNMENT_V6 -->
+
+<!-- BEGIN BL_HIDE_PAST_TIMES_V7 -->
+<!-- Same-day elapsed appointment times are filtered using the business timezone: America/New_York. -->
+<!-- END BL_HIDE_PAST_TIMES_V7 -->
 </body></html>
