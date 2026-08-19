@@ -2055,4 +2055,53 @@ let attempts=0,timer=setInterval(()=>{attempts++;if(install()||attempts>=50)clea
 })();
 </script>
 <!-- END BL_RHONDA_REVIEW_V16_1 -->
+
+<!-- BEGIN BL_REQUEST_LINKS_V17 -->
+<style id="bl-request-links-v17-style">
+#bl-booking-v14{scroll-margin-top:104px!important}
+[data-request-link-v17="true"]{cursor:pointer!important}
+</style>
+<script id="bl-request-links-v17-script">
+(function(){
+'use strict';
+if(window.__BL_REQUEST_LINKS_V17__)return;
+window.__BL_REQUEST_LINKS_V17__=true;
+const targetId='bl-booking-v14';
+const normalize=value=>String(value||'').replace(/\s+/g,' ').trim().toLowerCase();
+function bookingTarget(){return document.getElementById(targetId)}
+function isAppointmentCall(control){
+ const label=normalize(control.textContent||control.value||control.getAttribute('aria-label'));
+ if(label!=='request appointment'&&label!=='request an appointment')return false;
+ if(control.id==='bl-submit')return false;
+ if(control.matches('button[type="submit"],input[type="submit"]'))return false;
+ if(control.closest('#bl-booking-v14,form'))return false;
+ return true;
+}
+function navigate(event){
+ const target=bookingTarget();
+ if(!target)return;
+ if(event)event.preventDefault();
+ history.replaceState(null,'','#'+targetId);
+ target.scrollIntoView({behavior:'smooth',block:'start'});
+ const firstControl=target.querySelector('#bl-duration,select,input,button');
+ window.setTimeout(()=>{if(firstControl)firstControl.focus({preventScroll:true})},650);
+}
+function install(){
+ const target=bookingTarget();
+ if(!target)return false;
+ document.querySelectorAll('a,button,input[type="button"]').forEach(control=>{
+   if(!isAppointmentCall(control))return;
+   if(control.tagName==='A')control.setAttribute('href','#'+targetId);
+   control.dataset.requestLinkV17='true';
+   if(control.dataset.requestLinkBoundV17==='true')return;
+   control.dataset.requestLinkBoundV17='true';
+   control.addEventListener('click',navigate);
+ });
+ return document.querySelectorAll('[data-request-link-v17="true"]').length>0;
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
+let attempts=0,timer=setInterval(()=>{attempts++;if(install()||attempts>=60)clearInterval(timer)},150);
+})();
+</script>
+<!-- END BL_REQUEST_LINKS_V17 -->
 </body></html>
