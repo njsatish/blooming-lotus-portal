@@ -1,4 +1,5 @@
 import json
+import html
 import os
 import time
 import uuid
@@ -13,6 +14,7 @@ from botocore.exceptions import ClientError
 table = boto3.resource("dynamodb").Table(os.environ["TABLE_NAME"])
 announcements_table = boto3.resource("dynamodb").Table(os.environ["ANNOUNCEMENTS_TABLE"])
 sns = boto3.client("sns")
+ses = boto3.client("ses")
 notification_topic_arn = os.environ["NOTIFICATION_TOPIC_ARN"]
 retention_days = int(os.environ.get("RETENTION_DAYS", "90"))
 reservation_table_name = os.environ["RESERVATION_TABLE"]
@@ -208,6 +210,49 @@ def build_availability(date, requested_duration=60, service=None):
     return slots
 
 
+def customer_acknowledgement_subject(appointment_id):
+    flower = "\U0001F338"
+    return f"{flower} Blooming Lotus — Appointment Request Received — {appointment_id} {flower}"
+
+def customer_acknowledgement_text(item):
+    return ("Blooming Lotus appointment request received\n\n"
+        + "Thank you, " + str(item.get("customerName") or "") + ".\n\n"
+        + "Request number: " + str(item.get("appointmentId") or "") + "\n"
+        + "Service: " + str(item.get("service") or "") + "\n"
+        + "Date: " + str(item.get("preferredDate") or "") + "\n"
+        + "Time: " + str(item.get("preferredTime") or "") + "\n"
+        + "Session length: " + str(item.get("sessionLength") or "") + "\n"
+        + "Massage Therapist: " + str(item.get("therapist") or "") + "\n\n"
+        + "Pending confirmation — this is not yet a confirmed appointment.\n"
+        + "The Blooming Lotus front desk will review the request and contact you.\n")
+
+def customer_acknowledgement_html(item):
+    esc=lambda value: html.escape(str(value or ""))
+    rows=[("Request number",item.get("appointmentId")),("Service",item.get("service")),("Date",item.get("preferredDate")),("Time",item.get("preferredTime")),("Session length",item.get("sessionLength")),("Massage Therapist",item.get("therapist")),("Phone",item.get("phone")),("Email",item.get("email")),("Notes",item.get("notes"))]
+    details="".join("<tr><td style='padding:12px;color:#806b75;font-weight:bold'>"+esc(label)+"</td><td style='padding:12px;color:#49333d'>"+esc(value)+"</td></tr>" for label,value in rows if value)
+    return ("<!doctype html><html><body style='margin:0;background:#f4eef1;font-family:Arial,sans-serif'>"
+      "<div style='max-width:680px;margin:24px auto;background:#fff;border-radius:22px;overflow:hidden'>"
+      "<div style='padding:30px;text-align:center;background:#fff1f6'><div style='font-size:42px'>&#127800;</div>"
+      "<h1 style='color:#581638;font-family:Georgia,serif'>Blooming Lotus</h1></div><div style='height:7px;background:#bd3c71'></div>"
+      "<div style='padding:34px'><h2 style='color:#581638'>Thank you, "+esc(item.get("customerName"))+".</h2>"
+      "<p>Blooming Lotus received the appointment request below.</p>"
+      "<div style='padding:15px;background:#f1f9eb;color:#3d6830;font-weight:bold'>Pending confirmation — this is not yet a confirmed appointment.</div>"
+      "<table style='width:100%;margin-top:20px;border-collapse:collapse'>"+details+"</table>"
+      "<p style='padding:17px;border-left:5px solid #bd3c71;background:#fff1f6'><strong>What happens next?</strong><br>The front desk will review availability and contact you to confirm the appointment or suggest another time.</p>"
+      "<p>Blooming Lotus Oriental Massage<br>540-725-8888<br><a href='https://bloominglotus.denduluru.com' style='color:#bd3c71'>bloominglotus.denduluru.com</a></p>"
+      "</div></div></body></html>")
+
+def send_customer_acknowledgement(item):
+    destination=str(item.get("email") or "").strip().lower()
+    sandbox_recipient="njsatish@gmail.com"
+    if not destination: return False,"Customer email was not provided."
+    if destination != sandbox_recipient: return False,"SES sandbox: customer email is not the verified test recipient."
+    try:
+        result=ses.send_email(Source=sandbox_recipient,Destination={"ToAddresses":[destination]},ReplyToAddresses=[sandbox_recipient],Message={"Subject":{"Data":customer_acknowledgement_subject(item["appointmentId"]),"Charset":"UTF-8"},"Body":{"Text":{"Data":customer_acknowledgement_text(item),"Charset":"UTF-8"},"Html":{"Data":customer_acknowledgement_html(item),"Charset":"UTF-8"}}})
+        return True,result.get("MessageId")
+    except Exception as exc:
+        print("Customer acknowledgement email failed:",repr(exc)); return False,str(exc)
+
 def serialize_item(item):
     return {key: serializer.serialize(value) for key, value in item.items()}
 
@@ -330,7 +375,8 @@ def handle_appointment(event):
     published=True
     try:sns.publish(TopicArn=notification_topic_arn,Subject="Blooming Lotus - New Appointment Request",Message=f"Request #: {aid}\nCustomer: {name}\nTherapist: {saved['therapist']}\nDate: {date}\nTime: {preferred_time}\nLength: {saved['sessionLength']}")
     except Exception as exc:print("SNS publish failed:",repr(exc));published=False
-    return response(201,{"appointmentId":aid,"status":"REQUESTED","therapist":saved["therapist"],"notificationPublished":published,"message":"Appointment request received and the selected time is being held pending confirmation."})
+    customer_email_sent,customer_email_result=send_customer_acknowledgement(saved)
+    return response(201,{"customerEmailSent":customer_email_sent,"customerEmailResult":customer_email_result,"appointmentId":aid,"status":"REQUESTED","therapist":saved["therapist"],"notificationPublished":published,"message":"Appointment request received and the selected time is being held pending confirmation."})
 
 def handler(event, context):
     method = request_method(event)
