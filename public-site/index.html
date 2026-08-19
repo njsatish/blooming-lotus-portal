@@ -832,6 +832,68 @@ body {
 @media(max-width:680px){#bl-booking-v14 #bl-slots{grid-template-columns:repeat(2,minmax(0,1fr))}.bl-periods-v1>div{grid-template-columns:1fr}}
 </style>
 <!-- END BL_THERAPIST_FIRST_V1 -->
+
+<!-- BEGIN BL_SELECTION_COLORS_V13 -->
+<style id="bl-selection-colors-v13-style">
+/* Use the calendar's selected-date pink for every selected booking choice. */
+#bl-booking-v14{
+  --bl-selection-pink:#bd3c71;
+  --bl-selection-pink-hover:#a92f63;
+  --bl-selection-pink-soft:#fff1f6;
+  --bl-selection-border:#d9a9bd;
+}
+/* Selected time-of-day button */
+#bl-booking-v14 .bl-periods-v1 button.active,
+#bl-booking-v14 #bl-periods-v1 button.active,
+#bl-booking-v14 .bl-period-buttons-v39 button.active{
+  background:var(--bl-selection-pink)!important;
+  border-color:var(--bl-selection-pink)!important;
+  color:#fff!important;
+  box-shadow:0 8px 20px rgba(189,60,113,.18)!important;
+}
+#bl-booking-v14 .bl-periods-v1 button:not(.active),
+#bl-booking-v14 #bl-periods-v1 button:not(.active),
+#bl-booking-v14 .bl-period-buttons-v39 button:not(.active){
+  background:#fff!important;
+  border-color:var(--bl-selection-border)!important;
+  color:#62133a!important;
+}
+/* Selected appointment-time button */
+#bl-booking-v14 .bl-slot.selected,
+#bl-booking-v14 #bl-slots .bl-slot.selected,
+#bl-booking-v14 button[data-time].selected{
+  background:var(--bl-selection-pink)!important;
+  border-color:var(--bl-selection-pink)!important;
+  color:#fff!important;
+  box-shadow:0 8px 20px rgba(189,60,113,.18)!important;
+}
+#bl-booking-v14 .bl-slot.selected .bl-small,
+#bl-booking-v14 #bl-slots .bl-slot.selected .bl-small,
+#bl-booking-v14 button[data-time].selected .bl-small{
+  color:#fff!important;
+  opacity:.92!important;
+}
+#bl-booking-v14 .bl-slot:not(.selected),
+#bl-booking-v14 #bl-slots .bl-slot:not(.selected){
+  background:#fff!important;
+  border-color:#cdb5c0!important;
+  color:#4b383f!important;
+}
+#bl-booking-v14 .bl-slot:not(.selected):hover,
+#bl-booking-v14 #bl-slots .bl-slot:not(.selected):hover,
+#bl-booking-v14 .bl-periods-v1 button:not(.active):hover,
+#bl-booking-v14 #bl-periods-v1 button:not(.active):hover{
+  background:var(--bl-selection-pink-soft)!important;
+  border-color:var(--bl-selection-pink)!important;
+}
+/* Keyboard users receive the same accent as the calendar. */
+#bl-booking-v14 .bl-slot:focus-visible,
+#bl-booking-v14 #bl-periods-v1 button:focus-visible{
+  outline:3px solid rgba(189,60,113,.28)!important;
+  outline-offset:2px!important;
+}
+</style>
+<!-- END BL_SELECTION_COLORS_V13 -->
 </head>
 <body>
 <div class="preview"><strong>Concept Preview</strong> — unofficial demo for Blooming Lotus Oriental Massage. Confirm business details before launch.</div>
