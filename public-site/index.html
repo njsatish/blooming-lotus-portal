@@ -1827,4 +1827,49 @@ let attempts=0,timer=setInterval(()=>{attempts++;install();if(target()&&document
 })();
 </script>
 <!-- END BL_EXPLORE_SERVICES_LINK_V14 -->
+
+<!-- BEGIN BL_CONTACT_BUTTON_PINK_V14_1 -->
+<style id="bl-contact-button-pink-v14-1-style">
+.bl-contact-button-pink-v14-1{
+  background:#bd3c71!important;
+  border:1px solid #bd3c71!important;
+  color:#fff!important;
+  box-shadow:0 10px 24px rgba(189,60,113,.22)!important;
+  transition:background-color .18s ease,border-color .18s ease,box-shadow .18s ease,transform .18s ease!important;
+}
+.bl-contact-button-pink-v14-1:hover{
+  background:#a92f63!important;
+  border-color:#a92f63!important;
+  color:#fff!important;
+  box-shadow:0 12px 28px rgba(169,47,99,.28)!important;
+  transform:translateY(-1px)!important;
+}
+.bl-contact-button-pink-v14-1:active{
+  background:#932653!important;
+  border-color:#932653!important;
+  transform:translateY(0)!important;
+}
+.bl-contact-button-pink-v14-1:focus-visible{
+  outline:3px solid rgba(189,60,113,.30)!important;
+  outline-offset:3px!important;
+}
+</style>
+<script id="bl-contact-button-pink-v14-1-script">
+(function(){
+'use strict';
+if(window.__BL_CONTACT_BUTTON_PINK_V14_1__)return;
+window.__BL_CONTACT_BUTTON_PINK_V14_1__=true;
+const normalize=value=>String(value||'').replace(/\s+/g,' ').trim().toLowerCase();
+function install(){
+ const controls=[...document.querySelectorAll('a,button,input[type="button"],input[type="submit"]')];
+ const contact=controls.find(control=>normalize(control.textContent||control.value)==='contact us');
+ if(!contact)return false;
+ contact.classList.add('bl-contact-button-pink-v14-1');
+ return true;
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
+let attempts=0,timer=setInterval(()=>{attempts++;if(install()||attempts>=40)clearInterval(timer)},150);
+})();
+</script>
+<!-- END BL_CONTACT_BUTTON_PINK_V14_1 -->
 </body></html>
