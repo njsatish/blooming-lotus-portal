@@ -1786,4 +1786,45 @@ let attempts=0,timer=setInterval(()=>{attempts++;if(install()||attempts>=40)clea
 })();
 </script>
 <!-- END BL_RATING_ALIGNMENT_V12_1 -->
+
+<!-- BEGIN BL_EXPLORE_SERVICES_LINK_V14 -->
+<style id="bl-explore-services-link-v14-style">
+#massage-services-gallery-v34{scroll-margin-top:96px!important}
+</style>
+<script id="bl-explore-services-link-v14-script">
+(function(){
+'use strict';
+if(window.__BL_EXPLORE_SERVICES_LINK_V14__)return;
+window.__BL_EXPLORE_SERVICES_LINK_V14__=true;
+const normalize=value=>String(value||'').replace(/\s+/g,' ').trim().toLowerCase();
+const targetId='massage-services-gallery-v34';
+function target(){return document.getElementById(targetId)}
+function go(event){
+ const section=target();
+ if(!section)return;
+ if(event)event.preventDefault();
+ history.replaceState(null,'','#'+targetId);
+ section.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function install(){
+ const section=target();
+ if(!section)return false;
+ document.querySelectorAll('a,button').forEach(control=>{
+   const label=normalize(control.textContent);
+   const href=control.getAttribute('href')||'';
+   const isExplore=label==='explore services';
+   const isServicesNav=label==='services'&&(href.startsWith('#')||control.closest('header,nav'));
+   if(!isExplore&&!isServicesNav)return;
+   if(control.tagName==='A')control.setAttribute('href','#'+targetId);
+   if(control.dataset.servicesLinkV14==='true')return;
+   control.dataset.servicesLinkV14='true';
+   control.addEventListener('click',go);
+ });
+ return true;
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
+let attempts=0,timer=setInterval(()=>{attempts++;install();if(target()&&document.querySelector('[data-services-link-v14="true"]')||attempts>=50)clearInterval(timer)},150);
+})();
+</script>
+<!-- END BL_EXPLORE_SERVICES_LINK_V14 -->
 </body></html>
