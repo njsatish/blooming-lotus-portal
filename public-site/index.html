@@ -1143,8 +1143,8 @@ form?.addEventListener('submit',async e=>{
     periods.hidden=false;
     const visible=allSlots.filter(item=>!item.fullyBooked&&!isElapsedToday(item.time)&&slotMatchesTherapist(item)&&periodFor(item.time)===selectedPeriod);
     visible.forEach(item=>{slotMap[item.time]=item;const button=document.createElement('button');button.type='button';button.className='bl-slot';button.dataset.time=item.time;button.innerHTML=`${prettyTime(item.time)}<span class="bl-small">${therapist.value==='No preference'?item.availableTherapists+' available':escapeHtml(therapist.value)}</span>`;button.addEventListener('click',()=>selectSlot(item,button));slots.appendChild(button)});
-    if(!visible.length){setStatus(`No ${periodName[selectedPeriod].toLowerCase()} times are available for ${therapist.value}. Try another period or therapist.`,'error');return}
-    setStatus(`${visible.length} ${periodName[selectedPeriod].toLowerCase()} times available for ${therapist.value}.`,'success');
+    if(!visible.length){setStatus(therapist.value==='No preference'?`No ${periodName[selectedPeriod].toLowerCase()} times are available. Try another period.`:`No ${periodName[selectedPeriod].toLowerCase()} times are available for ${therapist.value}. Try another period or therapist.`,'error');return}
+    setStatus(therapist.value==='No preference'?`${visible.length} ${periodName[selectedPeriod].toLowerCase()} times available with any therapist.`:`${visible.length} ${periodName[selectedPeriod].toLowerCase()} times available for ${therapist.value}.`,'success');
   }
   let selectedTime='',slotMap={};
   const localToday=()=>{const d=new Date();const y=d.getFullYear();const m=String(d.getMonth()+1).padStart(2,'0');const day=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${day}`};
@@ -1159,9 +1159,9 @@ form?.addEventListener('submit',async e=>{
     try{
       const response=await fetch(`${API}/availability?date=${encodeURIComponent(date.value)}&duration=${encodeURIComponent(duration.value)}&service=${encodeURIComponent(service.value)}`);
       const data=await response.json();if(!response.ok)throw new Error(data.message||'Unable to load availability.');
-      allSlots=data.slots||[];allSlots.forEach(item=>{slotMap[item.time]=item});populateTherapists();renderTimes();
+      allSlots=data.slots||[];allSlots.forEach(item=>{slotMap[item.time]=item});populateTherapists();
       if(!uniqueTherapists(allSlots).length){setStatus('No massage therapists are available for this date and session length.','error');return}
-      setStatus('Choose a Massage Therapist to view available times.','success');
+      renderTimes();
     }catch(error){setStatus(error.message||'Unable to load availability.','error')}
   }
   function selectSlot(item,button){document.querySelectorAll('#bl-slots .bl-slot').forEach(x=>x.classList.remove('selected'));button.classList.add('selected');selectedTime=item.time;updateSummary()}
@@ -1486,4 +1486,8 @@ let attempts=0,timer=setInterval(()=>{attempts++;if(install()||attempts>=50)clea
 <!-- BEGIN BL_DEFAULT_NO_PREFERENCE_V8 -->
 <!-- Massage Therapist defaults to First available / No preference and renders matching times immediately. -->
 <!-- END BL_DEFAULT_NO_PREFERENCE_V8 -->
+
+<!-- BEGIN BL_DEFAULT_STATUS_FIX_V8_1 -->
+<!-- The default First available / No preference selection now shows the actual matching-time count instead of asking for a therapist selection. -->
+<!-- END BL_DEFAULT_STATUS_FIX_V8_1 -->
 </body></html>
