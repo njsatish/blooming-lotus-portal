@@ -6,9 +6,7 @@ const services=[
 ['swedish-massage','Swedish Massage','60 or 90 minutes','A classic flowing massage experience with smooth techniques and adjustable pressure.'],
 ['hot-stone-massage','Hot Stone Massage','60 or 90 minutes','A warming spa service featuring smooth heated stones as part of the massage experience.'],
 ['foot-reflexology','Foot Reflexology','30, 45, or 60 minutes','A focused foot service in a comfortable spa setting, with optional warm-soak preparation.'],
-['couples-massage','Couples Massage','60 or 90 minutes','Two prepared treatment spaces for customers who want appointments at the same time.'],
-['prenatal-massage','Prenatal Massage','60 minutes','A supportive appointment setup with bolsters and positioning options for customer comfort.'],
-['therapeutic-massage','Therapeutic Massage','45, 60, 75, or 90 minutes','A customized session using professional massage tools and positioning based on customer preferences.']];
+['couples-massage','Couples Massage','60 or 90 minutes','Two prepared treatment spaces for customers who want appointments at the same time.']];
 const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const booking=()=>document.querySelector('#booking,[id*="booking" i],form');
 function choose(title){let target=booking();if(!target)return;let select=[...target.querySelectorAll('select')].find(s=>/service/i.test(s.name+' '+s.id+' '+(s.closest('label')?.textContent||'')));if(select){let o=[...select.options].find(x=>x.textContent.toLowerCase().includes(title.toLowerCase()));if(o){select.value=o.value;select.dispatchEvent(new Event('change',{bubbles:true}))}}target.scrollIntoView({behavior:'smooth',block:'start'})}

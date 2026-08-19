@@ -1512,4 +1512,29 @@ let attempts=0,timer=setInterval(()=>{attempts++;if(install()||attempts>=50)clea
 <!-- BEGIN BL_SMART_TIME_PERIOD_V10_2 -->
 <!-- Today defaults once to the current Roanoke period; future dates default to Morning. Manual choices are preserved. -->
 <!-- END BL_SMART_TIME_PERIOD_V10_2 -->
+
+<!-- BEGIN BL_REMOVE_SERVICES_V11 -->
+<script id="bl-remove-services-v11">
+(function(){
+'use strict';
+if(window.__BL_REMOVE_SERVICES_V11__)return;window.__BL_REMOVE_SERVICES_V11__=true;
+const removed=new Set(['prenatal massage','therapeutic massage']);
+const normalized=value=>String(value||'').replace(/\s+/g,' ').trim().toLowerCase();
+function apply(){
+ document.querySelectorAll('select').forEach(select=>{
+   [...select.options].forEach(option=>{if(removed.has(normalized(option.textContent)))option.remove()});
+ });
+ document.querySelectorAll('[data-service]').forEach(node=>{
+   if(removed.has(normalized(node.dataset.service))||removed.has(normalized(node.textContent)))node.closest('article,li,.service-card,div')?.remove();
+ });
+ document.querySelectorAll('article,li,.service-card').forEach(node=>{
+   const heading=node.querySelector('h2,h3,h4');
+   if(heading&&removed.has(normalized(heading.textContent)))node.remove();
+ });
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});else apply();
+let attempts=0,timer=setInterval(()=>{apply();if(++attempts>=30)clearInterval(timer)},200);
+})();
+</script>
+<!-- END BL_REMOVE_SERVICES_V11 -->
 </body></html>
