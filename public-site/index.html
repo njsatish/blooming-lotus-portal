@@ -1306,4 +1306,48 @@ let tries=0,timer=setInterval(()=>{tries++;if(install()||tries>=40)clearInterval
 })();
 </script>
 <!-- END BL_TWO_COLUMN_BOOKING_V3 -->
+
+<!-- BEGIN BL_BOOKING_LAYOUT_V4 -->
+<style id="bl-booking-layout-v4-style">
+/* Row 1: session length and service. Row 2: calendar and appointment details. */
+#bl-booking-v14{max-width:1260px!important;width:min(1260px,calc(100% - 36px))!important}
+#bl-booking-v14>.bl-grid{display:grid!important;grid-template-columns:minmax(430px,.92fr) minmax(470px,1.08fr)!important;grid-template-rows:auto auto!important;column-gap:28px!important;row-gap:22px!important;align-items:start!important}
+#bl-booking-v14>.bl-grid>.bl-v4-top-row{grid-column:1/-1!important;grid-row:1!important;display:grid!important;grid-template-columns:1fr 1fr!important;gap:22px!important;padding:22px 26px!important;border:1px solid #e7d9df;border-radius:22px;background:#fffafc;box-shadow:0 10px 30px rgba(84,35,63,.06)}
+#bl-booking-v14 .bl-v4-top-row>div{width:100%!important;min-width:0!important;margin:0!important;position:static!important;transform:none!important}
+#bl-booking-v14 .bl-v4-top-row select{width:100%!important;max-width:none!important;min-width:0!important}
+#bl-booking-v14 #bl-date-calendar-v2{grid-column:1!important;grid-row:2!important;position:sticky!important;top:18px!important;margin:0!important}
+#bl-booking-v14>.bl-grid>.bl-v3-right-panel{grid-column:2!important;grid-row:2!important;margin:0!important;min-height:0!important}
+#bl-booking-v14 .bl-v3-right-panel>div:has(#bl-therapist){order:1!important}
+#bl-booking-v14 .bl-v3-right-panel #bl-status{order:2!important}
+#bl-booking-v14 .bl-v3-right-panel #bl-periods-v1{order:3!important}
+#bl-booking-v14 .bl-v3-right-panel #bl-slots{order:4!important}
+#bl-booking-v14 .bl-v3-right-panel .bl-details{order:5!important}
+.bl-v4-removed-team-options{display:none!important}
+@media(max-width:980px){#bl-booking-v14>.bl-grid{grid-template-columns:1fr!important;grid-template-rows:auto!important}#bl-booking-v14>.bl-grid>.bl-v4-top-row{grid-column:1!important;grid-row:auto!important}#bl-booking-v14 #bl-date-calendar-v2{grid-column:1!important;grid-row:auto!important;position:static!important}#bl-booking-v14>.bl-grid>.bl-v3-right-panel{grid-column:1!important;grid-row:auto!important}}
+@media(max-width:620px){#bl-booking-v14>.bl-grid>.bl-v4-top-row{grid-template-columns:1fr!important;padding:18px!important}}
+</style>
+<script id="bl-booking-layout-v4-script">
+(function(){
+'use strict';
+if(window.__BL_BOOKING_LAYOUT_V4__)return;window.__BL_BOOKING_LAYOUT_V4__=true;
+const normalize=value=>String(value||'').replace(/\s+/g,' ').trim().toLowerCase();
+function smallestTeamOptions(){
+ const candidates=[...document.querySelectorAll('aside,article,section,div')].filter(node=>{const t=normalize(node.textContent);return t.includes('therapist options')&&t.includes('built around the team')&&t.includes('jack')&&t.includes('rose')&&t.includes('mike')&&t.includes('no preference')});
+ return candidates.sort((a,b)=>a.textContent.length-b.textContent.length)[0]||null;
+}
+function wrap(control,root){if(!control)return null;let node=control.closest('label,fieldset,.field,.form-field,[class*="field"],div');return node&&root.contains(node)?node:null}
+function install(){
+ const booking=document.getElementById('bl-booking-v14'),grid=booking&&booking.querySelector(':scope > .bl-grid'),calendar=document.getElementById('bl-date-calendar-v2'),panel=grid&&grid.querySelector(':scope > .bl-v3-right-panel');
+ if(!booking||!grid||!calendar||!panel)return false;
+ let top=grid.querySelector(':scope > .bl-v4-top-row');if(!top){top=document.createElement('section');top.className='bl-v4-top-row';top.setAttribute('aria-label','Session and service selections');grid.insertBefore(top,calendar)}
+ const duration=document.getElementById('bl-duration'),service=document.getElementById('bl-service');[wrap(duration,booking),wrap(service,booking)].forEach(node=>{if(node&&!top.contains(node))top.appendChild(node)});
+ const team=smallestTeamOptions();if(team){team.classList.add('bl-v4-removed-team-options');team.setAttribute('aria-hidden','true')}
+ panel.querySelectorAll('.bl-v3-right-title').forEach(title=>{title.querySelector('h3')&&(title.querySelector('h3').textContent='Choose appointment details')});
+ return true;
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
+let attempts=0,timer=setInterval(()=>{attempts++;if(install()||attempts>=50)clearInterval(timer)},100);
+})();
+</script>
+<!-- END BL_BOOKING_LAYOUT_V4 -->
 </body></html>
