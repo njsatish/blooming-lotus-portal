@@ -1203,4 +1203,60 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
+
+<!-- BEGIN BL_MONTH_CALENDAR_V2 -->
+<style id="bl-month-calendar-v2-style">
+#bl-date-calendar-v2{margin:0 0 18px;padding:30px;border:1px solid #e7d9df;border-radius:26px;background:#fffafc;box-shadow:0 14px 38px rgba(84,35,63,.08);color:#382a31}
+#bl-date-calendar-v2 .bl-cal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:22px}
+#bl-date-calendar-v2 .bl-cal-kicker{margin:0 0 5px;font-size:12px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:#6c5c65}
+#bl-date-calendar-v2 .bl-cal-title{margin:0;font:700 clamp(30px,3vw,42px)/1.05 Georgia,serif;color:#3b2b33}
+#bl-date-calendar-v2 .bl-cal-nav{display:flex;gap:10px}
+#bl-date-calendar-v2 .bl-cal-nav button{width:46px;height:46px;border:1px solid #66555d;border-radius:50%;background:#fff;color:#3b2b33;font-size:26px;line-height:1;cursor:pointer}
+#bl-date-calendar-v2 .bl-cal-nav button:hover{border-color:#bd3c71;color:#bd3c71;background:#fff4f8}
+#bl-date-calendar-v2 .bl-cal-week,#bl-date-calendar-v2 .bl-cal-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px}
+#bl-date-calendar-v2 .bl-cal-week span{padding:7px 0;text-align:center;font-size:11px;font-weight:900;letter-spacing:.14em;color:#74646c}
+#bl-date-calendar-v2 .bl-cal-day{aspect-ratio:1;border:1px solid transparent;border-radius:14px;background:transparent;color:#382a31;font-size:15px;font-weight:800;cursor:pointer}
+#bl-date-calendar-v2 .bl-cal-day:hover:not(:disabled){background:#f7e2eb;border-color:#edc6d7}
+#bl-date-calendar-v2 .bl-cal-day:disabled{opacity:.22;cursor:not-allowed}
+#bl-date-calendar-v2 .bl-cal-day.is-today{border:2px solid #b82f68}
+#bl-date-calendar-v2 .bl-cal-day.is-selected{background:#bd3c71;border-color:#bd3c71;color:#fff}
+#bl-date-calendar-v2 .bl-cal-note{margin:20px 0 0;font-size:12px;color:#786871}
+#bl-date-calendar-v2 .bl-cal-closure{display:block;margin-top:8px;color:#9c3158;font-weight:700}
+.bl-date-native-v2{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important}
+@media(max-width:680px){#bl-date-calendar-v2{padding:20px;border-radius:20px}#bl-date-calendar-v2 .bl-cal-week,#bl-date-calendar-v2 .bl-cal-days{gap:3px}#bl-date-calendar-v2 .bl-cal-day{border-radius:10px;font-size:13px}#bl-date-calendar-v2 .bl-cal-nav button{width:40px;height:40px}}
+</style>
+<script id="bl-month-calendar-v2-script">
+(function(){
+'use strict';
+if(window.__BL_MONTH_CALENDAR_V2__)return;window.__BL_MONTH_CALENDAR_V2__=true;
+const dateInput=document.getElementById('bl-date');if(!dateInput)return;
+const pad=n=>String(n).padStart(2,'0');
+const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const fromIso=value=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(value||''))return null;const [y,m,d]=value.split('-').map(Number);return new Date(y,m-1,d)};
+const today=new Date();today.setHours(0,0,0,0);
+let selected=fromIso(dateInput.value);let view=new Date((selected||today).getFullYear(),(selected||today).getMonth(),1);
+const wrapper=dateInput.closest('label,div');if(wrapper)wrapper.classList.add('bl-date-native-v2');
+const calendar=document.createElement('section');calendar.id='bl-date-calendar-v2';calendar.setAttribute('aria-label','Select appointment date');
+const placement=(wrapper&&wrapper.parentElement)||dateInput.parentElement;placement.insertBefore(calendar,wrapper||dateInput);
+function closureMessage(value){dateInput.value=value;dateInput.dispatchEvent(new Event('input',{bubbles:true}));const message=dateInput.validationMessage;return message||''}
+function render(){
+ const title=view.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+ calendar.innerHTML=`<div class="bl-cal-head"><div><p class="bl-cal-kicker">Select a date</p><h3 class="bl-cal-title">${title}</h3></div><div class="bl-cal-nav"><button type="button" data-prev aria-label="Previous month">‹</button><button type="button" data-next aria-label="Next month">›</button></div></div><div class="bl-cal-week">${['SUN','MON','TUE','WED','THU','FRI','SAT'].map(x=>`<span>${x}</span>`).join('')}</div><div class="bl-cal-days"></div><p class="bl-cal-note">Past dates and unavailable closure dates cannot be selected.<span class="bl-cal-closure"></span></p>`;
+ const days=calendar.querySelector('.bl-cal-days'),first=view.getDay(),total=new Date(view.getFullYear(),view.getMonth()+1,0).getDate(),min=fromIso(dateInput.min),max=fromIso(dateInput.max);
+ for(let i=0;i<first;i++){const b=document.createElement('button');b.type='button';b.className='bl-cal-day';b.disabled=true;b.setAttribute('aria-hidden','true');days.appendChild(b)}
+ for(let n=1;n<=total;n++){
+  const d=new Date(view.getFullYear(),view.getMonth(),n),value=iso(d),b=document.createElement('button');b.type='button';b.className='bl-cal-day';b.textContent=n;b.dataset.date=value;
+  let disabled=d<today||(min&&d<min)||(max&&d>max);
+  const original=dateInput.value;const custom=closureMessage(value);dateInput.value=original;if(custom)disabled=true;
+  b.disabled=!!disabled;if(iso(today)===value)b.classList.add('is-today');if(selected&&iso(selected)===value)b.classList.add('is-selected');
+  b.addEventListener('click',()=>{selected=d;dateInput.value=value;dateInput.setCustomValidity('');dateInput.dispatchEvent(new Event('input',{bubbles:true}));dateInput.dispatchEvent(new Event('change',{bubbles:true}));render()});days.appendChild(b)
+ }
+ calendar.querySelector('[data-prev]').onclick=()=>{view=new Date(view.getFullYear(),view.getMonth()-1,1);render()};
+ calendar.querySelector('[data-next]').onclick=()=>{view=new Date(view.getFullYear(),view.getMonth()+1,1);render()};
+}
+dateInput.addEventListener('change',()=>{const d=fromIso(dateInput.value);if(d){selected=d;view=new Date(d.getFullYear(),d.getMonth(),1);render()}});
+render();
+})();
+</script>
+<!-- END BL_MONTH_CALENDAR_V2 -->
 </body></html>
