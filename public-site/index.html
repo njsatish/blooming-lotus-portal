@@ -1226,7 +1226,7 @@ form?.addEventListener('submit',async e=>{
   <div id="bl-slots" class="bl-slots" aria-live="polite"></div>
   <div class="bl-details">
     <div class="bl-details-grid">
-      <div><label for="bl-therapist">Therapist</label><select id="bl-therapist" disabled><option value="">Select a time first</option></select></div>
+      <div><label for="bl-therapist">Therapist</label><select id="bl-therapist" disabled><option value="No preference" selected>First available / No preference</option></select></div>
       <div><label for="bl-name">Name</label><input id="bl-name" autocomplete="name" required></div>
       <div><label for="bl-phone">Phone</label><input id="bl-phone" type="tel" autocomplete="tel" required></div>
       <div><label for="bl-email">Email</label><input id="bl-email" type="email" autocomplete="email"></div>
@@ -2174,4 +2174,48 @@ if(document.readyState==='loading'){
 <!-- BEGIN BL_V19_PART2_THERAPIST_DEFAULT -->
 <!-- Therapist options are generated with First available / No preference selected by the existing populateTherapists function. No polling or observers. -->
 <!-- END BL_V19_PART2_THERAPIST_DEFAULT -->
+
+<!-- BEGIN BL_V19_REPAIR_V2 -->
+<style id="bl-v19-repair-v2-style">
+.bl-v19-repair-v2-hidden{display:none!important}
+</style>
+<script id="bl-v19-repair-v2-script">
+(function(){
+'use strict';
+if(window.__BL_V19_REPAIR_V2__)return;window.__BL_V19_REPAIR_V2__=true;
+const clean=value=>String(value||'').replace(/\s+/g,' ').trim().toLowerCase();
+function fixTherapist(){
+ const select=document.getElementById('bl-therapist');if(!select)return;
+ let option=[...select.options].find(item=>item.value==='No preference'||clean(item.textContent)==='first available / no preference'||clean(item.textContent)==='no preference');
+ if(!option){option=document.createElement('option');select.insertBefore(option,select.firstChild)}
+ option.value='No preference';option.textContent='First available / No preference';option.selected=true;
+ select.value='No preference';
+}
+function hideCalloutShell(){
+ const services=document.getElementById('massage-services-gallery-v34');
+ const reviews=document.querySelector('.bl-review-gallery-v16')||document.querySelector('[data-review-gallery-v16="true"]');
+ if(!services||!reviews)return;
+ const serviceSection=services.closest('section')||services;
+ const reviewSection=reviews.closest('section')||reviews;
+ let node=reviewSection.nextElementSibling;
+ while(node&&node!==serviceSection){
+   const text=clean(node.textContent);
+   const hasAppointmentControl=[...node.querySelectorAll('a,button')].some(control=>clean(control.textContent).includes('appointment'));
+   if(hasAppointmentControl||text.includes('ready to schedule')||text.includes('choose a preferred date and time')){
+     node.classList.add('bl-v19-repair-v2-hidden');node.setAttribute('aria-hidden','true');
+   }
+   node=node.nextElementSibling;
+ }
+ // Fallback for nested shell: hide the smallest outer card containing the standalone CTA.
+ [...document.querySelectorAll('a,button')].filter(control=>clean(control.textContent).includes('appointment')&&!control.closest('#bl-booking-v14')).forEach(control=>{
+   let card=control.closest('section,aside,article');
+   if(!card){card=control.parentElement}
+   if(card&&services.compareDocumentPosition(card)&Node.DOCUMENT_POSITION_PRECEDING){card.classList.add('bl-v19-repair-v2-hidden');card.setAttribute('aria-hidden','true')}
+ });
+}
+function apply(){fixTherapist();hideCalloutShell()}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});else apply();
+})();
+</script>
+<!-- END BL_V19_REPAIR_V2 -->
 </body></html>
