@@ -1107,6 +1107,7 @@ form?.addEventListener('submit',async e=>{
   const $=id=>document.getElementById(id);
   const date=$('bl-date'),duration=$('bl-duration'),service=$('bl-service'),slots=$('bl-slots'),status=$('bl-status'),therapist=$('bl-therapist'),summary=$('bl-summary'),submit=$('bl-submit');
   let allSlots=[],selectedPeriod='morning';
+  let smartPeriodPending=true;
   const periodFor=time=>{const parts=String(time).split(':').map(Number),mins=parts[0]*60+parts[1];return mins<720?'morning':mins<1020?'afternoon':'evening'};
   const periodName={morning:'Morning',afternoon:'Afternoon',evening:'Evening'};
   function ensurePeriodControls(){
@@ -1115,7 +1116,7 @@ form?.addEventListener('submit',async e=>{
     box=document.createElement('div');box.id='bl-periods-v1';box.className='bl-periods-v1';box.hidden=true;
     box.innerHTML='<strong>Time of day</strong><div><button type="button" data-period="morning" class="active">Morning<small>Before 12 PM</small></button><button type="button" data-period="afternoon">Afternoon<small>12 PM–4:59 PM</small></button><button type="button" data-period="evening">Evening<small>5 PM or later</small></button></div>';
     slots.parentNode.insertBefore(box,slots);
-    box.querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>{box.querySelectorAll('button').forEach(x=>x.classList.remove('active'));button.classList.add('active');selectedPeriod=button.dataset.period;selectedTime='';renderTimes()}));
+    box.querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>{box.querySelectorAll('button').forEach(x=>x.classList.remove('active'));button.classList.add('active');selectedPeriod=button.dataset.period;smartPeriodPending=false;selectedTime='';renderTimes()}));
     return box;
   }
   function uniqueTherapists(items){const result=[];items.forEach(item=>(item.therapists||[]).forEach(name=>{if(name&&!result.includes(name))result.push(name)}));return result;}
@@ -1136,8 +1137,25 @@ form?.addEventListener('submit',async e=>{
     if(pieces.length<2||Number.isNaN(pieces[0])||Number.isNaN(pieces[1]))return false;
     return pieces[0]*60+pieces[1]<=businessNow().minutes;
   }
+  function setActivePeriodButton(){
+    const controls=ensurePeriodControls();
+    controls.querySelectorAll('button[data-period]').forEach(button=>button.classList.toggle('active',button.dataset.period===selectedPeriod));
+  }
+  function chooseSmartDefaultPeriod(){
+    const now=businessNow();
+    const selectedDate=date.value;
+    let preferred='morning';
+    if(selectedDate===now.date) preferred=now.minutes<720?'morning':now.minutes<1020?'afternoon':'evening';
+    const order=['morning','afternoon','evening'];
+    const candidates=selectedDate===now.date?order.slice(order.indexOf(preferred)):order;
+    const hasSlots=period=>allSlots.some(item=>!item.fullyBooked&&!isElapsedToday(item.time)&&slotMatchesTherapist(item)&&periodFor(item.time)===period);
+    selectedPeriod=candidates.find(hasSlots)||preferred;
+    setActivePeriodButton();
+  }
   function renderTimes(){
     selectedTime='';slots.innerHTML='';submit.disabled=true;summary.textContent='No appointment time selected.';
+    if(smartPeriodPending){chooseSmartDefaultPeriod();smartPeriodPending=false;}
+    setActivePeriodButton();
     const periods=ensurePeriodControls();
     if(!therapist.value){periods.hidden=true;setStatus('Choose a Massage Therapist to view available times.');return}
     periods.hidden=false;
@@ -1151,7 +1169,7 @@ form?.addEventListener('submit',async e=>{
   date.min=localToday();
   const prettyTime=t=>{const [h,m]=t.split(':').map(Number);return new Date(2000,0,1,h,m).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})};
   function setStatus(message,type=''){status.textContent=message;status.className='bl-status'+(type?' '+type:'')}
-  function resetSelection(){selectedTime='';slotMap={};allSlots=[];slots.innerHTML='';therapist.innerHTML='<option value="">Choose Massage Therapist</option>';therapist.disabled=true;ensurePeriodControls().hidden=true;submit.disabled=true;summary.textContent='No appointment time selected.'}
+  function resetSelection(){smartPeriodPending=true;selectedTime='';slotMap={};allSlots=[];slots.innerHTML='';therapist.innerHTML='<option value="">Choose Massage Therapist</option>';therapist.disabled=true;ensurePeriodControls().hidden=true;submit.disabled=true;summary.textContent='No appointment time selected.'}
   function updateSummary(){if(!selectedTime||!therapist.value){submit.disabled=true;return;}summary.textContent=`${service.value} — ${date.value} at ${prettyTime(selectedTime)} with ${therapist.value} (${duration.value} minutes)`;submit.disabled=false}
   async function loadAvailability(){
     resetSelection();if(!date.value){setStatus('Select a date to view available appointments.');return}
@@ -1490,4 +1508,8 @@ let attempts=0,timer=setInterval(()=>{attempts++;if(install()||attempts>=50)clea
 <!-- BEGIN BL_DEFAULT_STATUS_FIX_V8_1 -->
 <!-- The default First available / No preference selection now shows the actual matching-time count instead of asking for a therapist selection. -->
 <!-- END BL_DEFAULT_STATUS_FIX_V8_1 -->
+
+<!-- BEGIN BL_SMART_TIME_PERIOD_V10_2 -->
+<!-- Today defaults once to the current Roanoke period; future dates default to Morning. Manual choices are preserved. -->
+<!-- END BL_SMART_TIME_PERIOD_V10_2 -->
 </body></html>
