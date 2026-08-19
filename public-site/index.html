@@ -832,69 +832,6 @@ body {
 @media(max-width:680px){#bl-booking-v14 #bl-slots{grid-template-columns:repeat(2,minmax(0,1fr))}.bl-periods-v1>div{grid-template-columns:1fr}}
 </style>
 <!-- END BL_THERAPIST_FIRST_V1 -->
-
-<!-- BEGIN BL_BOOKING_CONTAINER_ALIGNMENT_V9_1 -->
-<style id="bl-booking-container-alignment-v9-1-style">
-/* Match the booking heading and booking cards to the standard site content width. */
-.bl-v9-section .bl-v9-heading-wrap,
-.bl-v9-section > .container,
-.bl-v9-section > [class*="container"]{
-  width:min(1520px,calc(100% - 64px))!important;
-  max-width:1520px!important;
-  margin-left:auto!important;
-  margin-right:auto!important;
-}
-#bl-booking-v14{
-  width:min(1520px,calc(100% - 64px))!important;
-  max-width:1520px!important;
-  margin-left:auto!important;
-  margin-right:auto!important;
-  padding-left:0!important;
-  padding-right:0!important;
-}
-#bl-booking-v14>.bl-grid{
-  width:100%!important;
-  max-width:100%!important;
-  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
-  gap:26px!important;
-}
-#bl-booking-v14 #bl-date-calendar-v2,
-#bl-booking-v14>.bl-grid>.bl-v3-right-panel{
-  width:100%!important;
-  max-width:100%!important;
-  min-width:0!important;
-  overflow:hidden!important;
-}
-/* Keep fields and slot grids inside the right card instead of extending beyond it. */
-#bl-booking-v14 .bl-v5-preferences,
-#bl-booking-v14 .bl-v3-right-panel .bl-details-grid{
-  width:100%!important;
-  max-width:100%!important;
-  min-width:0!important;
-}
-#bl-booking-v14 .bl-v5-preferences>div,
-#bl-booking-v14 .bl-v5-preferences select,
-#bl-booking-v14 .bl-v3-right-panel input,
-#bl-booking-v14 .bl-v3-right-panel select,
-#bl-booking-v14 .bl-v3-right-panel textarea{
-  min-width:0!important;
-  max-width:100%!important;
-}
-@media(max-width:1120px){
-  .bl-v9-section .bl-v9-heading-wrap,
-  .bl-v9-section > .container,
-  .bl-v9-section > [class*="container"],
-  #bl-booking-v14{width:min(900px,calc(100% - 28px))!important}
-  #bl-booking-v14>.bl-grid{grid-template-columns:1fr!important}
-}
-@media(max-width:680px){
-  .bl-v9-section .bl-v9-heading-wrap,
-  .bl-v9-section > .container,
-  .bl-v9-section > [class*="container"],
-  #bl-booking-v14{width:calc(100% - 18px)!important}
-}
-</style>
-<!-- END BL_BOOKING_CONTAINER_ALIGNMENT_V9_1 -->
 </head>
 <body>
 <div class="preview"><strong>Concept Preview</strong> — unofficial demo for Blooming Lotus Oriental Massage. Confirm business details before launch.</div>
@@ -1553,40 +1490,4 @@ let attempts=0,timer=setInterval(()=>{attempts++;if(install()||attempts>=50)clea
 <!-- BEGIN BL_DEFAULT_STATUS_FIX_V8_1 -->
 <!-- The default First available / No preference selection now shows the actual matching-time count instead of asking for a therapist selection. -->
 <!-- END BL_DEFAULT_STATUS_FIX_V8_1 -->
-
-<!-- BEGIN BL_FLAT_BOOKING_V9 -->
-<style id="bl-flat-booking-v9-style">
-/* Visually collapse the decorative wrappers between the section heading and booking UI. */
-.bl-v9-section{padding-top:42px!important;padding-bottom:54px!important}
-.bl-v9-section .bl-v9-heading{margin-bottom:18px!important}
-.bl-v9-section .bl-v9-heading-wrap{width:min(1440px,calc(100% - 40px))!important;max-width:1440px!important;margin-left:auto!important;margin-right:auto!important}
-.bl-v9-shell,.bl-v9-column,.bl-v9-wrapper{display:block!important;width:100%!important;max-width:none!important;min-width:0!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;outline:0!important}
-.bl-v9-empty{display:none!important}
-#bl-booking-v14{width:min(1460px,calc(100% - 32px))!important;max-width:1460px!important;margin:0 auto!important;padding:12px!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
-#bl-booking-v14>.bl-grid{gap:22px!important}
-#bl-booking-v14 #bl-date-calendar-v2,#bl-booking-v14>.bl-grid>.bl-v3-right-panel{border-radius:24px!important;min-height:820px!important;padding:30px!important;box-shadow:0 14px 38px rgba(84,35,63,.07)!important}
-@media(max-width:1120px){.bl-v9-section .bl-v9-heading-wrap{width:min(900px,calc(100% - 24px))!important}#bl-booking-v14{width:min(900px,calc(100% - 20px))!important;padding:8px!important}#bl-booking-v14 #bl-date-calendar-v2,#bl-booking-v14>.bl-grid>.bl-v3-right-panel{min-height:0!important}}
-</style>
-<script id="bl-flat-booking-v9-script">
-(function(){
-'use strict';
-if(window.__BL_FLAT_BOOKING_V9__)return;window.__BL_FLAT_BOOKING_V9__=true;
-const norm=v=>String(v||'').replace(/\s+/g,' ').trim().toLowerCase();
-function install(){
- const booking=document.getElementById('bl-booking-v14');if(!booking)return false;
- const section=booking.closest('section')||booking.parentElement;section.classList.add('bl-v9-section');
- const heading=[...section.querySelectorAll('h1,h2,h3')].find(h=>norm(h.textContent).includes('request an appointment'));
- if(heading){heading.classList.add('bl-v9-heading');const hw=heading.parentElement;if(hw)hw.classList.add('bl-v9-heading-wrap')}
- let node=booking.parentElement,depth=0;
- while(node&&node!==section&&depth<5){node.classList.add(depth===0?'bl-v9-column':depth===1?'bl-v9-shell':'bl-v9-wrapper');node=node.parentElement;depth++}
- // Hide only empty siblings left from the removed demo/therapist cards.
- const parent=booking.parentElement;
- if(parent&&parent.parentElement){[...parent.parentElement.children].forEach(sibling=>{if(sibling===parent)return;const meaningful=sibling.querySelector('form,input,select,textarea,button,img,video,iframe,canvas,svg,a[href]');if(!norm(sibling.textContent)&&!meaningful)sibling.classList.add('bl-v9-empty')})}
- return true;
-}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
-let tries=0,timer=setInterval(()=>{tries++;if(install()||tries>=50)clearInterval(timer)},100);
-})();
-</script>
-<!-- END BL_FLAT_BOOKING_V9 -->
 </body></html>
