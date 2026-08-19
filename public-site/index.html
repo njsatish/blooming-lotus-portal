@@ -1662,4 +1662,80 @@ let attempts=0,timer=setInterval(()=>{attempts++;if(install()||attempts>=40)clea
 })();
 </script>
 <!-- END BL_RATING_ALIGNMENT_V12 -->
+
+<!-- BEGIN BL_RATING_ALIGNMENT_V12_1 -->
+<style id="bl-rating-alignment-v12-1-style">
+/* Apply the centered width to the actual full-bleed gradient ancestor. */
+.bl-rating-gradient-v12-1{
+  width:min(1520px,calc(100% - 64px))!important;
+  max-width:1520px!important;
+  margin:42px auto!important;
+  border-radius:28px!important;
+  overflow:hidden!important;
+  box-sizing:border-box!important;
+  position:relative!important;
+  left:auto!important;
+  right:auto!important;
+  transform:none!important;
+}
+.bl-rating-gradient-v12-1 .bl-rating-content-v12-1{
+  width:min(1180px,calc(100% - 56px))!important;
+  max-width:1180px!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+  box-sizing:border-box!important;
+}
+/* Neutralize the ineffective V12 class when it landed on an inner node. */
+.bl-rating-aligned-v12:not(.bl-rating-gradient-v12-1){
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  border-radius:0!important;
+}
+@media(max-width:1120px){
+  .bl-rating-gradient-v12-1{width:min(900px,calc(100% - 28px))!important;margin:30px auto!important}
+  .bl-rating-gradient-v12-1 .bl-rating-content-v12-1{width:calc(100% - 32px)!important}
+}
+@media(max-width:680px){
+  .bl-rating-gradient-v12-1{width:calc(100% - 18px)!important;border-radius:20px!important}
+  .bl-rating-gradient-v12-1 .bl-rating-content-v12-1{width:calc(100% - 24px)!important}
+}
+</style>
+<script id="bl-rating-alignment-v12-1-script">
+(function(){
+'use strict';
+if(window.__BL_RATING_ALIGNMENT_V12_1__)return;
+window.__BL_RATING_ALIGNMENT_V12_1__=true;
+const normalize=value=>String(value||'').replace(/\s+/g,' ').trim().toLowerCase();
+function containsRating(node){
+ const text=normalize(node&&node.textContent);
+ return text.includes('4.9')&&text.includes('google ratings')&&
+   text.includes("i haven't felt this much relief in years")&&
+   text.includes('extremely clean, warmly greeted');
+}
+function install(){
+ const anchors=[...document.querySelectorAll('section,aside,article,div')].filter(containsRating);
+ if(!anchors.length)return false;
+ const inner=anchors.sort((a,b)=>a.textContent.length-b.textContent.length)[0];
+ let node=inner;
+ let gradient=null;
+ while(node&&node!==document.body){
+   const style=getComputedStyle(node);
+   const bg=(style.backgroundImage||'')+' '+(style.backgroundColor||'');
+   const wide=node.getBoundingClientRect().width>=window.innerWidth*.8;
+   if((bg.includes('gradient')||wide)&&containsRating(node))gradient=node;
+   node=node.parentElement;
+ }
+ if(!gradient)gradient=inner.closest('section')||inner;
+ gradient.classList.add('bl-rating-gradient-v12-1');
+ const content=[...gradient.children].find(child=>containsRating(child))||inner;
+ content.classList.add('bl-rating-content-v12-1');
+ document.documentElement.dataset.ratingAlignmentV121='complete';
+ return true;
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
+let attempts=0,timer=setInterval(()=>{attempts++;if(install()||attempts>=40)clearInterval(timer)},150);
+})();
+</script>
+<!-- END BL_RATING_ALIGNMENT_V12_1 -->
 </body></html>
