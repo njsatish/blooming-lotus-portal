@@ -458,12 +458,12 @@ def handle_appointment(event):
     if notes:item["notes"]=notes
     saved,message=reserve_and_create(item,date,preferred_time,duration,eligible if therapist=="No preference" else [therapist])
     if not saved:return response(409,{"message":message,"code":"SLOT_UNAVAILABLE"})
-    published=True
-    try:sns.publish(TopicArn=notification_topic_arn,Subject="Blooming Lotus - New Appointment Request",Message=f"Request #: {aid}\nCustomer: {name}\nTherapist: {saved['therapist']}\nDate: {date}\nTime: {preferred_time}\nLength: {saved['sessionLength']}")
-    except Exception as exc:print("SNS publish failed:",repr(exc));published=False
+    published=False
+    plainBusinessNotificationDisabled=True
+    print("Legacy SNS business notification disabled; SES HTML business email remains enabled.")
     business_email_sent,business_email_result=send_business_html_notification(saved)
     customer_email_sent,customer_email_result=send_customer_acknowledgement(saved)
-    return response(201,{"businessEmailSent":business_email_sent,"businessEmailResult":business_email_result,"customerEmailSent":customer_email_sent,"customerEmailResult":customer_email_result,"appointmentId":aid,"status":"REQUESTED","therapist":saved["therapist"],"notificationPublished":published,"message":"Appointment request received and the selected time is being held pending confirmation."})
+    return response(201,{"plainBusinessNotificationDisabled":plainBusinessNotificationDisabled,"businessEmailSent":business_email_sent,"businessEmailResult":business_email_result,"customerEmailSent":customer_email_sent,"customerEmailResult":customer_email_result,"appointmentId":aid,"status":"REQUESTED","therapist":saved["therapist"],"notificationPublished":published,"message":"Appointment request received and the selected time is being held pending confirmation."})
 
 def handler(event, context):
     method = request_method(event)
