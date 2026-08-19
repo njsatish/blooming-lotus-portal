@@ -1589,4 +1589,89 @@ let tries=0,timer=setInterval(()=>{tries++;if(install()||tries>=50)clearInterval
 })();
 </script>
 <!-- END BL_FLAT_BOOKING_V9 -->
+
+<!-- BEGIN BL_BOOKING_HEADING_ALIGNMENT_V9_2 -->
+<style id="bl-booking-heading-alignment-v9-2-style">
+/* The booking heading uses exactly the same centered container as the two cards. */
+.bl-v9-2-heading-container{
+  width:min(1520px,calc(100% - 64px))!important;
+  max-width:1520px!important;
+  margin:0 auto 34px!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+}
+.bl-v9-2-heading-container .bl-v9-2-kicker{
+  display:block!important;
+  margin:0 0 18px!important;
+  padding:0!important;
+}
+.bl-v9-2-heading-container .bl-v9-2-heading{
+  margin:0!important;
+  padding:0!important;
+  max-width:none!important;
+}
+/* Neutralize old full-bleed positioning on the original heading wrapper. */
+.bl-v9-2-original-heading-wrapper{
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:0!important;
+  transform:none!important;
+  left:auto!important;
+  right:auto!important;
+}
+#bl-booking-v14{
+  width:min(1520px,calc(100% - 64px))!important;
+  max-width:1520px!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+}
+@media(max-width:1120px){
+  .bl-v9-2-heading-container,#bl-booking-v14{
+    width:min(900px,calc(100% - 28px))!important;
+  }
+}
+@media(max-width:680px){
+  .bl-v9-2-heading-container,#bl-booking-v14{
+    width:calc(100% - 18px)!important;
+  }
+  .bl-v9-2-heading-container{margin-bottom:22px!important}
+}
+</style>
+<script id="bl-booking-heading-alignment-v9-2-script">
+(function(){
+'use strict';
+if(window.__BL_BOOKING_HEADING_ALIGNMENT_V9_2__)return;
+window.__BL_BOOKING_HEADING_ALIGNMENT_V9_2__=true;
+const normalize=value=>String(value||'').replace(/\s+/g,' ').trim().toLowerCase();
+function install(){
+ const booking=document.getElementById('bl-booking-v14');
+ if(!booking)return false;
+ const headings=[...document.querySelectorAll('h1,h2,h3')];
+ const heading=headings.find(node=>normalize(node.textContent)==='request an appointment.');
+ if(!heading)return false;
+ let container=document.querySelector('.bl-v9-2-heading-container');
+ if(!container){
+   container=document.createElement('div');
+   container.className='bl-v9-2-heading-container';
+   heading.parentElement.insertBefore(container,heading);
+ }
+ const original=heading.parentElement;
+ if(original!==container)original.classList.add('bl-v9-2-original-heading-wrapper');
+ const candidates=[...document.querySelectorAll('span,p,div')];
+ const kicker=candidates.filter(node=>normalize(node.textContent)==='booking experience').sort((a,b)=>a.textContent.length-b.textContent.length)[0]||null;
+ if(kicker){kicker.classList.add('bl-v9-2-kicker');container.appendChild(kicker)}
+ heading.classList.add('bl-v9-2-heading');container.appendChild(heading);
+ const bookingSection=booking.closest('section');
+ if(bookingSection&&container.parentElement!==bookingSection){
+   const firstBookingAncestor=[...bookingSection.children].find(child=>child.contains(booking));
+   bookingSection.insertBefore(container,firstBookingAncestor||bookingSection.firstChild);
+ }
+ return true;
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
+let attempts=0,timer=setInterval(()=>{attempts++;if(install()||attempts>=50)clearInterval(timer)},100);
+})();
+</script>
+<!-- END BL_BOOKING_HEADING_ALIGNMENT_V9_2 -->
 </body></html>
