@@ -2296,13 +2296,13 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </style>
 <div id="bl-confirm-overlay-v19-4" aria-hidden="true">
   <div id="bl-confirm-dialog-v19-4" role="dialog" aria-modal="true" aria-labelledby="bl-confirm-title-v19-4">
-    <div class="bl-v19-4-kicker">Review your selections</div>
-    <h2 id="bl-confirm-title-v19-4">Confirm appointment details</h2>
-    <p>Please confirm these selections before continuing. Choose “Change selections” to go back and make adjustments.</p>
+    <div class="bl-v19-4-kicker">Final review</div>
+    <h2 id="bl-confirm-title-v19-4">Review your appointment request</h2>
+    <p>Please review your appointment and contact details. The appointment is not confirmed until Blooming Lotus contacts you.</p>
     <div id="bl-confirm-summary-v19-4"></div>
     <div class="bl-v19-4-actions">
-      <button id="bl-confirm-change-v19-4" class="bl-v19-4-action" type="button">Change selections</button>
-      <button id="bl-confirm-continue-v19-4" class="bl-v19-4-action" type="button">Confirm &amp; continue</button>
+      <button id="bl-confirm-change-v19-4" class="bl-v19-4-action" type="button">Change details</button>
+      <button id="bl-confirm-continue-v19-4" class="bl-v19-4-action" type="button">Confirm &amp; send request</button>
     </div>
   </div>
 </div>
@@ -2323,8 +2323,14 @@ const submit=byId('bl-submit');
 let selectedTime='';
 let confirmedSignature='';
 let lastFocus=null;
+let allowFinalSubmission=false;
 
 function value(id){const el=byId(id);return el?String(el.value||'').trim():''}
+function fieldValue(ids,names){
+ for(const id of ids){const el=byId(id);if(el)return String(el.value||'').trim()}
+ for(const name of names){const el=booking.querySelector('[name="'+name+'"]');if(el)return String(el.value||'').trim()}
+ return ''
+}
 function selectedText(id){const el=byId(id);if(!el)return '';const option=el.options&&el.selectedIndex>=0?el.options[el.selectedIndex]:null;return String(option?option.textContent:el.value||'').replace(/\s+/g,' ').trim()}
 function timeFromControl(control){
  return String(control.dataset.time||control.dataset.value||control.getAttribute('data-slot')||control.textContent||'').replace(/\s+/g,' ').trim();
@@ -2340,7 +2346,9 @@ function formatDate(raw){
 }
 function rows(){return [
  ['Date',formatDate(value('bl-date'))],['Time',selectedTime],['Session length',selectedText('bl-duration')],
- ['Service',selectedText('bl-service')],['Therapist',selectedText('bl-therapist')]
+ ['Service',selectedText('bl-service')],['Therapist',selectedText('bl-therapist')],
+ ['Name',fieldValue(['bl-name'],['name','customerName'])],['Phone',fieldValue(['bl-phone'],['phone'])],
+ ['Email',fieldValue(['bl-email'],['email'])],['Notes',fieldValue(['bl-notes'],['notes'])||'None']
 ]}
 function populate(){summary.innerHTML=rows().map(([label,val])=>'<div class="bl-v19-4-row"><div class="bl-v19-4-label">'+escapeHtml(label)+'</div><div class="bl-v19-4-value">'+escapeHtml(val)+'</div></div>').join('')}
 function openDialog(){
@@ -2349,12 +2357,10 @@ function openDialog(){
 }
 function closeDialog(){overlay.setAttribute('aria-hidden','true');document.body.style.overflow='';if(lastFocus&&lastFocus.focus)lastFocus.focus()}
 function markConfirmed(){
- confirmedSignature=signature();closeDialog();
- let note=byId('bl-confirmed-note-v19-4');
- if(!note){note=document.createElement('div');note.id='bl-confirmed-note-v19-4';note.setAttribute('role','status');booking.appendChild(note)}
- note.textContent='Selections confirmed. Complete your contact details and submit the appointment request.';note.dataset.visible='true';
- const firstContact=byId('bl-name')||booking.querySelector('input[name="name"],input[type="text"]');
- if(firstContact){firstContact.scrollIntoView({behavior:'smooth',block:'center'});firstContact.focus({preventScroll:true})}
+ confirmedSignature=signature();closeDialog();allowFinalSubmission=true;
+ const form=submit&&submit.form?submit.form:booking.querySelector('form');
+ if(form&&typeof form.requestSubmit==='function')form.requestSubmit(submit);
+ else if(submit)submit.click();
 }
 function invalidate(){
  if(confirmedSignature&&confirmedSignature!==signature()){
@@ -2367,7 +2373,7 @@ booking.addEventListener('click',event=>{
  if(!control||control===submit||control.closest('#bl-confirm-overlay-v19-4'))return;
  if(control.matches('[data-period],[data-time-of-day],.bl-time-period,.bl-time-filter')||/^(morning|afternoon|evening)/i.test(String(control.textContent||'').trim()))return;
  const text=timeFromControl(control);
- if(validTime(text)){selectedTime=text;invalidate();openDialog()}
+ if(validTime(text)){selectedTime=text;invalidate()}
 });
 ['bl-date','bl-duration','bl-service','bl-therapist'].forEach(id=>{const el=byId(id);if(el)el.addEventListener('change',invalidate)});
 changeButton.addEventListener('click',closeDialog);
@@ -2375,9 +2381,13 @@ continueButton.addEventListener('click',markConfirmed);
 overlay.addEventListener('click',event=>{if(event.target===overlay)closeDialog()});
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&overlay.getAttribute('aria-hidden')==='false')closeDialog()});
 if(submit)submit.addEventListener('click',event=>{
- if(complete()&&confirmedSignature!==signature()){
-   event.preventDefault();event.stopImmediatePropagation();openDialog();
+ if(allowFinalSubmission){allowFinalSubmission=false;return}
+ const form=submit.form||booking.querySelector('form');
+ if(form&&typeof form.reportValidity==='function'&&!form.reportValidity()){
+   event.preventDefault();event.stopImmediatePropagation();return
  }
+ if(!complete())return;
+ event.preventDefault();event.stopImmediatePropagation();openDialog();
 },true);
 
 const heading=[...document.querySelectorAll('h1,h2,h3')].find(node=>node.textContent.trim().toLowerCase()==='request an appointment.');
@@ -2421,4 +2431,8 @@ booking.addEventListener('click',event=>{
 })();
 </script>
 <!-- END BL_BLOCK_SUNDAYS_V20_1_1 -->
+
+<!-- BEGIN BL_V19_PART4_2_FINAL_CONFIRM -->
+<!-- Confirmation opens only after Request Appointment is clicked and native required-field validation passes. Exact-time and time-of-day clicks never open the dialog. -->
+<!-- END BL_V19_PART4_2_FINAL_CONFIRM -->
 </body></html>
