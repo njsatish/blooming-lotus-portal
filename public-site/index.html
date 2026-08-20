@@ -1285,6 +1285,116 @@ body {
 })();
 </script>
 <!-- BLOOMING_LOTUS_VISIBLE_TIMES_V21_11_END -->
+<!-- BLOOMING_LOTUS_TIME_SLOTS_LAYOUT_V21_12_START -->
+<style id="blooming-lotus-time-slots-layout-v21-12">
+  /* The actual time-slot list must occupy normal document flow. */
+  [data-bl-time-grid-v21-12="true"] {
+    display:grid !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:12px !important;
+    width:100% !important;
+    min-width:0 !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    overflow:visible !important;
+    position:relative !important;
+    clip:auto !important;
+    clip-path:none !important;
+    margin-bottom:22px !important;
+  }
+  [data-bl-time-grid-v21-12="true"] > * {
+    min-width:0 !important;
+    max-width:100% !important;
+    height:auto !important;
+    min-height:64px !important;
+    overflow:visible !important;
+    position:relative !important;
+  }
+  /* Clear fixed-height and clipping rules only between the slot list and form. */
+  [data-bl-time-ancestor-v21-12="true"] {
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    overflow:visible !important;
+    clip:auto !important;
+    clip-path:none !important;
+  }
+  /* Keep the customer fields below the complete slot grid. */
+  [data-bl-customer-fields-v21-12="true"] {
+    position:relative !important;
+    clear:both !important;
+  }
+  [data-lotus-frame-v21-5="true"] {
+    height:auto !important;
+    max-height:none !important;
+    overflow:visible !important;
+  }
+  @media(max-width:760px){
+    [data-bl-time-grid-v21-12="true"]{grid-template-columns:repeat(2,minmax(0,1fr)) !important;}
+  }
+  @media(max-width:480px){
+    [data-bl-time-grid-v21-12="true"]{grid-template-columns:1fr !important;}
+  }
+</style>
+<script id="blooming-lotus-time-slots-script-v21-12">
+(function(){
+ 'use strict';
+ var timeRx=/^(?:0?[1-9]|1[0-2]):[0-5][0-9]\s*(?:AM|PM)\b/i;
+ function text(el){return(el&&el.textContent||'').replace(/\s+/g,' ').trim();}
+ function norm(el){return text(el).toLowerCase().replace(/[\s:*]+$/g,'').trim();}
+ function ancestors(el){var a=[];while(el&&el!==document.body){a.push(el);el=el.parentElement;}return a;}
+ function commonAncestor(nodes){
+   if(!nodes.length)return null;
+   return ancestors(nodes[0]).find(function(a){return nodes.every(function(n){return a.contains(n);});})||null;
+ }
+ function findNameLabel(){
+   return Array.from(document.querySelectorAll('label,legend,p,span,div')).find(function(el){
+     return el.children.length<=2&&norm(el)==='name';
+   });
+ }
+ function reset(){
+   document.querySelectorAll('[data-bl-time-grid-v21-12],[data-bl-time-ancestor-v21-12],[data-bl-customer-fields-v21-12]').forEach(function(el){
+     el.removeAttribute('data-bl-time-grid-v21-12');
+     el.removeAttribute('data-bl-time-ancestor-v21-12');
+     el.removeAttribute('data-bl-customer-fields-v21-12');
+   });
+ }
+ function apply(){
+   reset();
+   var frame=document.querySelector('[data-lotus-frame-v21-5="true"]');
+   if(!frame)return;
+   var candidates=Array.from(frame.querySelectorAll('button,[role="button"],label,div')).filter(function(el){
+     if(el.children.length>3)return false;
+     return timeRx.test(text(el));
+   });
+   /* Keep the smallest elements so parent text duplicates do not pollute detection. */
+   var slots=candidates.filter(function(el){
+     return !Array.from(el.children).some(function(child){return timeRx.test(text(child));});
+   });
+   if(!slots.length)return;
+   var grid=commonAncestor(slots);
+   if(!grid||!frame.contains(grid))return;
+   grid.setAttribute('data-bl-time-grid-v21-12','true');
+
+   var name=findNameLabel();
+   if(name&&frame.contains(name)){
+     var customer=name.parentElement;
+     if(customer)customer.setAttribute('data-bl-customer-fields-v21-12','true');
+     var node=grid.parentElement;
+     while(node&&node!==frame&&node.contains(grid)&&node.contains(name)){
+       node.setAttribute('data-bl-time-ancestor-v21-12','true');
+       node=node.parentElement;
+     }
+   }
+ }
+ var timer;function schedule(){clearTimeout(timer);timer=setTimeout(apply,120);}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});else apply();
+ new MutationObserver(schedule).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['class','style','hidden']});
+ window.addEventListener('resize',schedule);
+})();
+</script>
+<!-- BLOOMING_LOTUS_TIME_SLOTS_LAYOUT_V21_12_END -->
 </head>
 <body>
 <div class="preview"><strong>Concept Preview</strong> — unofficial demo for Blooming Lotus Oriental Massage. Confirm business details before launch.</div>
