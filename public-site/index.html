@@ -1192,6 +1192,96 @@ body {
 }
 </style>
 <!-- BLOOMING_LOTUS_DIRECT_TIME_SLOTS_FIX_V21_13_END -->
+<!-- BLOOMING_LOTUS_INITIAL_CLOSURE_V21_15_START -->
+<style id="blooming-lotus-initial-closure-v21-15">
+#bl-date-calendar-v2 .bl-cal-day.bl-announcement-closed-v21-15,
+#bl-date-calendar-v2 .bl-cal-day.bl-announcement-closed-v21-15:hover {
+  opacity:.34 !important;
+  color:#8f858a !important;
+  background:#eee9eb !important;
+  border-color:#ddd5d8 !important;
+  cursor:not-allowed !important;
+  box-shadow:none !important;
+}
+</style>
+<script id="blooming-lotus-initial-closure-script-v21-15">
+(function(){
+'use strict';
+const ANNOUNCEMENTS_API="https://w61mphhi00.execute-api.us-east-1.amazonaws.com";
+let closureRanges=[];
+function isoDate(value){return /^\d{4}-\d{2}-\d{2}$/.test(String(value||''));}
+function closedOn(date){return closureRanges.find(x=>x.start<=date&&date<=x.end);}
+function friendlyDate(value){
+ const d=new Date(value+'T12:00:00');
+ return Number.isNaN(d.getTime())?value:d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+}
+function usefulMessage(item,date){
+ const raw=String(item.message||'').trim();
+ if(raw && !/^(message|test)$/i.test(raw)) return raw;
+ return 'Blooming Lotus is closed on '+friendlyDate(date)+'. Please choose another appointment date.';
+}
+function applyClosures(){
+ document.querySelectorAll('#bl-date-calendar-v2 .bl-cal-day[data-date]').forEach(button=>{
+   const item=closedOn(button.dataset.date);
+   button.classList.toggle('bl-announcement-closed-v21-15',!!item);
+   if(item){
+     button.disabled=true;
+     button.setAttribute('aria-disabled','true');
+     button.setAttribute('tabindex','-1');
+     button.title=usefulMessage(item,button.dataset.date);
+   }
+ });
+}
+async function loadClosures(){
+ try{
+   const response=await fetch(ANNOUNCEMENTS_API+'/announcements/active',{cache:'no-store'});
+   const data=await response.json();
+   closureRanges=(data.announcements||[]).filter(x=>x.status==='PUBLISHED'&&x.blockAppointmentDates&&isoDate(x.closureStartDate)&&isoDate(x.closureEndDate)).map(x=>({start:x.closureStartDate,end:x.closureEndDate,title:x.title||'',message:x.message||''}));
+   applyClosures();
+ }catch(error){console.warn('Unable to load closure dates for calendar',error);}
+}
+
+/* Correct the message even when a closure date is selected before announcements finish loading. */
+const originalFetch=window.fetch.bind(window);
+window.fetch=async function(input,init){
+ const response=await originalFetch(input,init);
+ const url=String(typeof input==='string'?input:(input&&input.url)||'');
+ if(!url.includes('/availability')) return response;
+ try{
+   const data=await response.clone().json();
+   if(data&&data.closed){
+     const date=String(data.date||'');
+     const message=String(data.message||'').trim();
+     if(!message||/^(message|test)$/i.test(message)) data.message='Blooming Lotus is closed on '+friendlyDate(date)+'. Please choose another appointment date.';
+     const body=JSON.stringify(data);
+     return new Response(body,{status:response.status,statusText:response.statusText,headers:response.headers});
+   }
+ }catch(_error){}
+ return response;
+};
+
+/* The existing renderer shows “no therapists” unless data.closed is handled first.
+   Capture the completed availability request and replace that misleading status. */
+document.addEventListener('change',event=>{
+ if(event.target&&event.target.id==='bl-date') setTimeout(()=>{
+   const date=event.target.value,item=closedOn(date);
+   if(!item)return;
+   const status=document.getElementById('bl-status');
+   const slots=document.getElementById('bl-slots');
+   const therapist=document.getElementById('bl-therapist');
+   const periods=document.getElementById('bl-periods-v1');
+   if(slots)slots.innerHTML='';
+   if(therapist){therapist.innerHTML='<option value="">No therapists available — business closed</option>';therapist.disabled=true;}
+   if(periods)periods.hidden=true;
+   if(status){status.textContent=usefulMessage(item,date);status.className='bl-status error';}
+ },250);
+},true);
+
+new MutationObserver(applyClosures).observe(document.documentElement,{childList:true,subtree:true});
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadClosures,{once:true});else loadClosures();
+})();
+</script>
+<!-- BLOOMING_LOTUS_INITIAL_CLOSURE_V21_15_END -->
 </head>
 <body>
 <div class="preview"><strong>Concept Preview</strong> — unofficial demo for Blooming Lotus Oriental Massage. Confirm business details before launch.</div>
