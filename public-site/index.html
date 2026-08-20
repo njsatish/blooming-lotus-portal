@@ -2572,50 +2572,55 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <!-- Sunday styling is reapplied after date selection and every calendar interaction; CSS grid fallback persists through redraws. -->
 <!-- END BL_PERSISTENT_GRAY_SUNDAYS_V20_3_1 -->
 
-<!-- BEGIN BL_V20_6_RELIABILITY -->
-<style id="bl-v20-6-reliability-style">
-#bl-booking-v14[data-submit-state="sending"]{position:relative}
-#bl-booking-v14[data-submit-state="sending"]::after{
- content:"";position:absolute;inset:0;z-index:9998;background:rgba(255,255,255,.18);cursor:wait
-}
+<!-- BEGIN BL_V20_6_1_SUBMISSION -->
+<style id="bl-v20-6-1-submission-style">
+#bl-booking-v14[data-submit-state="sending"] input,
+#bl-booking-v14[data-submit-state="sending"] select,
+#bl-booking-v14[data-submit-state="sending"] textarea,
+#bl-booking-v14[data-submit-state="sending"] button:not(#bl-submit),
 #bl-booking-v14[data-submit-state="complete"] input,
 #bl-booking-v14[data-submit-state="complete"] select,
 #bl-booking-v14[data-submit-state="complete"] textarea,
-#bl-booking-v14[data-submit-state="complete"] button:not(#bl-start-another-v20-6){pointer-events:none!important;opacity:.72!important;cursor:not-allowed!important}
-#bl-start-another-v20-6{display:none;width:100%;margin-top:12px;padding:14px 20px;border:1px solid #b93770;border-radius:999px;background:#fff;color:#9d2b5e;font-size:16px;font-weight:800;cursor:pointer}
-#bl-start-another-v20-6[data-visible="true"]{display:block}
-.bl-closure-v20-6{color:#d8d3d6!important;background:transparent!important;border-color:transparent!important;box-shadow:none!important;pointer-events:none!important;cursor:not-allowed!important}
-#bl-closure-v20-6{display:none;margin:14px 0;padding:14px 16px;border:1px solid #e5b6b6;border-radius:12px;background:#fff1f1;color:#8d2d2d;font-weight:800}
-#bl-closure-v20-6[data-visible="true"]{display:block}
+#bl-booking-v14[data-submit-state="complete"] button:not(#bl-start-another-v20-6-1){pointer-events:none!important;cursor:not-allowed!important}
+#bl-booking-v14[data-submit-state="sending"]{opacity:.94}
+#bl-start-another-v20-6-1{display:none;width:100%;margin-top:12px;padding:14px 20px;border:1px solid #b93770;border-radius:999px;background:#fff;color:#9d2b5e;font-size:16px;font-weight:800;cursor:pointer}
+#bl-start-another-v20-6-1[data-visible="true"]{display:block}
 </style>
-<script id="bl-v20-6-reliability-script">
+<script id="bl-v20-6-1-submission-script">
 (function(){
 'use strict';
-if(window.__BL_V20_6_RELIABILITY__)return;window.__BL_V20_6_RELIABILITY__=true;
-const booking=document.getElementById('bl-booking-v14');const submit=document.getElementById('bl-submit');const dateInput=document.getElementById('bl-date');
-if(!booking||!submit||!dateInput)return;
-const originalLabel=String(submit.textContent||submit.value||'Request Appointment').trim();let done=false;
+if(window.__BL_V20_6_1_SUBMISSION__)return;window.__BL_V20_6_1_SUBMISSION__=true;
+const booking=document.getElementById('bl-booking-v14');const submit=document.getElementById('bl-submit');
+if(!booking||!submit)return;
+const normalLabel=String(submit.textContent||submit.value||'Request Appointment').trim();let complete=false;let activePosts=0;
 const setLabel=text=>{if(submit.tagName==='INPUT')submit.value=text;else submit.textContent=text};
-const appointmentId=data=>data&&(data.appointmentId||data.requestNumber||data.requestId)||'';
-let closureBox=document.getElementById('bl-closure-v20-6');if(!closureBox){closureBox=document.createElement('div');closureBox.id='bl-closure-v20-6';closureBox.setAttribute('role','alert');dateInput.parentElement.insertAdjacentElement('afterend',closureBox)}
-const closedDates=new Set();
-function range(start,end){if(!/^\d{4}-\d{2}-\d{2}$/.test(start||''))return[];const a=new Date(start+'T12:00:00'),b=new Date((end||start)+'T12:00:00'),r=[];for(let d=new Date(a);d<=b;d.setDate(d.getDate()+1))r.push(d.toISOString().slice(0,10));return r}
-function dateOf(control){return control.dataset.date||control.getAttribute('data-value')||control.value||''}
-function paintClosures(){booking.querySelectorAll('button,[data-date],[data-value]').forEach(c=>{if(closedDates.has(dateOf(c))){c.classList.add('bl-closure-v20-6');c.disabled=true;c.setAttribute('aria-disabled','true')}})}
-function showClosure(data,requested){const c=data.closure||{};range(c.start||requested,c.end||c.start||requested).forEach(d=>closedDates.add(d));closureBox.textContent=((c.title&&c.title!=='Message')?c.title+': ':'')+(data.message||'Blooming Lotus is closed on the selected date. Please choose another date.');closureBox.dataset.visible='true';if(dateInput.value===requested)dateInput.value='';requestAnimationFrame(paintClosures)}
-function begin(){if(done)return;booking.dataset.submitState='sending';setLabel('Sending Request...');submit.disabled=true;submit.setAttribute('aria-disabled','true')}
-function unlock(){if(done)return;booking.dataset.submitState='';submit.disabled=false;submit.removeAttribute('aria-disabled');setLabel(originalLabel)}
-function addAnother(){let b=document.getElementById('bl-start-another-v20-6');if(!b){b=document.createElement('button');b.type='button';b.id='bl-start-another-v20-6';b.textContent='Start Another Request';submit.insertAdjacentElement('afterend',b);b.addEventListener('click',()=>{const u=new URL(location.href);u.searchParams.set('new-request',Date.now());u.hash='bl-booking-v14';location.assign(u)})}b.dataset.visible='true'}
-function finish(data){if(done)return;done=true;booking.dataset.submitState='complete';booking.querySelectorAll('input,select,textarea,button').forEach(c=>{if(c.id!=='bl-start-another-v20-6'){c.disabled=true;c.setAttribute('aria-disabled','true')}});setLabel('Request Sent');addAnother();const id=appointmentId(data);if(id)booking.querySelectorAll('div,p,span').forEach(n=>{if(!n.children&&/^Request\s+BL-/i.test((n.textContent||'').trim())&&(n.textContent||'').includes(id))n.textContent=n.textContent.replace(/^Request\s+BL-[^\s]+\s+submitted\s+for\s+/i,'Submitted for ')})}
-function inspect(status,data,requested){if(data&&data.closed){showClosure(data,requested);return}if(status>=200&&status<300&&appointmentId(data))finish(data)}
-function urlDate(input){try{return new URL(typeof input==='string'?input:input.url,location.href).searchParams.get('date')||dateInput.value}catch(e){return dateInput.value}}
+const idFrom=data=>data&&(data.appointmentId||data.requestNumber||data.requestId)||'';
+function begin(){if(complete)return;activePosts++;booking.dataset.submitState='sending';submit.disabled=true;submit.setAttribute('aria-disabled','true');setLabel('Sending Request...')}
+function unlock(){if(complete)return;activePosts=Math.max(0,activePosts-1);if(activePosts)return;booking.dataset.submitState='';submit.disabled=false;submit.removeAttribute('aria-disabled');setLabel(normalLabel)}
+function addAnother(){let b=document.getElementById('bl-start-another-v20-6-1');if(!b){b=document.createElement('button');b.type='button';b.id='bl-start-another-v20-6-1';b.textContent='Start Another Request';submit.insertAdjacentElement('afterend',b);b.addEventListener('click',()=>{const u=new URL(location.href);u.searchParams.set('new-request',Date.now());u.hash='bl-booking-v14';location.assign(u)})}b.dataset.visible='true'}
+function removeDuplicate(id){if(!id)return;booking.querySelectorAll('div,p,span').forEach(n=>{if(n.children||n.closest('[role="alert"]'))return;const t=String(n.textContent||'').trim();if(t.includes(id)&&/^Request\s+BL-/i.test(t))n.textContent=t.replace(/^Request\s+BL-[^\s]+\s+submitted\s+for\s+/i,'Submitted for ')})}
+function finish(data){if(complete)return;complete=true;activePosts=0;booking.dataset.submitState='complete';booking.querySelectorAll('input,select,textarea,button').forEach(c=>{if(c.id!=='bl-start-another-v20-6-1'){c.disabled=true;c.setAttribute('aria-disabled','true')}});setLabel('Request Sent');removeDuplicate(idFrom(data));addAnother()}
+function process(status,data){if(status>=200&&status<300&&idFrom(data))finish(data);else unlock()}
+function isAppointmentPost(input,init){const method=String((init&&init.method)||(input&&input.method)||'GET').toUpperCase();if(method!=='POST')return false;const text=String(typeof input==='string'?input:(input&&input.url)||'');return !text.includes('/availability')}
 
-document.addEventListener('click',e=>{if(e.target.closest('#bl-confirm-continue-v19-4'))begin()},true);
 const nativeFetch=window.fetch.bind(window);
-window.fetch=async function(input,init){const method=String((init&&init.method)||(input&&input.method)||'GET').toUpperCase();const response=await nativeFetch(input,init);response.clone().json().then(data=>inspect(response.status,data,urlDate(input))).catch(()=>{if(method==='POST')unlock()});return response};
-const NX=window.XMLHttpRequest;function WX(){const x=new NX();let method='GET',url='';const open=x.open;x.open=function(m,u){method=String(m||'GET').toUpperCase();url=String(u||'');return open.apply(x,arguments)};x.addEventListener('load',()=>{try{inspect(x.status,JSON.parse(x.responseText||'{}'),urlDate(url))}catch(e){if(method==='POST')unlock()}});x.addEventListener('error',()=>{if(method==='POST')unlock()});return x}WX.prototype=NX.prototype;Object.getOwnPropertyNames(NX).forEach(k=>{try{WX[k]=NX[k]}catch(e){}});window.XMLHttpRequest=WX;
-booking.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const l=String(b.getAttribute('aria-label')||b.textContent||'').toLowerCase();if(l.includes('previous')||l.includes('next'))requestAnimationFrame(paintClosures)},true);
+window.fetch=async function(input,init){
+ const appointmentPost=isAppointmentPost(input,init);if(appointmentPost)begin();
+ try{const response=await nativeFetch(input,init);if(appointmentPost){response.clone().json().then(data=>process(response.status,data)).catch(unlock)}return response}
+ catch(error){if(appointmentPost)unlock();throw error}
+};
+
+const NativeXHR=window.XMLHttpRequest;
+function WrappedXHR(){
+ const xhr=new NativeXHR();let method='GET',url='',started=false;
+ const open=xhr.open;xhr.open=function(m,u){method=String(m||'GET').toUpperCase();url=String(u||'');return open.apply(xhr,arguments)};
+ const send=xhr.send;xhr.send=function(){started=method==='POST'&&!url.includes('/availability');if(started)begin();return send.apply(xhr,arguments)};
+ xhr.addEventListener('load',()=>{if(!started)return;try{process(xhr.status,JSON.parse(xhr.responseText||'{}'))}catch(error){unlock()}});
+ xhr.addEventListener('error',()=>{if(started)unlock()});xhr.addEventListener('abort',()=>{if(started)unlock()});
+ return xhr;
+}
+WrappedXHR.prototype=NativeXHR.prototype;Object.getOwnPropertyNames(NativeXHR).forEach(k=>{try{WrappedXHR[k]=NativeXHR[k]}catch(error){}});window.XMLHttpRequest=WrappedXHR;
 })();
 </script>
-<!-- END BL_V20_6_RELIABILITY -->
+<!-- END BL_V20_6_1_SUBMISSION -->
 </body></html>
