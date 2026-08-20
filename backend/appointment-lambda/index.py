@@ -392,6 +392,8 @@ def validate_date(date):
         return "Appointment date must use YYYY-MM-DD."
     if chosen < datetime.now(ZoneInfo("America/New_York")).date():
         return "Past appointment dates are not allowed. Choose today or a future date."
+    if chosen.weekday() == 6:
+        return "Blooming Lotus is closed on Sundays. Please choose Monday through Saturday."
     return None
 
 

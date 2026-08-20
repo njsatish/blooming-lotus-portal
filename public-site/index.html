@@ -2389,4 +2389,36 @@ if(heading&&heading.parentElement)heading.parentElement.classList.add('bl-v19-pa
 <!-- BEGIN BL_V19_PART4_1_EXACT_TIME_FIX -->
 <!-- Confirmation opens only for an exact appointment slot, never for Morning, Afternoon, or Evening filters. -->
 <!-- END BL_V19_PART4_1_EXACT_TIME_FIX -->
+
+<!-- BEGIN BL_BLOCK_SUNDAYS_V20_1_1 -->
+<style id="bl-block-sundays-v20-1-style">
+.bl-sunday-disabled-v20-1{opacity:.42!important;cursor:not-allowed!important;pointer-events:none!important;text-decoration:line-through!important}
+#bl-sunday-message-v20-1{display:none;margin:12px 0;padding:12px 14px;border:1px solid #f0d4a9;border-radius:12px;background:#fff8e8;color:#6b592f;font-size:14px;font-weight:800}
+#bl-sunday-message-v20-1[data-visible="true"]{display:block}
+</style>
+<script id="bl-block-sundays-v20-1-script">
+(function(){
+'use strict';
+if(window.__BL_BLOCK_SUNDAYS_V20_1_1__)return;window.__BL_BLOCK_SUNDAYS_V20_1_1__=true;
+const dateInput=document.getElementById('bl-date');
+const booking=document.getElementById('bl-booking-v14');
+if(!dateInput||!booking)return;
+let message=document.getElementById('bl-sunday-message-v20-1');
+if(!message){message=document.createElement('div');message.id='bl-sunday-message-v20-1';message.setAttribute('role','alert');message.textContent='Blooming Lotus is closed on Sundays. Please choose Monday through Saturday.';dateInput.parentElement.appendChild(message)}
+function isSunday(value){if(!/^\d{4}-\d{2}-\d{2}$/.test(value||''))return false;const p=value.split('-').map(Number);return new Date(p[0],p[1]-1,p[2]).getDay()===0}
+function validate(event){
+ if(!isSunday(dateInput.value)){message.dataset.visible='false';dateInput.setCustomValidity('');return true}
+ if(event){event.preventDefault();event.stopImmediatePropagation()}
+ dateInput.setCustomValidity('Blooming Lotus is closed on Sundays. Please choose Monday through Saturday.');message.dataset.visible='true';dateInput.value='';dateInput.focus();return false
+}
+dateInput.addEventListener('change',validate,true);
+dateInput.addEventListener('input',()=>{if(!isSunday(dateInput.value)){message.dataset.visible='false';dateInput.setCustomValidity('')}});
+booking.addEventListener('click',event=>{
+ const control=event.target.closest('[data-date],button');if(!control)return;
+ const raw=control.dataset.date||control.getAttribute('data-value')||'';
+ if(isSunday(raw)){event.preventDefault();event.stopImmediatePropagation();message.dataset.visible='true';dateInput.focus()}
+},true);
+})();
+</script>
+<!-- END BL_BLOCK_SUNDAYS_V20_1_1 -->
 </body></html>
