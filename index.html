@@ -501,145 +501,123 @@ footer{padding:56px 0 28px;background:linear-gradient(180deg,#4f1d3b,#41152f);co
     margin-top: 0 !important;
   }
 </style>
-<!-- BLOOMING_LOTUS_BOOKING_GLOW_V21_0_START -->
-<style id="blooming-lotus-booking-glow-v21-0">
-  /* Lotus Glow frame around the combined calendar + appointment area */
-  .bl-booking-glow-v21 {
+<!-- BLOOMING_LOTUS_GLOW_REPAIR_V21_1_START -->
+<style id="blooming-lotus-glow-repair-v21-1">
+  /* V21.1: visible Lotus Glow on the actual two-column booking card */
+  [data-lotus-glow-v21-1="true"] {
     position: relative !important;
+    overflow: visible !important;
     border: 2px solid #ca5b94 !important;
     border-radius: 24px !important;
     background: #fff !important;
     box-shadow:
-      0 0 0 7px rgba(202, 91, 148, 0.08),
-      0 14px 38px rgba(202, 91, 148, 0.18) !important;
-    overflow: hidden;
+      0 0 0 7px rgba(202, 91, 148, 0.10),
+      0 16px 42px rgba(202, 91, 148, 0.22) !important;
+    isolation: isolate;
   }
 
-  /* Bold booking labels: Session length, Service, Therapist, Time of day, etc. */
-  .bl-booking-glow-v21 label,
-  .bl-booking-glow-v21 .bl-bold-field-v21,
-  .bl-booking-glow-v21 legend {
-    color: #321522 !important;
+  /* Strong, consistent labels */
+  [data-lotus-booking-label-v21-1="true"] {
+    color: #3b2530 !important;
     font-weight: 800 !important;
   }
 
-  /* Keep dropdown/input values prominent but below the label hierarchy. */
-  .bl-booking-glow-v21 select,
-  .bl-booking-glow-v21 input,
-  .bl-booking-glow-v21 textarea {
-    color: #39242c !important;
+  /* Calendar heading and weekday row */
+  [data-lotus-calendar-heading-v21-1="true"],
+  [data-lotus-calendar-weekday-v21-1="true"] {
+    color: #38242e !important;
+    font-weight: 800 !important;
+  }
+
+  /* Selected values remain bold but subordinate to labels */
+  [data-lotus-glow-v21-1="true"] select,
+  [data-lotus-glow-v21-1="true"] input,
+  [data-lotus-glow-v21-1="true"] textarea {
     font-weight: 600 !important;
   }
 
-  /* Calendar heading and weekday labels. */
-  .bl-booking-glow-v21 .bl-calendar-title-v21 {
-    color: #28172c !important;
-    font-weight: 800 !important;
-  }
-  .bl-booking-glow-v21 .bl-calendar-week-v21 {
-    color: #4d1730 !important;
-    font-weight: 800 !important;
-  }
-
   @media (max-width: 760px) {
-    .bl-booking-glow-v21 {
+    [data-lotus-glow-v21-1="true"] {
       border-radius: 18px !important;
       box-shadow:
-        0 0 0 5px rgba(202, 91, 148, 0.08),
-        0 10px 28px rgba(202, 91, 148, 0.15) !important;
+        0 0 0 5px rgba(202, 91, 148, 0.10),
+        0 12px 30px rgba(202, 91, 148, 0.18) !important;
     }
   }
 </style>
-<script id="blooming-lotus-booking-glow-script-v21-0">
+<script id="blooming-lotus-glow-repair-script-v21-1">
 (function () {
   'use strict';
+  var labels = ['session length','service','therapist','time of day','name','phone','email','notes'];
+  var weekdays = ['sun','mon','tue','wed','thu','fri','sat'];
+  var monthRx = /^(january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{4}$/i;
 
-  var FIELD_LABELS = [
-    'session length', 'service', 'therapist', 'time of day',
-    'name', 'phone', 'email', 'notes'
-  ];
-  var WEEKDAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-
-  function cleanText(node) {
-    return (node && node.textContent ? node.textContent : '')
-      .replace(/\s+/g, ' ').trim().toLowerCase();
+  function text(el) {
+    return (el && el.textContent || '').replace(/\s+/g,' ').trim();
   }
-
-  function locateText(targets) {
-    var nodes = document.querySelectorAll('label, legend, h1, h2, h3, h4, p, span, div');
-    return Array.prototype.filter.call(nodes, function (node) {
-      var text = cleanText(node).replace(/[:*]/g, '').trim();
-      return targets.indexOf(text) !== -1 && node.children.length <= 3;
+  function normalized(el) {
+    return text(el).toLowerCase().replace(/[\s:*()]+$/g,'').trim();
+  }
+  function exactNode(values, regex) {
+    return Array.from(document.querySelectorAll('label,legend,h1,h2,h3,h4,h5,p,span,div')).find(function(el) {
+      if (el.children.length > 4) return false;
+      var t=text(el);
+      return regex ? regex.test(t) : values.indexOf(normalized(el)) >= 0;
     });
   }
-
-  function commonAncestor(a, b) {
-    if (!a || !b) return null;
-    var ancestors = [];
-    var node = a;
-    while (node && node !== document.body) {
-      ancestors.push(node);
-      node = node.parentElement;
-    }
-    node = b;
-    while (node && node !== document.body) {
-      if (ancestors.indexOf(node) !== -1) return node;
-      node = node.parentElement;
-    }
-    return null;
+  function ancestors(el) {
+    var out=[];
+    while (el && el !== document.body) { out.push(el); el=el.parentElement; }
+    return out;
   }
-
-  function enhanceBooking() {
-    var labels = locateText(FIELD_LABELS);
-    labels.forEach(function (node) { node.classList.add('bl-bold-field-v21'); });
-
-    /* Locate calendar month title using a month + four-digit year pattern. */
-    var calendarTitle = Array.prototype.find.call(
-      document.querySelectorAll('h1, h2, h3, h4, div, span'),
-      function (node) {
-        return /^(january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{4}$/i
-          .test((node.textContent || '').trim()) && node.children.length === 0;
-      }
-    );
-    if (calendarTitle) calendarTitle.classList.add('bl-calendar-title-v21');
-
-    locateText(WEEKDAYS).forEach(function (node) {
-      node.classList.add('bl-calendar-week-v21');
+  function bestBookingFrame(month, session) {
+    if (!month || !session) return null;
+    var candidates=ancestors(month).filter(function(el){ return el.contains(session); });
+    /* Select the smallest common container that visibly spans both columns. */
+    var valid=candidates.filter(function(el){
+      var box=el.getBoundingClientRect();
+      var mb=month.getBoundingClientRect();
+      var sb=session.getBoundingClientRect();
+      return box.width >= Math.abs(sb.right-mb.left)+40 && box.height > 300;
     });
-
-    var sessionLabel = labels.find(function (node) {
-      return cleanText(node).indexOf('session length') === 0;
+    return valid[0] || candidates[0] || null;
+  }
+  function apply() {
+    var month=exactNode([], monthRx);
+    var session=exactNode(['session length']);
+    document.querySelectorAll('label,legend').forEach(function(el){
+      var t=normalized(el);
+      if (labels.some(function(x){ return t === x || t.indexOf(x+' ')===0; }))
+        el.setAttribute('data-lotus-booking-label-v21-1','true');
     });
-
-    var frame = commonAncestor(calendarTitle, sessionLabel);
-    if (frame) {
-      /* Avoid selecting a page-wide wrapper when a tighter child contains both columns. */
-      var childCandidates = Array.prototype.filter.call(frame.children, function (child) {
-        return child.contains(calendarTitle) && child.contains(sessionLabel);
+    /* Fallback for labels implemented as div/span/p. */
+    labels.forEach(function(name){
+      var el=exactNode([name]);
+      if (el) el.setAttribute('data-lotus-booking-label-v21-1','true');
+    });
+    if (month) month.setAttribute('data-lotus-calendar-heading-v21-1','true');
+    weekdays.forEach(function(day){
+      document.querySelectorAll('span,div,p').forEach(function(el){
+        if (normalized(el)===day && el.children.length===0)
+          el.setAttribute('data-lotus-calendar-weekday-v21-1','true');
       });
-      if (childCandidates.length) frame = childCandidates[0];
-      frame.classList.add('bl-booking-glow-v21');
-      frame.setAttribute('data-booking-style', 'lotus-glow-v21-0');
-    } else {
-      console.warn('Blooming Lotus V21.0: booking frame not found; bold labels were still applied.');
-    }
+    });
+    var frame=bestBookingFrame(month,session);
+    document.querySelectorAll('[data-lotus-glow-v21-1="true"]').forEach(function(el){
+      if (el!==frame) el.removeAttribute('data-lotus-glow-v21-1');
+    });
+    if (frame) frame.setAttribute('data-lotus-glow-v21-1','true');
+    else console.warn('Blooming Lotus V21.1: calendar/form frame was not found.');
   }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', enhanceBooking, { once: true });
-  } else {
-    enhanceBooking();
-  }
-
-  /* Reapply after dynamic calendar/form rendering without creating duplicate classes. */
   var timer;
-  new MutationObserver(function () {
-    clearTimeout(timer);
-    timer = setTimeout(enhanceBooking, 120);
-  }).observe(document.documentElement, { childList: true, subtree: true });
+  function schedule(){ clearTimeout(timer); timer=setTimeout(apply,80); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',apply,{once:true});
+  else apply();
+  new MutationObserver(schedule).observe(document.documentElement,{childList:true,subtree:true});
+  window.addEventListener('resize',schedule);
 })();
 </script>
-<!-- BLOOMING_LOTUS_BOOKING_GLOW_V21_0_END -->
+<!-- BLOOMING_LOTUS_GLOW_REPAIR_V21_1_END -->
 </head>
 <body>
 <div class="preview"><strong>Concept Preview</strong> — unofficial demo for Blooming Lotus Oriental Massage. Confirm business details before launch.</div>
