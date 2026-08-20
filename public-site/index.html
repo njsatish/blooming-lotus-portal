@@ -2571,4 +2571,97 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <!-- BEGIN BL_PERSISTENT_GRAY_SUNDAYS_V20_3_1 -->
 <!-- Sunday styling is reapplied after date selection and every calendar interaction; CSS grid fallback persists through redraws. -->
 <!-- END BL_PERSISTENT_GRAY_SUNDAYS_V20_3_1 -->
+
+<!-- BEGIN BL_LOCK_AFTER_REQUEST_V20_4 -->
+<style id="bl-lock-after-request-v20-4-style">
+#bl-booking-v14[data-request-complete="true"] input,
+#bl-booking-v14[data-request-complete="true"] select,
+#bl-booking-v14[data-request-complete="true"] textarea,
+#bl-booking-v14[data-request-complete="true"] button:not(#bl-start-another-v20-4){
+  pointer-events:none!important;cursor:not-allowed!important
+}
+#bl-booking-v14[data-request-complete="true"] input,
+#bl-booking-v14[data-request-complete="true"] select,
+#bl-booking-v14[data-request-complete="true"] textarea{background:#f5f1f3!important;color:#695a62!important;opacity:.82!important}
+#bl-start-another-v20-4{
+  display:none;width:100%;margin-top:12px;padding:14px 20px;border:1px solid #b93770;
+  border-radius:999px;background:#fff;color:#9d2b5e;font-size:16px;font-weight:800;cursor:pointer
+}
+#bl-start-another-v20-4[data-visible="true"]{display:block}
+#bl-submit[data-sending="true"]{opacity:.72!important;cursor:wait!important}
+</style>
+<script id="bl-lock-after-request-v20-4-script">
+(function(){
+'use strict';
+if(window.__BL_LOCK_AFTER_REQUEST_V20_4__)return;
+window.__BL_LOCK_AFTER_REQUEST_V20_4__=true;
+const booking=document.getElementById('bl-booking-v14');
+const submit=document.getElementById('bl-submit');
+if(!booking||!submit)return;
+const originalLabel=String(submit.textContent||submit.value||'Request Appointment').trim();
+let completed=false;
+
+function setButtonLabel(text){if('value' in submit&&submit.tagName==='INPUT')submit.value=text;else submit.textContent=text}
+function appointmentIdFrom(data){return data&&(data.appointmentId||data.requestNumber||data.requestId)||''}
+function removeDuplicateRequestNumber(appointmentId){
+ if(!appointmentId)return;
+ const escaped=appointmentId.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+ const pattern=new RegExp('Request\\s+'+escaped+'\\s+submitted\\s+for\\s+','i');
+ booking.querySelectorAll('div,p,span').forEach(node=>{
+   if(node.closest('[role="alert"]')||node.children.length)return;
+   const text=String(node.textContent||'').trim();
+   if(pattern.test(text))node.textContent=text.replace(pattern,'Submitted for ');
+ });
+}
+function addStartAnother(){
+ let button=document.getElementById('bl-start-another-v20-4');
+ if(!button){
+   button=document.createElement('button');button.type='button';button.id='bl-start-another-v20-4';
+   button.textContent='Start Another Request';submit.insertAdjacentElement('afterend',button);
+   button.addEventListener('click',()=>{
+     const url=new URL(window.location.href);url.searchParams.set('new-request',Date.now().toString());url.hash='bl-booking-v14';window.location.assign(url.toString());
+   });
+ }
+ button.dataset.visible='true';
+}
+function lockCompletedRequest(data){
+ if(completed)return;completed=true;
+ const appointmentId=appointmentIdFrom(data);
+ booking.dataset.requestComplete='true';
+ booking.querySelectorAll('input,select,textarea,button').forEach(control=>{
+   if(control.id==='bl-start-another-v20-4')return;
+   control.disabled=true;control.setAttribute('aria-disabled','true');
+ });
+ submit.dataset.sending='false';setButtonLabel('Request Sent');
+ removeDuplicateRequestNumber(appointmentId);addStartAnother();
+}
+function restoreAfterFailure(){
+ if(completed)return;
+ submit.disabled=false;submit.removeAttribute('aria-disabled');submit.dataset.sending='false';setButtonLabel(originalLabel);
+}
+
+/* Show an immediate in-progress state after final confirmation. */
+document.addEventListener('click',event=>{
+ const confirm=event.target.closest('#bl-confirm-continue-v19-4');
+ if(!confirm)return;
+ submit.disabled=true;submit.setAttribute('aria-disabled','true');submit.dataset.sending='true';setButtonLabel('Sending Request...');
+},true);
+
+/* Observe the existing appointment POST response without changing its request body
+   or backend behavior. A successful appointmentId locks the completed form. */
+const nativeFetch=window.fetch.bind(window);
+window.fetch=async function(input,init){
+ const response=await nativeFetch(input,init);
+ const method=String((init&&init.method)||'GET').toUpperCase();
+ if(method!=='POST')return response;
+ const clone=response.clone();
+ clone.json().then(data=>{
+   if(response.ok&&appointmentIdFrom(data))requestAnimationFrame(()=>lockCompletedRequest(data));
+   else requestAnimationFrame(restoreAfterFailure);
+ }).catch(()=>requestAnimationFrame(restoreAfterFailure));
+ return response;
+};
+})();
+</script>
+<!-- END BL_LOCK_AFTER_REQUEST_V20_4 -->
 </body></html>
