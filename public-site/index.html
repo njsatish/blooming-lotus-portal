@@ -1126,6 +1126,39 @@ body {
   }
 </style>
 <!-- BLOOMING_LOTUS_HEADING_GAP_V21_8_END -->
+<!-- BLOOMING_LOTUS_BOTTOM_SPACE_V21_9_START -->
+<style id="blooming-lotus-bottom-space-v21-9">
+  /*
+    Remove inherited fixed/minimum heights from only the working booking frame.
+    The card will end shortly after the taller calendar/form column instead of
+    reserving unused space below the controls.
+  */
+  [data-lotus-frame-v21-5="true"] {
+    min-height:0 !important;
+    height:auto !important;
+    align-items:stretch !important;
+  }
+
+  /* The two direct booking columns may carry their own minimum heights. */
+  [data-lotus-frame-v21-5="true"] > * {
+    min-height:0 !important;
+    height:auto !important;
+  }
+
+  /* Keep a comfortable, consistent bottom inset without a large empty area. */
+  [data-lotus-frame-v21-5="true"] > *:first-child,
+  [data-lotus-frame-v21-5="true"] > *:last-child {
+    padding-bottom:28px !important;
+  }
+
+  @media(max-width:760px){
+    [data-lotus-frame-v21-5="true"] > *:first-child,
+    [data-lotus-frame-v21-5="true"] > *:last-child {
+      padding-bottom:22px !important;
+    }
+  }
+</style>
+<!-- BLOOMING_LOTUS_BOTTOM_SPACE_V21_9_END -->
 </head>
 <body>
 <div class="preview"><strong>Concept Preview</strong> — unofficial demo for Blooming Lotus Oriental Massage. Confirm business details before launch.</div>
