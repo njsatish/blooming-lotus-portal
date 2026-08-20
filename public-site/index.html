@@ -2694,4 +2694,98 @@ document.addEventListener('click',event=>{if(event.target.closest('#bl-confirm-c
 })();
 </script>
 <!-- END BL_LOCK_AFTER_REQUEST_V20_4_1 -->
+
+<!-- BEGIN BL_CLOSURE_MESSAGE_V20_5 -->
+<style id="bl-closure-message-v20-5-style">
+.bl-closure-date-v20-5{
+  color:#d8d3d6!important;background:transparent!important;
+  border-color:transparent!important;box-shadow:none!important;
+  cursor:not-allowed!important;pointer-events:none!important;opacity:1!important
+}
+#bl-closure-message-v20-5{
+  display:none;margin:14px 0;padding:14px 16px;border:1px solid #e5b6b6;
+  border-radius:12px;background:#fff1f1;color:#8d2d2d;font-size:15px;font-weight:800;line-height:1.45
+}
+#bl-closure-message-v20-5[data-visible="true"]{display:block}
+</style>
+<script id="bl-closure-message-v20-5-script">
+(function(){
+'use strict';
+if(window.__BL_CLOSURE_MESSAGE_V20_5__)return;
+window.__BL_CLOSURE_MESSAGE_V20_5__=true;
+const booking=document.getElementById('bl-booking-v14');
+const dateInput=document.getElementById('bl-date');
+if(!booking||!dateInput)return;
+const closedDates=new Set();
+let message=document.getElementById('bl-closure-message-v20-5');
+if(!message){
+ message=document.createElement('div');message.id='bl-closure-message-v20-5';message.setAttribute('role','alert');message.setAttribute('aria-live','assertive');
+ const therapist=document.getElementById('bl-therapist');
+ (therapist?.parentElement||dateInput.parentElement).insertAdjacentElement('afterend',message);
+}
+function isoDates(start,end){
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(start||''))return [];
+ const first=new Date(start+'T12:00:00');const last=/^\d{4}-\d{2}-\d{2}$/.test(end||'')?new Date(end+'T12:00:00'):first;
+ const result=[];for(let d=new Date(first);d<=last;d.setDate(d.getDate()+1))result.push(d.toISOString().slice(0,10));return result
+}
+function controlDate(control){return control.dataset.date||control.getAttribute('data-value')||control.getAttribute('value')||''}
+function applyClosedDates(){
+ booking.querySelectorAll('button,[data-date],[data-value]').forEach(control=>{
+   const date=controlDate(control);if(!closedDates.has(date))return;
+   control.classList.add('bl-closure-date-v20-5');control.setAttribute('aria-disabled','true');control.setAttribute('tabindex','-1');
+   if(control.tagName==='BUTTON')control.disabled=true;
+ });
+}
+function showClosure(payload,requestedDate){
+ const closure=payload&&payload.closure||{};
+ const start=closure.start||requestedDate;const end=closure.end||start;
+ isoDates(start,end).forEach(date=>closedDates.add(date));
+ const text=(payload&&payload.message)||'Blooming Lotus is closed on the selected date. Please choose another date.';
+ const title=closure.title&&closure.title!=='Message'?closure.title:'';
+ message.textContent=title?title+': '+text:text;message.dataset.visible='true';
+ if(dateInput.value===requestedDate)dateInput.value='';
+ requestAnimationFrame(applyClosedDates);
+}
+function requestedDate(input){
+ try{const url=new URL(typeof input==='string'?input:input.url,location.href);return url.searchParams.get('date')||dateInput.value}catch(error){return dateInput.value}
+}
+function isAvailability(input){try{return new URL(typeof input==='string'?input:input.url,location.href).pathname.includes('/availability')}catch(error){return false}}
+
+const nativeFetch=window.fetch.bind(window);
+window.fetch=async function(input,init){
+ const response=await nativeFetch(input,init);
+ if(response.status===409&&isAvailability(input)){
+   const date=requestedDate(input);
+   response.clone().json().then(payload=>showClosure(payload,date)).catch(()=>showClosure({},date));
+ }
+ return response;
+};
+
+const NativeXHR=window.XMLHttpRequest;
+function WrappedXHR(){
+ const xhr=new NativeXHR();let url='';let method='GET';
+ const open=xhr.open;xhr.open=function(m,u){method=String(m||'GET').toUpperCase();url=String(u||'');return open.apply(xhr,arguments)};
+ xhr.addEventListener('load',()=>{
+   if(method==='GET'&&xhr.status===409&&isAvailability(url)){
+     let payload={};try{payload=JSON.parse(xhr.responseText||'{}')}catch(error){}
+     showClosure(payload,requestedDate(url));
+   }
+ });
+ return xhr;
+}
+WrappedXHR.prototype=NativeXHR.prototype;
+Object.getOwnPropertyNames(NativeXHR).forEach(key=>{try{WrappedXHR[key]=NativeXHR[key]}catch(error){}});
+window.XMLHttpRequest=WrappedXHR;
+
+booking.addEventListener('click',event=>{
+ const control=event.target.closest('button,[data-date],[data-value]');if(!control)return;
+ const date=controlDate(control);
+ if(closedDates.has(date)){event.preventDefault();event.stopImmediatePropagation();message.dataset.visible='true';dateInput.focus();return}
+ const label=String(control.getAttribute('aria-label')||control.textContent||'').toLowerCase();
+ if(label.includes('previous')||label.includes('next'))requestAnimationFrame(applyClosedDates);
+},true);
+dateInput.addEventListener('change',()=>{message.dataset.visible='false';requestAnimationFrame(applyClosedDates)});
+})();
+</script>
+<!-- END BL_CLOSURE_MESSAGE_V20_5 -->
 </body></html>
