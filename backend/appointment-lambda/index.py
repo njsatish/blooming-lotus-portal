@@ -425,8 +425,10 @@ def handle_availability(event):
     closure = closure_for_date(date)
     if closure:
         return response(
-            409,
+            200,
             {
+                "closed": True,
+                "date": date,
                 "message": closure.get("message")
                 or "Blooming Lotus is closed on the selected date. Please choose another date.",
                 "closure": {
@@ -434,6 +436,8 @@ def handle_availability(event):
                     "start": closure.get("closureStartDate"),
                     "end": closure.get("closureEndDate"),
                 },
+                "therapists": [],
+                "slots": [],
             },
         )
 

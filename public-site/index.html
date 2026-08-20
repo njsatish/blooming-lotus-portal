@@ -2572,220 +2572,50 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <!-- Sunday styling is reapplied after date selection and every calendar interaction; CSS grid fallback persists through redraws. -->
 <!-- END BL_PERSISTENT_GRAY_SUNDAYS_V20_3_1 -->
 
-<!-- BEGIN BL_LOCK_AFTER_REQUEST_V20_4_1 -->
-<style id="bl-lock-after-request-v20-4-1-style">
-#bl-booking-v14[data-submission-state="sending"] input,
-#bl-booking-v14[data-submission-state="sending"] select,
-#bl-booking-v14[data-submission-state="sending"] textarea,
-#bl-booking-v14[data-submission-state="sending"] button:not(#bl-submit),
-#bl-booking-v14[data-submission-state="complete"] input,
-#bl-booking-v14[data-submission-state="complete"] select,
-#bl-booking-v14[data-submission-state="complete"] textarea,
-#bl-booking-v14[data-submission-state="complete"] button:not(#bl-start-another-v20-4-1){
-  pointer-events:none!important;cursor:not-allowed!important
+<!-- BEGIN BL_V20_6_RELIABILITY -->
+<style id="bl-v20-6-reliability-style">
+#bl-booking-v14[data-submit-state="sending"]{position:relative}
+#bl-booking-v14[data-submit-state="sending"]::after{
+ content:"";position:absolute;inset:0;z-index:9998;background:rgba(255,255,255,.18);cursor:wait
 }
-#bl-booking-v14[data-submission-state="sending"] input,
-#bl-booking-v14[data-submission-state="sending"] select,
-#bl-booking-v14[data-submission-state="sending"] textarea,
-#bl-booking-v14[data-submission-state="complete"] input,
-#bl-booking-v14[data-submission-state="complete"] select,
-#bl-booking-v14[data-submission-state="complete"] textarea{
-  background:#f5f1f3!important;color:#695a62!important;opacity:.76!important
-}
-#bl-start-another-v20-4-1{
-  display:none;width:100%;margin-top:12px;padding:14px 20px;border:1px solid #b93770;
-  border-radius:999px;background:#fff;color:#9d2b5e;font-size:16px;font-weight:800;cursor:pointer
-}
-#bl-start-another-v20-4-1[data-visible="true"]{display:block}
+#bl-booking-v14[data-submit-state="complete"] input,
+#bl-booking-v14[data-submit-state="complete"] select,
+#bl-booking-v14[data-submit-state="complete"] textarea,
+#bl-booking-v14[data-submit-state="complete"] button:not(#bl-start-another-v20-6){pointer-events:none!important;opacity:.72!important;cursor:not-allowed!important}
+#bl-start-another-v20-6{display:none;width:100%;margin-top:12px;padding:14px 20px;border:1px solid #b93770;border-radius:999px;background:#fff;color:#9d2b5e;font-size:16px;font-weight:800;cursor:pointer}
+#bl-start-another-v20-6[data-visible="true"]{display:block}
+.bl-closure-v20-6{color:#d8d3d6!important;background:transparent!important;border-color:transparent!important;box-shadow:none!important;pointer-events:none!important;cursor:not-allowed!important}
+#bl-closure-v20-6{display:none;margin:14px 0;padding:14px 16px;border:1px solid #e5b6b6;border-radius:12px;background:#fff1f1;color:#8d2d2d;font-weight:800}
+#bl-closure-v20-6[data-visible="true"]{display:block}
 </style>
-<script id="bl-lock-after-request-v20-4-1-script">
+<script id="bl-v20-6-reliability-script">
 (function(){
 'use strict';
-if(window.__BL_LOCK_AFTER_REQUEST_V20_4_1__)return;
-window.__BL_LOCK_AFTER_REQUEST_V20_4_1__=true;
-const booking=document.getElementById('bl-booking-v14');
-const submit=document.getElementById('bl-submit');
-if(!booking||!submit)return;
-const initialLabel=String(submit.textContent||submit.value||'Request Appointment').trim();
-let finished=false;
-let requestObserved=false;
-function label(text){if(submit.tagName==='INPUT')submit.value=text;else submit.textContent=text}
-function requestId(data){return data&&(data.appointmentId||data.requestNumber||data.requestId)||''}
-function setControlsDisabled(disabled){
- booking.querySelectorAll('input,select,textarea,button').forEach(control=>{
-   if(control.id==='bl-start-another-v20-4-1')return;
-   control.disabled=disabled;control.setAttribute('aria-disabled',disabled?'true':'false');
- });
-}
-function beginSending(){
- if(finished)return;
- booking.dataset.submissionState='sending';setControlsDisabled(true);submit.disabled=true;label('Sending Request...');
-}
-function removeDuplicateRequestId(id){
- if(!id)return;
- booking.querySelectorAll('div,p,span').forEach(node=>{
-   if(node.children.length||node.closest('[role="alert"]'))return;
-   const text=String(node.textContent||'').trim();
-   if(text.includes(id)&&/^Request\s+BL-/i.test(text))node.textContent=text.replace(/^Request\s+BL-[^\s]+\s+submitted\s+for\s+/i,'Submitted for ');
- });
-}
-function addStartAnother(){
- let button=document.getElementById('bl-start-another-v20-4-1');
- if(!button){
-   button=document.createElement('button');button.type='button';button.id='bl-start-another-v20-4-1';button.textContent='Start Another Request';
-   submit.insertAdjacentElement('afterend',button);
-   button.addEventListener('click',()=>{const url=new URL(location.href);url.searchParams.set('new-request',Date.now());url.hash='bl-booking-v14';location.assign(url)});
- }
- button.dataset.visible='true';button.disabled=false;button.removeAttribute('aria-disabled');
-}
-function complete(data){
- if(finished)return;finished=true;
- const id=requestId(data);booking.dataset.submissionState='complete';setControlsDisabled(true);label('Request Sent');
- removeDuplicateRequestId(id);addStartAnother();
-}
-function fail(){
- if(finished)return;
- booking.dataset.submissionState='';setControlsDisabled(false);submit.disabled=false;submit.removeAttribute('aria-disabled');label(initialLabel);
-}
-function process(status,data){
- if(status>=200&&status<300&&requestId(data)){complete(data)}else{fail()}
-}
-
-document.addEventListener('click',event=>{
- if(event.target.closest('#bl-confirm-continue-v19-4'))beginSending();
-},true);
-
-const nativeFetch=window.fetch.bind(window);
-window.fetch=async function(input,init){
- const method=String((init&&init.method)||(input&&input.method)||'GET').toUpperCase();
- const response=await nativeFetch(input,init);
- if(method==='POST'){
-   requestObserved=true;
-   response.clone().json().then(data=>process(response.status,data)).catch(fail);
- }
- return response;
-};
-
-const NativeXHR=window.XMLHttpRequest;
-function WrappedXHR(){
- const xhr=new NativeXHR();let method='GET';
- const open=xhr.open;xhr.open=function(m){method=String(m||'GET').toUpperCase();return open.apply(xhr,arguments)};
- xhr.addEventListener('load',()=>{
-   if(method!=='POST')return;requestObserved=true;
-   try{process(xhr.status,JSON.parse(xhr.responseText||'{}'))}catch(error){fail()}
- });
- xhr.addEventListener('error',()=>{if(method==='POST')fail()});
- return xhr;
-}
-WrappedXHR.prototype=NativeXHR.prototype;
-Object.getOwnPropertyNames(NativeXHR).forEach(key=>{try{WrappedXHR[key]=NativeXHR[key]}catch(error){}});
-window.XMLHttpRequest=WrappedXHR;
-
-/* If the existing handler emits its green success status independently, capture
-   that same appointment ID through a short, bounded sequence of animation frames. */
-function scanSuccess(frames){
- if(finished)return;
- const status=[...booking.querySelectorAll('[role="alert"],.bl-status,.bl-message,div,p')].find(node=>/Request number:\s*(BL-[A-Z0-9-]+)/i.test(node.textContent||''));
- if(status){const match=(status.textContent||'').match(/Request number:\s*(BL-[A-Z0-9-]+)/i);complete({appointmentId:match&&match[1]});return}
- if(frames>0)requestAnimationFrame(()=>scanSuccess(frames-1));
- else if(!requestObserved)fail();
-}
-document.addEventListener('click',event=>{if(event.target.closest('#bl-confirm-continue-v19-4'))requestAnimationFrame(()=>scanSuccess(240))},true);
-})();
-</script>
-<!-- END BL_LOCK_AFTER_REQUEST_V20_4_1 -->
-
-<!-- BEGIN BL_CLOSURE_MESSAGE_V20_5 -->
-<style id="bl-closure-message-v20-5-style">
-.bl-closure-date-v20-5{
-  color:#d8d3d6!important;background:transparent!important;
-  border-color:transparent!important;box-shadow:none!important;
-  cursor:not-allowed!important;pointer-events:none!important;opacity:1!important
-}
-#bl-closure-message-v20-5{
-  display:none;margin:14px 0;padding:14px 16px;border:1px solid #e5b6b6;
-  border-radius:12px;background:#fff1f1;color:#8d2d2d;font-size:15px;font-weight:800;line-height:1.45
-}
-#bl-closure-message-v20-5[data-visible="true"]{display:block}
-</style>
-<script id="bl-closure-message-v20-5-script">
-(function(){
-'use strict';
-if(window.__BL_CLOSURE_MESSAGE_V20_5__)return;
-window.__BL_CLOSURE_MESSAGE_V20_5__=true;
-const booking=document.getElementById('bl-booking-v14');
-const dateInput=document.getElementById('bl-date');
-if(!booking||!dateInput)return;
+if(window.__BL_V20_6_RELIABILITY__)return;window.__BL_V20_6_RELIABILITY__=true;
+const booking=document.getElementById('bl-booking-v14');const submit=document.getElementById('bl-submit');const dateInput=document.getElementById('bl-date');
+if(!booking||!submit||!dateInput)return;
+const originalLabel=String(submit.textContent||submit.value||'Request Appointment').trim();let done=false;
+const setLabel=text=>{if(submit.tagName==='INPUT')submit.value=text;else submit.textContent=text};
+const appointmentId=data=>data&&(data.appointmentId||data.requestNumber||data.requestId)||'';
+let closureBox=document.getElementById('bl-closure-v20-6');if(!closureBox){closureBox=document.createElement('div');closureBox.id='bl-closure-v20-6';closureBox.setAttribute('role','alert');dateInput.parentElement.insertAdjacentElement('afterend',closureBox)}
 const closedDates=new Set();
-let message=document.getElementById('bl-closure-message-v20-5');
-if(!message){
- message=document.createElement('div');message.id='bl-closure-message-v20-5';message.setAttribute('role','alert');message.setAttribute('aria-live','assertive');
- const therapist=document.getElementById('bl-therapist');
- (therapist?.parentElement||dateInput.parentElement).insertAdjacentElement('afterend',message);
-}
-function isoDates(start,end){
- if(!/^\d{4}-\d{2}-\d{2}$/.test(start||''))return [];
- const first=new Date(start+'T12:00:00');const last=/^\d{4}-\d{2}-\d{2}$/.test(end||'')?new Date(end+'T12:00:00'):first;
- const result=[];for(let d=new Date(first);d<=last;d.setDate(d.getDate()+1))result.push(d.toISOString().slice(0,10));return result
-}
-function controlDate(control){return control.dataset.date||control.getAttribute('data-value')||control.getAttribute('value')||''}
-function applyClosedDates(){
- booking.querySelectorAll('button,[data-date],[data-value]').forEach(control=>{
-   const date=controlDate(control);if(!closedDates.has(date))return;
-   control.classList.add('bl-closure-date-v20-5');control.setAttribute('aria-disabled','true');control.setAttribute('tabindex','-1');
-   if(control.tagName==='BUTTON')control.disabled=true;
- });
-}
-function showClosure(payload,requestedDate){
- const closure=payload&&payload.closure||{};
- const start=closure.start||requestedDate;const end=closure.end||start;
- isoDates(start,end).forEach(date=>closedDates.add(date));
- const text=(payload&&payload.message)||'Blooming Lotus is closed on the selected date. Please choose another date.';
- const title=closure.title&&closure.title!=='Message'?closure.title:'';
- message.textContent=title?title+': '+text:text;message.dataset.visible='true';
- if(dateInput.value===requestedDate)dateInput.value='';
- requestAnimationFrame(applyClosedDates);
-}
-function requestedDate(input){
- try{const url=new URL(typeof input==='string'?input:input.url,location.href);return url.searchParams.get('date')||dateInput.value}catch(error){return dateInput.value}
-}
-function isAvailability(input){try{return new URL(typeof input==='string'?input:input.url,location.href).pathname.includes('/availability')}catch(error){return false}}
+function range(start,end){if(!/^\d{4}-\d{2}-\d{2}$/.test(start||''))return[];const a=new Date(start+'T12:00:00'),b=new Date((end||start)+'T12:00:00'),r=[];for(let d=new Date(a);d<=b;d.setDate(d.getDate()+1))r.push(d.toISOString().slice(0,10));return r}
+function dateOf(control){return control.dataset.date||control.getAttribute('data-value')||control.value||''}
+function paintClosures(){booking.querySelectorAll('button,[data-date],[data-value]').forEach(c=>{if(closedDates.has(dateOf(c))){c.classList.add('bl-closure-v20-6');c.disabled=true;c.setAttribute('aria-disabled','true')}})}
+function showClosure(data,requested){const c=data.closure||{};range(c.start||requested,c.end||c.start||requested).forEach(d=>closedDates.add(d));closureBox.textContent=((c.title&&c.title!=='Message')?c.title+': ':'')+(data.message||'Blooming Lotus is closed on the selected date. Please choose another date.');closureBox.dataset.visible='true';if(dateInput.value===requested)dateInput.value='';requestAnimationFrame(paintClosures)}
+function begin(){if(done)return;booking.dataset.submitState='sending';setLabel('Sending Request...');submit.disabled=true;submit.setAttribute('aria-disabled','true')}
+function unlock(){if(done)return;booking.dataset.submitState='';submit.disabled=false;submit.removeAttribute('aria-disabled');setLabel(originalLabel)}
+function addAnother(){let b=document.getElementById('bl-start-another-v20-6');if(!b){b=document.createElement('button');b.type='button';b.id='bl-start-another-v20-6';b.textContent='Start Another Request';submit.insertAdjacentElement('afterend',b);b.addEventListener('click',()=>{const u=new URL(location.href);u.searchParams.set('new-request',Date.now());u.hash='bl-booking-v14';location.assign(u)})}b.dataset.visible='true'}
+function finish(data){if(done)return;done=true;booking.dataset.submitState='complete';booking.querySelectorAll('input,select,textarea,button').forEach(c=>{if(c.id!=='bl-start-another-v20-6'){c.disabled=true;c.setAttribute('aria-disabled','true')}});setLabel('Request Sent');addAnother();const id=appointmentId(data);if(id)booking.querySelectorAll('div,p,span').forEach(n=>{if(!n.children&&/^Request\s+BL-/i.test((n.textContent||'').trim())&&(n.textContent||'').includes(id))n.textContent=n.textContent.replace(/^Request\s+BL-[^\s]+\s+submitted\s+for\s+/i,'Submitted for ')})}
+function inspect(status,data,requested){if(data&&data.closed){showClosure(data,requested);return}if(status>=200&&status<300&&appointmentId(data))finish(data)}
+function urlDate(input){try{return new URL(typeof input==='string'?input:input.url,location.href).searchParams.get('date')||dateInput.value}catch(e){return dateInput.value}}
 
+document.addEventListener('click',e=>{if(e.target.closest('#bl-confirm-continue-v19-4'))begin()},true);
 const nativeFetch=window.fetch.bind(window);
-window.fetch=async function(input,init){
- const response=await nativeFetch(input,init);
- if(response.status===409&&isAvailability(input)){
-   const date=requestedDate(input);
-   response.clone().json().then(payload=>showClosure(payload,date)).catch(()=>showClosure({},date));
- }
- return response;
-};
-
-const NativeXHR=window.XMLHttpRequest;
-function WrappedXHR(){
- const xhr=new NativeXHR();let url='';let method='GET';
- const open=xhr.open;xhr.open=function(m,u){method=String(m||'GET').toUpperCase();url=String(u||'');return open.apply(xhr,arguments)};
- xhr.addEventListener('load',()=>{
-   if(method==='GET'&&xhr.status===409&&isAvailability(url)){
-     let payload={};try{payload=JSON.parse(xhr.responseText||'{}')}catch(error){}
-     showClosure(payload,requestedDate(url));
-   }
- });
- return xhr;
-}
-WrappedXHR.prototype=NativeXHR.prototype;
-Object.getOwnPropertyNames(NativeXHR).forEach(key=>{try{WrappedXHR[key]=NativeXHR[key]}catch(error){}});
-window.XMLHttpRequest=WrappedXHR;
-
-booking.addEventListener('click',event=>{
- const control=event.target.closest('button,[data-date],[data-value]');if(!control)return;
- const date=controlDate(control);
- if(closedDates.has(date)){event.preventDefault();event.stopImmediatePropagation();message.dataset.visible='true';dateInput.focus();return}
- const label=String(control.getAttribute('aria-label')||control.textContent||'').toLowerCase();
- if(label.includes('previous')||label.includes('next'))requestAnimationFrame(applyClosedDates);
-},true);
-dateInput.addEventListener('change',()=>{message.dataset.visible='false';requestAnimationFrame(applyClosedDates)});
+window.fetch=async function(input,init){const method=String((init&&init.method)||(input&&input.method)||'GET').toUpperCase();const response=await nativeFetch(input,init);response.clone().json().then(data=>inspect(response.status,data,urlDate(input))).catch(()=>{if(method==='POST')unlock()});return response};
+const NX=window.XMLHttpRequest;function WX(){const x=new NX();let method='GET',url='';const open=x.open;x.open=function(m,u){method=String(m||'GET').toUpperCase();url=String(u||'');return open.apply(x,arguments)};x.addEventListener('load',()=>{try{inspect(x.status,JSON.parse(x.responseText||'{}'),urlDate(url))}catch(e){if(method==='POST')unlock()}});x.addEventListener('error',()=>{if(method==='POST')unlock()});return x}WX.prototype=NX.prototype;Object.getOwnPropertyNames(NX).forEach(k=>{try{WX[k]=NX[k]}catch(e){}});window.XMLHttpRequest=WX;
+booking.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const l=String(b.getAttribute('aria-label')||b.textContent||'').toLowerCase();if(l.includes('previous')||l.includes('next'))requestAnimationFrame(paintClosures)},true);
 })();
 </script>
-<!-- END BL_CLOSURE_MESSAGE_V20_5 -->
+<!-- END BL_V20_6_RELIABILITY -->
 </body></html>
