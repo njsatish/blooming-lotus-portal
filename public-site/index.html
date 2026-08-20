@@ -965,94 +965,119 @@ body {
 @media(max-width:760px){.bl-review-gallery-v16-quote{font-size:19px!important;line-height:1.5!important}.bl-review-gallery-v16-card{padding:21px!important}}
 </style>
 <!-- END BL_REVIEW_TEXT_SIZE_V16_2 -->
-<!-- BLOOMING_LOTUS_CLOSED_BORDER_V21_5_START -->
-<style id="blooming-lotus-closed-border-v21-5">
-  /* The border is drawn above both columns, preventing the right panel from covering it. */
-  [data-lotus-frame-v21-5="true"] {
+<!-- BLOOMING_LOTUS_APPROVED_BOOKING_V21_6_START -->
+<style id="blooming-lotus-approved-booking-v21-6">
+  /* Approved design: one closed frame containing both calendar and form. */
+  [data-bl-approved-frame-v21-6="true"] {
     box-sizing:border-box !important;
-    position:relative !important;
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) minmax(0,1.12fr) !important;
     width:100% !important;
     max-width:100% !important;
     min-width:0 !important;
-    overflow:visible !important;
-    border:0 !important;
-    border-radius:24px !important;
+    margin:0 !important;
+    position:relative !important;
+    overflow:hidden !important;
+    border:2px solid #c73a78 !important;
+    border-radius:26px !important;
     background:#fff !important;
-    box-shadow:0 16px 38px rgba(195,61,120,.16) !important;
+    box-shadow:0 0 0 8px rgba(199,58,120,.09),0 18px 45px rgba(117,42,78,.14) !important;
     isolation:isolate !important;
   }
-  [data-lotus-frame-v21-5="true"]::after {
-    content:"" !important;
-    position:absolute !important;
+  [data-bl-approved-frame-v21-6="true"] > [data-bl-booking-column-v21-6="true"] {
     box-sizing:border-box !important;
-    inset:0 !important;
-    z-index:999 !important;
-    pointer-events:none !important;
-    border:2px solid #c33d78 !important;
-    border-radius:24px !important;
-    box-shadow:0 0 0 7px rgba(195,61,120,.10) !important;
-  }
-  /* Keep both booking columns inside the available width. */
-  [data-lotus-frame-v21-5="true"] > * {
-    min-width:0 !important;
+    width:auto !important;
     max-width:100% !important;
+    min-width:0 !important;
+    margin:0 !important;
+    overflow:hidden !important;
+    border-radius:0 !important;
   }
-  /* Remove decoration only from wrappers closely fitted around the booking card. */
-  [data-lotus-tight-wrapper-v21-5="true"] {
-    border-color:transparent !important;
+  [data-bl-form-column-v21-6="true"] {
+    border-left:1px solid #ead7df !important;
+  }
+  /* Remove only the close-fitting decorative wrapper outside the approved frame. */
+  [data-bl-close-wrapper-v21-6="true"] {
+    border:0 !important;
     outline:0 !important;
     box-shadow:none !important;
     background:transparent !important;
   }
-  [data-lotus-frame-v21-5="true"] label,
-  [data-lotus-frame-v21-5="true"] legend,
-  [data-lotus-bold-v21-5="true"] {
-    color:#38242e !important;
+  /* Move the booking heading closer to the frame. */
+  [data-bl-booking-heading-v21-6="true"] {
+    margin-bottom:24px !important;
+    padding-bottom:0 !important;
+  }
+  [data-bl-booking-section-v21-6="true"] {
+    padding-top:48px !important;
+  }
+  /* Strong field hierarchy matching the approved preview. */
+  [data-bl-approved-frame-v21-6="true"] label,
+  [data-bl-approved-frame-v21-6="true"] legend,
+  [data-bl-bold-v21-6="true"] {
+    color:#39262f !important;
+    font-weight:900 !important;
+  }
+  [data-bl-approved-frame-v21-6="true"] select,
+  [data-bl-approved-frame-v21-6="true"] input,
+  [data-bl-approved-frame-v21-6="true"] textarea,
+  [data-bl-approved-frame-v21-6="true"] option {
+    box-sizing:border-box !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    color:#362d31 !important;
     font-weight:800 !important;
   }
-  [data-lotus-frame-v21-5="true"] select,
-  [data-lotus-frame-v21-5="true"] input,
-  [data-lotus-frame-v21-5="true"] textarea,
-  [data-lotus-frame-v21-5="true"] option {
-    color:#382f33 !important;
-    font-weight:800 !important;
+  [data-bl-approved-frame-v21-6="true"] input::placeholder,
+  [data-bl-approved-frame-v21-6="true"] textarea::placeholder {
+    color:#81767c !important;
+    font-weight:700 !important;
+    opacity:1 !important;
   }
-  [data-lotus-frame-v21-5="true"] input::placeholder,
-  [data-lotus-frame-v21-5="true"] textarea::placeholder {
-    color:#756d70 !important;font-weight:700 !important;opacity:1 !important;
-  }
-  @media(max-width:760px){
-    [data-lotus-frame-v21-5="true"],
-    [data-lotus-frame-v21-5="true"]::after {border-radius:18px !important;}
+  @media(max-width:840px){
+    [data-bl-approved-frame-v21-6="true"]{grid-template-columns:1fr !important;border-radius:20px !important;}
+    [data-bl-form-column-v21-6="true"]{border-left:0 !important;border-top:1px solid #ead7df !important;}
+    [data-bl-booking-heading-v21-6="true"]{margin-bottom:18px !important;}
   }
 </style>
-<script id="blooming-lotus-closed-border-script-v21-5">
+<script id="blooming-lotus-approved-booking-script-v21-6">
 (function(){
  'use strict';
  var monthRx=/^(january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{4}$/i;
  var names=['session length','service','therapist','time of day','name','phone','email','notes'];
  function text(e){return(e&&e.textContent||'').replace(/\s+/g,' ').trim();}
  function norm(e){return text(e).toLowerCase().replace(/[\s:*()]+$/g,'').trim();}
- function month(){return Array.from(document.querySelectorAll('h1,h2,h3,h4,div,span')).find(function(e){return e.children.length===0&&monthRx.test(text(e));});}
- function session(){return Array.from(document.querySelectorAll('label,legend,div,span,p')).find(function(e){return e.children.length<=2&&norm(e)==='session length';});}
  function ancestors(e){var a=[];while(e&&e!==document.body){a.push(e);e=e.parentElement;}return a;}
+ function findMonth(){return Array.from(document.querySelectorAll('h1,h2,h3,h4,div,span')).find(function(e){return e.children.length===0&&monthRx.test(text(e));});}
+ function findSession(){return Array.from(document.querySelectorAll('label,legend,div,span,p')).find(function(e){return e.children.length<=2&&norm(e)==='session length';});}
+ function findHeading(){return Array.from(document.querySelectorAll('h1,h2,h3')).find(function(e){return norm(e)==='request an appointment.'||norm(e)==='request an appointment';});}
+ function directChildOf(parent,node){while(node&&node.parentElement!==parent)node=node.parentElement;return node&&node.parentElement===parent?node:null;}
+ function reset(){
+   ['data-bl-approved-frame-v21-6','data-bl-booking-column-v21-6','data-bl-form-column-v21-6','data-bl-close-wrapper-v21-6','data-bl-booking-heading-v21-6','data-bl-booking-section-v21-6'].forEach(function(a){document.querySelectorAll('['+a+']').forEach(function(e){e.removeAttribute(a);});});
+ }
  function apply(){
-   document.querySelectorAll('[data-lotus-frame-v21-5]').forEach(function(e){e.removeAttribute('data-lotus-frame-v21-5');});
-   document.querySelectorAll('[data-lotus-tight-wrapper-v21-5]').forEach(function(e){e.removeAttribute('data-lotus-tight-wrapper-v21-5');});
-   var m=month(),s=session();if(!m||!s)return;
-   var frame=ancestors(m).find(function(e){return e.contains(s);});
-   if(!frame)return;
-   frame.setAttribute('data-lotus-frame-v21-5','true');
-   var fr=frame.getBoundingClientRect(),outer=frame.parentElement,count=0;
-   while(outer&&outer!==document.body&&count<2){
+   reset();
+   var m=findMonth(),s=findSession(),heading=findHeading();if(!m||!s)return;
+   var frame=ancestors(m).find(function(e){return e.contains(s);});if(!frame)return;
+   var calendarCol=directChildOf(frame,m),formCol=directChildOf(frame,s);
+   if(!calendarCol||!formCol||calendarCol===formCol)return;
+   frame.setAttribute('data-bl-approved-frame-v21-6','true');
+   calendarCol.setAttribute('data-bl-booking-column-v21-6','true');
+   formCol.setAttribute('data-bl-booking-column-v21-6','true');
+   formCol.setAttribute('data-bl-form-column-v21-6','true');
+   if(heading){
+     heading.setAttribute('data-bl-booking-heading-v21-6','true');
+     var section=ancestors(heading).find(function(e){return e.contains(frame);});
+     if(section)section.setAttribute('data-bl-booking-section-v21-6','true');
+   }
+   var fr=frame.getBoundingClientRect(),outer=frame.parentElement;
+   if(outer&&outer!==document.body){
      var r=outer.getBoundingClientRect();
-     if(r.width<=fr.width+140&&r.height<=fr.height+140){
-       outer.setAttribute('data-lotus-tight-wrapper-v21-5','true');
-     }else break;
-     outer=outer.parentElement;count++;
+     if(r.width<=fr.width+140&&r.height<=fr.height+140)outer.setAttribute('data-bl-close-wrapper-v21-6','true');
    }
    document.querySelectorAll('label,legend,div,span,p').forEach(function(e){
-     var n=norm(e);if(names.some(function(x){return n===x||n.indexOf(x+' ')===0;}))e.setAttribute('data-lotus-bold-v21-5','true');
+     var n=norm(e);if(names.some(function(x){return n===x||n.indexOf(x+' ')===0;}))e.setAttribute('data-bl-bold-v21-6','true');
    });
  }
  var timer;function schedule(){clearTimeout(timer);timer=setTimeout(apply,100);}
@@ -1061,7 +1086,7 @@ body {
  window.addEventListener('resize',schedule);
 })();
 </script>
-<!-- BLOOMING_LOTUS_CLOSED_BORDER_V21_5_END -->
+<!-- BLOOMING_LOTUS_APPROVED_BOOKING_V21_6_END -->
 </head>
 <body>
 <div class="preview"><strong>Concept Preview</strong> — unofficial demo for Blooming Lotus Oriental Massage. Confirm business details before launch.</div>
