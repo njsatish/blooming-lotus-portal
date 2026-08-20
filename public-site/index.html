@@ -2435,4 +2435,62 @@ booking.addEventListener('click',event=>{
 <!-- BEGIN BL_V19_PART4_2_FINAL_CONFIRM -->
 <!-- Confirmation opens only after Request Appointment is clicked and native required-field validation passes. Exact-time and time-of-day clicks never open the dialog. -->
 <!-- END BL_V19_PART4_2_FINAL_CONFIRM -->
+
+<!-- BEGIN BL_GRAY_SUNDAYS_V20_2_1 -->
+<style id="bl-gray-sundays-v20-2-1-style">
+.bl-sunday-cell-v20-2-1{
+  color:#d8d3d6!important;background:transparent!important;
+  border-color:transparent!important;box-shadow:none!important;
+  cursor:not-allowed!important;pointer-events:none!important;
+  text-decoration:none!important;opacity:1!important
+}
+</style>
+<script id="bl-gray-sundays-v20-2-1-script">
+(function(){
+'use strict';
+if(window.__BL_GRAY_SUNDAYS_V20_2_1__)return;
+window.__BL_GRAY_SUNDAYS_V20_2_1__=true;
+const dateInput=document.getElementById('bl-date');
+if(!dateInput)return;
+function findCalendar(){
+ return document.getElementById('bl-date-calendar-v2')||
+        dateInput.closest('section,article,div')?.querySelector('[role="grid"],.bl-calendar-grid,.bl-cal-grid,[data-calendar-grid]')||
+        document.querySelector('[role="grid"],.bl-calendar-grid,.bl-cal-grid,[data-calendar-grid]');
+}
+function graySundays(){
+ const grid=findCalendar();if(!grid)return;
+ const children=[...grid.children];
+ children.forEach((cell,index)=>{
+   const column=index%7;
+   if(column!==0)return;
+   const control=cell.matches('button,[data-date],[data-value]')?cell:cell.querySelector('button,[data-date],[data-value]');
+   const target=control||cell;
+   target.classList.add('bl-sunday-cell-v20-2-1');
+   target.setAttribute('aria-disabled','true');
+   if(target.tagName==='BUTTON')target.disabled=true;
+ });
+}
+function isSunday(value){
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(value||''))return false;
+ const parts=value.split('-').map(Number);
+ return new Date(parts[0],parts[1]-1,parts[2]).getDay()===0;
+}
+const calendarRegion=dateInput.closest('section,article,div')||document;
+calendarRegion.addEventListener('click',event=>{
+ const control=event.target.closest('button,[data-date],[data-value]');if(!control)return;
+ const raw=control.dataset.date||control.getAttribute('data-value')||control.value||'';
+ if(!isSunday(raw))return;
+ event.preventDefault();event.stopImmediatePropagation();
+ const message=document.getElementById('bl-sunday-message-v20-1');if(message)message.dataset.visible='true';
+ dateInput.focus();
+},true);
+// Apply once initially and after the existing previous/next month buttons are used.
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',graySundays,{once:true});else graySundays();
+calendarRegion.addEventListener('click',event=>{
+ const label=String(event.target.closest('button')?.getAttribute('aria-label')||event.target.textContent||'').toLowerCase();
+ if(label.includes('previous')||label.includes('next'))requestAnimationFrame(graySundays);
+});
+})();
+</script>
+<!-- END BL_GRAY_SUNDAYS_V20_2_1 -->
 </body></html>
