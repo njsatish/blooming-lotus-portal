@@ -965,123 +965,104 @@ body {
 @media(max-width:760px){.bl-review-gallery-v16-quote{font-size:19px!important;line-height:1.5!important}.bl-review-gallery-v16-card{padding:21px!important}}
 </style>
 <!-- END BL_REVIEW_TEXT_SIZE_V16_2 -->
-<!-- BLOOMING_LOTUS_GLOW_REPAIR_V21_1_START -->
-<style id="blooming-lotus-glow-repair-v21-1">
-  /* V21.1: visible Lotus Glow on the actual two-column booking card */
-  [data-lotus-glow-v21-1="true"] {
+<!-- BLOOMING_LOTUS_BOOKING_FRAME_V21_3_START -->
+<style id="blooming-lotus-booking-frame-v21-3">
+  /* The one visible, fully closed Lotus Glow frame. */
+  [data-lotus-frame-v21-3="true"] {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
     position: relative !important;
-    overflow: visible !important;
-    border: 2px solid #ca5b94 !important;
+    overflow: hidden !important;
+    border: 2px solid #c33d78 !important;
     border-radius: 24px !important;
     background: #fff !important;
     box-shadow:
-      0 0 0 7px rgba(202, 91, 148, 0.10),
-      0 16px 42px rgba(202, 91, 148, 0.22) !important;
-    isolation: isolate;
+      0 0 0 7px rgba(195,61,120,.10),
+      0 16px 38px rgba(195,61,120,.16) !important;
   }
 
-  /* Strong, consistent labels */
-  [data-lotus-booking-label-v21-1="true"] {
-    color: #3b2530 !important;
-    font-weight: 800 !important;
+  /* Remove the redundant beige/white frames outside the pink frame. */
+  [data-lotus-outer-v21-3="true"] {
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
   }
 
-  /* Calendar heading and weekday row */
-  [data-lotus-calendar-heading-v21-1="true"],
-  [data-lotus-calendar-weekday-v21-1="true"] {
+  /* Bold both field names and field values. */
+  [data-lotus-frame-v21-3="true"] label,
+  [data-lotus-frame-v21-3="true"] legend,
+  [data-lotus-bold-v21-3="true"] {
     color: #38242e !important;
     font-weight: 800 !important;
   }
-
-  /* Selected values remain bold but subordinate to labels */
-  [data-lotus-glow-v21-1="true"] select,
-  [data-lotus-glow-v21-1="true"] input,
-  [data-lotus-glow-v21-1="true"] textarea {
-    font-weight: 600 !important;
+  [data-lotus-frame-v21-3="true"] select,
+  [data-lotus-frame-v21-3="true"] input,
+  [data-lotus-frame-v21-3="true"] textarea,
+  [data-lotus-frame-v21-3="true"] option {
+    color: #382f33 !important;
+    font-weight: 800 !important;
+  }
+  [data-lotus-frame-v21-3="true"] input::placeholder,
+  [data-lotus-frame-v21-3="true"] textarea::placeholder {
+    color: #756d70 !important;
+    font-weight: 700 !important;
+    opacity: 1 !important;
   }
 
-  @media (max-width: 760px) {
-    [data-lotus-glow-v21-1="true"] {
+  @media (max-width:760px) {
+    [data-lotus-frame-v21-3="true"] {
       border-radius: 18px !important;
-      box-shadow:
-        0 0 0 5px rgba(202, 91, 148, 0.10),
-        0 12px 30px rgba(202, 91, 148, 0.18) !important;
+      box-shadow: 0 0 0 5px rgba(195,61,120,.10),0 12px 28px rgba(195,61,120,.14) !important;
     }
   }
 </style>
-<script id="blooming-lotus-glow-repair-script-v21-1">
-(function () {
+<script id="blooming-lotus-booking-frame-script-v21-3">
+(function(){
   'use strict';
-  var labels = ['session length','service','therapist','time of day','name','phone','email','notes'];
-  var weekdays = ['sun','mon','tue','wed','thu','fri','sat'];
-  var monthRx = /^(january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{4}$/i;
-
-  function text(el) {
-    return (el && el.textContent || '').replace(/\s+/g,' ').trim();
+  var monthRx=/^(january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{4}$/i;
+  var fieldNames=['session length','service','therapist','time of day','name','phone','email','notes'];
+  function txt(el){return (el&&el.textContent||'').replace(/\s+/g,' ').trim();}
+  function norm(el){return txt(el).toLowerCase().replace(/[\s:*()]+$/g,'').trim();}
+  function monthNode(){return Array.from(document.querySelectorAll('h1,h2,h3,h4,div,span')).find(function(el){return el.children.length===0&&monthRx.test(txt(el));});}
+  function sessionNode(){return Array.from(document.querySelectorAll('label,legend,div,span,p')).find(function(el){return el.children.length<=2&&norm(el)==='session length';});}
+  function chain(el){var a=[];while(el&&el!==document.body){a.push(el);el=el.parentElement;}return a;}
+  function frameFor(month,session){
+    if(!month||!session)return null;
+    var commons=chain(month).filter(function(el){return el.contains(session);});
+    return commons.find(function(el){
+      var r=el.getBoundingClientRect(),m=month.getBoundingClientRect(),s=session.getBoundingClientRect();
+      return r.height>350 && r.width>600 && r.left<=m.left && r.right>=s.right;
+    })||commons[0]||null;
   }
-  function normalized(el) {
-    return text(el).toLowerCase().replace(/[\s:*()]+$/g,'').trim();
-  }
-  function exactNode(values, regex) {
-    return Array.from(document.querySelectorAll('label,legend,h1,h2,h3,h4,h5,p,span,div')).find(function(el) {
-      if (el.children.length > 4) return false;
-      var t=text(el);
-      return regex ? regex.test(t) : values.indexOf(normalized(el)) >= 0;
+  function apply(){
+    var month=monthNode(),session=sessionNode(),frame=frameFor(month,session);
+    document.querySelectorAll('[data-lotus-frame-v21-3]').forEach(function(el){el.removeAttribute('data-lotus-frame-v21-3');});
+    document.querySelectorAll('[data-lotus-outer-v21-3]').forEach(function(el){el.removeAttribute('data-lotus-outer-v21-3');});
+    if(!frame){console.warn('Blooming Lotus V21.3: booking frame not found');return;}
+    frame.setAttribute('data-lotus-frame-v21-3','true');
+    /* Only remove decoration from the two immediate wrappers outside the frame. */
+    var outer=frame.parentElement,count=0;
+    while(outer&&outer!==document.body&&count<2){
+      outer.setAttribute('data-lotus-outer-v21-3','true');
+      outer=outer.parentElement;count++;
+    }
+    document.querySelectorAll('label,legend,div,span,p').forEach(function(el){
+      var n=norm(el);
+      if(fieldNames.some(function(name){return n===name||n.indexOf(name+' ')===0;}))el.setAttribute('data-lotus-bold-v21-3','true');
     });
   }
-  function ancestors(el) {
-    var out=[];
-    while (el && el !== document.body) { out.push(el); el=el.parentElement; }
-    return out;
-  }
-  function bestBookingFrame(month, session) {
-    if (!month || !session) return null;
-    var candidates=ancestors(month).filter(function(el){ return el.contains(session); });
-    /* Select the smallest common container that visibly spans both columns. */
-    var valid=candidates.filter(function(el){
-      var box=el.getBoundingClientRect();
-      var mb=month.getBoundingClientRect();
-      var sb=session.getBoundingClientRect();
-      return box.width >= Math.abs(sb.right-mb.left)+40 && box.height > 300;
-    });
-    return valid[0] || candidates[0] || null;
-  }
-  function apply() {
-    var month=exactNode([], monthRx);
-    var session=exactNode(['session length']);
-    document.querySelectorAll('label,legend').forEach(function(el){
-      var t=normalized(el);
-      if (labels.some(function(x){ return t === x || t.indexOf(x+' ')===0; }))
-        el.setAttribute('data-lotus-booking-label-v21-1','true');
-    });
-    /* Fallback for labels implemented as div/span/p. */
-    labels.forEach(function(name){
-      var el=exactNode([name]);
-      if (el) el.setAttribute('data-lotus-booking-label-v21-1','true');
-    });
-    if (month) month.setAttribute('data-lotus-calendar-heading-v21-1','true');
-    weekdays.forEach(function(day){
-      document.querySelectorAll('span,div,p').forEach(function(el){
-        if (normalized(el)===day && el.children.length===0)
-          el.setAttribute('data-lotus-calendar-weekday-v21-1','true');
-      });
-    });
-    var frame=bestBookingFrame(month,session);
-    document.querySelectorAll('[data-lotus-glow-v21-1="true"]').forEach(function(el){
-      if (el!==frame) el.removeAttribute('data-lotus-glow-v21-1');
-    });
-    if (frame) frame.setAttribute('data-lotus-glow-v21-1','true');
-    else console.warn('Blooming Lotus V21.1: calendar/form frame was not found.');
-  }
-  var timer;
-  function schedule(){ clearTimeout(timer); timer=setTimeout(apply,80); }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',apply,{once:true});
-  else apply();
+  var timer;function schedule(){clearTimeout(timer);timer=setTimeout(apply,100);}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});else apply();
   new MutationObserver(schedule).observe(document.documentElement,{childList:true,subtree:true});
   window.addEventListener('resize',schedule);
 })();
 </script>
-<!-- BLOOMING_LOTUS_GLOW_REPAIR_V21_1_END -->
+<!-- BLOOMING_LOTUS_BOOKING_FRAME_V21_3_END -->
 </head>
 <body>
 <div class="preview"><strong>Concept Preview</strong> — unofficial demo for Blooming Lotus Oriental Massage. Confirm business details before launch.</div>
