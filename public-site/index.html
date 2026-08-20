@@ -2447,6 +2447,15 @@ booking.addEventListener('click',event=>{
   cursor:not-allowed!important;pointer-events:none!important;
   opacity:1!important
 }
+
+#bl-booking-v14 [role="grid"] > :nth-child(7n+1),
+#bl-booking-v14 .bl-calendar-grid > :nth-child(7n+1),
+#bl-booking-v14 .bl-cal-grid > :nth-child(7n+1),
+#bl-booking-v14 [data-calendar-grid] > :nth-child(7n+1){
+  color:#d8d3d6!important;background:transparent!important;
+  border-color:transparent!important;box-shadow:none!important;
+  cursor:not-allowed!important;pointer-events:none!important;opacity:1!important
+}
 #bl-contact-error-summary-v20-3{
   display:none;margin:0 0 16px;padding:13px 15px;border:1px solid #e7a8bd;
   border-radius:12px;background:#fff0f5;color:#8d204d;font-size:14px;font-weight:800
@@ -2552,8 +2561,14 @@ function applyAfterCalendarNavigation(event){
 }
 const scope=calendarScope();
 scope.addEventListener('click',applyAfterCalendarNavigation);
+scope.addEventListener('click',()=>requestAnimationFrame(graySundayControls));
+dateInput.addEventListener('change',()=>requestAnimationFrame(graySundayControls));
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',graySundayControls,{once:true});else graySundayControls();
 })();
 </script>
 <!-- END BL_V20_3_VALIDATION_SUNDAYS -->
+
+<!-- BEGIN BL_PERSISTENT_GRAY_SUNDAYS_V20_3_1 -->
+<!-- Sunday styling is reapplied after date selection and every calendar interaction; CSS grid fallback persists through redraws. -->
+<!-- END BL_PERSISTENT_GRAY_SUNDAYS_V20_3_1 -->
 </body></html>
