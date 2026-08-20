@@ -1126,275 +1126,72 @@ body {
   }
 </style>
 <!-- BLOOMING_LOTUS_HEADING_GAP_V21_8_END -->
-<!-- BLOOMING_LOTUS_COMPACT_SECTION_V21_10_START -->
-<style id="blooming-lotus-compact-section-v21-10">
-  /* Height is measured from visible booking content and updates dynamically. */
-  [data-lotus-frame-v21-5="true"][data-bl-compact-v21-10="true"] {
-    min-height:0 !important;
-    height:var(--bl-booking-height-v21-10) !important;
-    max-height:none !important;
-    overflow:visible !important;
-  }
+<!-- BLOOMING_LOTUS_DIRECT_TIME_SLOTS_FIX_V21_13_START -->
+<style id="blooming-lotus-direct-time-slots-fix-v21-13">
+/* Direct source-level targets confirmed by the diagnostic. */
+#bl-booking-v14 > .bl-grid > .bl-v3-right-panel {
+  height:auto !important;
+  min-height:860px !important;
+  max-height:none !important;
+  overflow:visible !important;
+}
 
-  /* Remove the large green-space tail after the booking card only. */
-  [data-bl-booking-section-v21-10="true"] {
-    min-height:0 !important;
-    padding-bottom:52px !important;
-  }
+#bl-booking-v14 .bl-v3-right-panel #bl-slots {
+  order:5 !important;
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:10px !important;
+  width:100% !important;
+  height:auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+  overflow:visible !important;
+  padding:1px !important;
+  margin:0 0 18px !important;
+  position:relative !important;
+}
 
-  @media(max-width:760px){
-    [data-lotus-frame-v21-5="true"][data-bl-compact-v21-10="true"] {
-      height:auto !important;
-    }
-    [data-bl-booking-section-v21-10="true"] {
-      padding-bottom:36px !important;
-    }
+#bl-booking-v14 .bl-v3-right-panel #bl-slots .bl-slot {
+  min-width:0 !important;
+  width:100% !important;
+  height:auto !important;
+  min-height:62px !important;
+  overflow:visible !important;
+  text-align:left !important;
+  padding:10px 12px !important;
+}
+
+#bl-booking-v14 .bl-v3-right-panel .bl-details {
+  order:6 !important;
+  position:relative !important;
+  clear:both !important;
+  flex:0 0 auto !important;
+  margin-top:0 !important;
+}
+
+/* Allow the actual two-column booking layout and pink overlay to grow. */
+#bl-booking-v14 > .bl-grid,
+[data-lotus-frame-v21-5="true"] {
+  height:auto !important;
+  max-height:none !important;
+  overflow:visible !important;
+}
+
+@media(max-width:760px){
+  #bl-booking-v14 > .bl-grid > .bl-v3-right-panel {
+    min-height:0 !important;
   }
+  #bl-booking-v14 .bl-v3-right-panel #bl-slots {
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+}
+@media(max-width:480px){
+  #bl-booking-v14 .bl-v3-right-panel #bl-slots {
+    grid-template-columns:1fr !important;
+  }
+}
 </style>
-<script id="blooming-lotus-compact-section-script-v21-10">
-(function(){
-  'use strict';
-  function visible(el){
-    var s=getComputedStyle(el),r=el.getBoundingClientRect();
-    return s.display!=='none'&&s.visibility!=='hidden'&&r.width>0&&r.height>0;
-  }
-  function nearestSection(frame){
-    var node=frame.parentElement;
-    while(node&&node!==document.body){
-      if((node.tagName==='SECTION'||node.tagName==='MAIN')&&node.contains(frame))return node;
-      node=node.parentElement;
-    }
-    return null;
-  }
-  function apply(){
-    var frame=document.querySelector('[data-lotus-frame-v21-5="true"]');
-    if(!frame)return;
-    var fr=frame.getBoundingClientRect();
-    var maxBottom=fr.top;
-    /* Measure visible leaf controls/text, not stretching layout wrappers. */
-    frame.querySelectorAll('input,select,textarea,button,label,legend,p,h1,h2,h3,h4,small,[role="button"]').forEach(function(el){
-      if(!visible(el))return;
-      var r=el.getBoundingClientRect();
-      if(r.bottom>maxBottom)maxBottom=r.bottom;
-    });
-    /* Keep 32px below the lowest visible control and never shrink below 560px. */
-    var required=Math.max(560,Math.ceil(maxBottom-fr.top+32));
-    frame.style.setProperty('--bl-booking-height-v21-10',required+'px');
-    frame.setAttribute('data-bl-compact-v21-10','true');
-
-    document.querySelectorAll('[data-bl-booking-section-v21-10]').forEach(function(el){
-      el.removeAttribute('data-bl-booking-section-v21-10');
-    });
-    var section=nearestSection(frame);
-    if(section)section.setAttribute('data-bl-booking-section-v21-10','true');
-  }
-  var timer;
-  function schedule(){clearTimeout(timer);timer=setTimeout(apply,120);}
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});else apply();
-  new MutationObserver(schedule).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['class','style','disabled']});
-  window.addEventListener('resize',schedule);
-})();
-</script>
-<!-- BLOOMING_LOTUS_COMPACT_SECTION_V21_10_END -->
-<!-- BLOOMING_LOTUS_VISIBLE_TIMES_V21_11_START -->
-<style id="blooming-lotus-visible-times-v21-11">
-  /* V21.5 made each direct booking column overflow:hidden. That clips the
-     dynamically inserted time buttons. Keep the overall border unchanged,
-     but allow the two columns and the time area to expand vertically. */
-  [data-lotus-frame-v21-5="true"] > * {
-    overflow:visible !important;
-    max-height:none !important;
-  }
-
-  [data-bl-time-area-v21-11="true"],
-  [data-bl-time-area-v21-11="true"] * {
-    visibility:visible !important;
-  }
-
-  [data-bl-time-path-v21-11="true"] {
-    overflow:visible !important;
-    max-height:none !important;
-    height:auto !important;
-    clip:auto !important;
-    clip-path:none !important;
-  }
-
-  /* Let the working pink frame grow when time buttons are rendered. */
-  [data-lotus-frame-v21-5="true"] {
-    height:auto !important;
-    max-height:none !important;
-    min-height:0 !important;
-  }
-</style>
-<script id="blooming-lotus-visible-times-script-v21-11">
-(function(){
-  'use strict';
-  function normalized(el){
-    return (el&&el.textContent||'').replace(/\s+/g,' ').trim().toLowerCase();
-  }
-  function visible(el){
-    var r=el.getBoundingClientRect(),s=getComputedStyle(el);
-    return r.width>0&&s.display!=='none'&&s.visibility!=='hidden';
-  }
-  function findTimeHeading(){
-    return Array.from(document.querySelectorAll('h1,h2,h3,h4,h5,label,legend,p,div,span'))
-      .find(function(el){return el.children.length<=2&&normalized(el)==='time of day';});
-  }
-  function findNameField(){
-    return Array.from(document.querySelectorAll('label,legend,p,div,span'))
-      .find(function(el){var t=normalized(el).replace(/[\s:*]+$/,'');return el.children.length<=2&&t==='name';});
-  }
-  function lowestCommon(a,b){
-    var list=[];while(a&&a!==document.body){list.push(a);a=a.parentElement;}
-    while(b&&b!==document.body){if(list.indexOf(b)>=0)return b;b=b.parentElement;}
-    return null;
-  }
-  function apply(){
-    document.querySelectorAll('[data-bl-time-area-v21-11],[data-bl-time-path-v21-11]').forEach(function(el){
-      el.removeAttribute('data-bl-time-area-v21-11');
-      el.removeAttribute('data-bl-time-path-v21-11');
-    });
-    var heading=findTimeHeading(),name=findNameField();
-    var frame=document.querySelector('[data-lotus-frame-v21-5="true"]');
-    if(!heading||!name||!frame)return;
-    var form=lowestCommon(heading,name);
-    if(!form||!frame.contains(form))return;
-
-    /* Mark the content between Time of day and Name as the dynamic time area. */
-    var hr=heading.getBoundingClientRect(),nr=name.getBoundingClientRect();
-    form.querySelectorAll('div,section,fieldset,ul,ol').forEach(function(el){
-      if(!visible(el))return;
-      var r=el.getBoundingClientRect();
-      if(r.top>=hr.top-8&&r.top<nr.top&&r.bottom<=nr.top+8){
-        el.setAttribute('data-bl-time-area-v21-11','true');
-      }
-    });
-
-    /* Remove clipping only along the path from the heading to the form column. */
-    var node=heading.parentElement;
-    while(node&&node!==form.parentElement&&frame.contains(node)){
-      node.setAttribute('data-bl-time-path-v21-11','true');
-      if(node===form)break;
-      node=node.parentElement;
-    }
-  }
-  var timer;function schedule(){clearTimeout(timer);timer=setTimeout(apply,100);}
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});else apply();
-  new MutationObserver(schedule).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['class','style','hidden']});
-  window.addEventListener('resize',schedule);
-})();
-</script>
-<!-- BLOOMING_LOTUS_VISIBLE_TIMES_V21_11_END -->
-<!-- BLOOMING_LOTUS_TIME_SLOTS_LAYOUT_V21_12_START -->
-<style id="blooming-lotus-time-slots-layout-v21-12">
-  /* The actual time-slot list must occupy normal document flow. */
-  [data-bl-time-grid-v21-12="true"] {
-    display:grid !important;
-    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
-    gap:12px !important;
-    width:100% !important;
-    min-width:0 !important;
-    height:auto !important;
-    min-height:0 !important;
-    max-height:none !important;
-    overflow:visible !important;
-    position:relative !important;
-    clip:auto !important;
-    clip-path:none !important;
-    margin-bottom:22px !important;
-  }
-  [data-bl-time-grid-v21-12="true"] > * {
-    min-width:0 !important;
-    max-width:100% !important;
-    height:auto !important;
-    min-height:64px !important;
-    overflow:visible !important;
-    position:relative !important;
-  }
-  /* Clear fixed-height and clipping rules only between the slot list and form. */
-  [data-bl-time-ancestor-v21-12="true"] {
-    height:auto !important;
-    min-height:0 !important;
-    max-height:none !important;
-    overflow:visible !important;
-    clip:auto !important;
-    clip-path:none !important;
-  }
-  /* Keep the customer fields below the complete slot grid. */
-  [data-bl-customer-fields-v21-12="true"] {
-    position:relative !important;
-    clear:both !important;
-  }
-  [data-lotus-frame-v21-5="true"] {
-    height:auto !important;
-    max-height:none !important;
-    overflow:visible !important;
-  }
-  @media(max-width:760px){
-    [data-bl-time-grid-v21-12="true"]{grid-template-columns:repeat(2,minmax(0,1fr)) !important;}
-  }
-  @media(max-width:480px){
-    [data-bl-time-grid-v21-12="true"]{grid-template-columns:1fr !important;}
-  }
-</style>
-<script id="blooming-lotus-time-slots-script-v21-12">
-(function(){
- 'use strict';
- var timeRx=/^(?:0?[1-9]|1[0-2]):[0-5][0-9]\s*(?:AM|PM)\b/i;
- function text(el){return(el&&el.textContent||'').replace(/\s+/g,' ').trim();}
- function norm(el){return text(el).toLowerCase().replace(/[\s:*]+$/g,'').trim();}
- function ancestors(el){var a=[];while(el&&el!==document.body){a.push(el);el=el.parentElement;}return a;}
- function commonAncestor(nodes){
-   if(!nodes.length)return null;
-   return ancestors(nodes[0]).find(function(a){return nodes.every(function(n){return a.contains(n);});})||null;
- }
- function findNameLabel(){
-   return Array.from(document.querySelectorAll('label,legend,p,span,div')).find(function(el){
-     return el.children.length<=2&&norm(el)==='name';
-   });
- }
- function reset(){
-   document.querySelectorAll('[data-bl-time-grid-v21-12],[data-bl-time-ancestor-v21-12],[data-bl-customer-fields-v21-12]').forEach(function(el){
-     el.removeAttribute('data-bl-time-grid-v21-12');
-     el.removeAttribute('data-bl-time-ancestor-v21-12');
-     el.removeAttribute('data-bl-customer-fields-v21-12');
-   });
- }
- function apply(){
-   reset();
-   var frame=document.querySelector('[data-lotus-frame-v21-5="true"]');
-   if(!frame)return;
-   var candidates=Array.from(frame.querySelectorAll('button,[role="button"],label,div')).filter(function(el){
-     if(el.children.length>3)return false;
-     return timeRx.test(text(el));
-   });
-   /* Keep the smallest elements so parent text duplicates do not pollute detection. */
-   var slots=candidates.filter(function(el){
-     return !Array.from(el.children).some(function(child){return timeRx.test(text(child));});
-   });
-   if(!slots.length)return;
-   var grid=commonAncestor(slots);
-   if(!grid||!frame.contains(grid))return;
-   grid.setAttribute('data-bl-time-grid-v21-12','true');
-
-   var name=findNameLabel();
-   if(name&&frame.contains(name)){
-     var customer=name.parentElement;
-     if(customer)customer.setAttribute('data-bl-customer-fields-v21-12','true');
-     var node=grid.parentElement;
-     while(node&&node!==frame&&node.contains(grid)&&node.contains(name)){
-       node.setAttribute('data-bl-time-ancestor-v21-12','true');
-       node=node.parentElement;
-     }
-   }
- }
- var timer;function schedule(){clearTimeout(timer);timer=setTimeout(apply,120);}
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});else apply();
- new MutationObserver(schedule).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['class','style','hidden']});
- window.addEventListener('resize',schedule);
-})();
-</script>
-<!-- BLOOMING_LOTUS_TIME_SLOTS_LAYOUT_V21_12_END -->
+<!-- BLOOMING_LOTUS_DIRECT_TIME_SLOTS_FIX_V21_13_END -->
 </head>
 <body>
 <div class="preview"><strong>Concept Preview</strong> — unofficial demo for Blooming Lotus Oriental Massage. Confirm business details before launch.</div>
