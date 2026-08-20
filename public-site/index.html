@@ -1107,6 +1107,25 @@ body {
   }
 </style>
 <!-- BLOOMING_LOTUS_EXPANDED_BORDER_V21_7_END -->
+<!-- BLOOMING_LOTUS_HEADING_GAP_V21_8_START -->
+<style id="blooming-lotus-heading-gap-v21-8">
+  /*
+    Pull only the proven V21.5 booking frame upward. This avoids modifying,
+    clipping, or hiding the booking section, Contact section, or footer.
+  */
+  [data-lotus-frame-v21-5="true"] {
+    margin-top:-110px !important;
+  }
+
+  /* Use a smaller adjustment as the viewport narrows. */
+  @media(max-width:1100px){
+    [data-lotus-frame-v21-5="true"] { margin-top:-80px !important; }
+  }
+  @media(max-width:760px){
+    [data-lotus-frame-v21-5="true"] { margin-top:-32px !important; }
+  }
+</style>
+<!-- BLOOMING_LOTUS_HEADING_GAP_V21_8_END -->
 </head>
 <body>
 <div class="preview"><strong>Concept Preview</strong> — unofficial demo for Blooming Lotus Oriental Massage. Confirm business details before launch.</div>
