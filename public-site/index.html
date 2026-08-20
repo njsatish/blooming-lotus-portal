@@ -2329,7 +2329,7 @@ function selectedText(id){const el=byId(id);if(!el)return '';const option=el.opt
 function timeFromControl(control){
  return String(control.dataset.time||control.dataset.value||control.getAttribute('data-slot')||control.textContent||'').replace(/\s+/g,' ').trim();
 }
-function validTime(text){return /\b(?:1[0-2]|0?[1-9]):[0-5]\d\s*(?:am|pm)\b/i.test(text)||/^\d{2}:\d{2}$/.test(text)}
+function validTime(text){const value=String(text||'').trim();if(/(?:morning|afternoon|evening)/i.test(value)||/[–—-]/.test(value))return false;return /^(?:1[0-2]|0?[1-9]):[0-5]\d\s*(?:am|pm)$/i.test(value)||/^\d{2}:\d{2}$/.test(value)}
 function signature(){return [value('bl-date'),value('bl-duration'),value('bl-service'),value('bl-therapist'),selectedTime].join('|')}
 function complete(){return value('bl-date')&&value('bl-duration')&&value('bl-service')&&value('bl-therapist')&&selectedTime}
 function escapeHtml(text){return String(text).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
@@ -2365,6 +2365,7 @@ function invalidate(){
 booking.addEventListener('click',event=>{
  const control=event.target.closest('button,[data-time],[data-slot]');
  if(!control||control===submit||control.closest('#bl-confirm-overlay-v19-4'))return;
+ if(control.matches('[data-period],[data-time-of-day],.bl-time-period,.bl-time-filter')||/^(morning|afternoon|evening)/i.test(String(control.textContent||'').trim()))return;
  const text=timeFromControl(control);
  if(validTime(text)){selectedTime=text;invalidate();openDialog()}
 });
@@ -2384,4 +2385,8 @@ if(heading&&heading.parentElement)heading.parentElement.classList.add('bl-v19-pa
 })();
 </script>
 <!-- END BL_V19_PART4_CONFIRMATION -->
+
+<!-- BEGIN BL_V19_PART4_1_EXACT_TIME_FIX -->
+<!-- Confirmation opens only for an exact appointment slot, never for Morning, Afternoon, or Evening filters. -->
+<!-- END BL_V19_PART4_1_EXACT_TIME_FIX -->
 </body></html>
