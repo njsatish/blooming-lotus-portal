@@ -1062,6 +1062,51 @@ body {
 })();
 </script>
 <!-- BLOOMING_LOTUS_CLOSED_BORDER_V21_5_END -->
+<!-- BLOOMING_LOTUS_EXPANDED_BORDER_V21_7_START -->
+<style id="blooming-lotus-expanded-border-v21-7">
+  /*
+    The current form fields extend roughly 15-20px beyond the right pink edge.
+    Expand only the visual frame by 44px on the right. Do not resize, clip, or
+    restyle any page-level parent, so Contact and Footer remain untouched.
+  */
+  [data-lotus-frame-v21-5="true"] {
+    overflow:visible !important;
+  }
+  [data-lotus-frame-v21-5="true"]::after {
+    left:0 !important;
+    top:0 !important;
+    bottom:0 !important;
+    right:-44px !important;
+    width:auto !important;
+    height:auto !important;
+    box-sizing:border-box !important;
+    border:2px solid #c33d78 !important;
+    border-radius:24px !important;
+    pointer-events:none !important;
+  }
+
+  /* Keep every field safely inside the newly expanded visual edge. */
+  [data-lotus-frame-v21-5="true"] select,
+  [data-lotus-frame-v21-5="true"] input,
+  [data-lotus-frame-v21-5="true"] textarea,
+  [data-lotus-frame-v21-5="true"] button {
+    box-sizing:border-box !important;
+    max-width:100% !important;
+  }
+
+  @media(max-width:900px){
+    [data-lotus-frame-v21-5="true"]::after {
+      right:-24px !important;
+    }
+  }
+  @media(max-width:760px){
+    [data-lotus-frame-v21-5="true"]::after {
+      right:0 !important;
+      border-radius:18px !important;
+    }
+  }
+</style>
+<!-- BLOOMING_LOTUS_EXPANDED_BORDER_V21_7_END -->
 </head>
 <body>
 <div class="preview"><strong>Concept Preview</strong> — unofficial demo for Blooming Lotus Oriental Massage. Confirm business details before launch.</div>
