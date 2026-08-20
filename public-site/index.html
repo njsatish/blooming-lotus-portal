@@ -2382,6 +2382,9 @@ overlay.addEventListener('click',event=>{if(event.target===overlay)closeDialog()
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&overlay.getAttribute('aria-hidden')==='false')closeDialog()});
 if(submit)submit.addEventListener('click',event=>{
  if(allowFinalSubmission){allowFinalSubmission=false;return}
+ if(typeof window.blValidateRequiredContactV20_3==='function'&&!window.blValidateRequiredContactV20_3()){
+   event.preventDefault();event.stopImmediatePropagation();return
+ }
  const form=submit.form||booking.querySelector('form');
  if(form&&typeof form.reportValidity==='function'&&!form.reportValidity()){
    event.preventDefault();event.stopImmediatePropagation();return
@@ -2436,61 +2439,121 @@ booking.addEventListener('click',event=>{
 <!-- Confirmation opens only after Request Appointment is clicked and native required-field validation passes. Exact-time and time-of-day clicks never open the dialog. -->
 <!-- END BL_V19_PART4_2_FINAL_CONFIRM -->
 
-<!-- BEGIN BL_GRAY_SUNDAYS_V20_2_1 -->
-<style id="bl-gray-sundays-v20-2-1-style">
-.bl-sunday-cell-v20-2-1{
+<!-- BEGIN BL_V20_3_VALIDATION_SUNDAYS -->
+<style id="bl-v20-3-validation-sundays-style">
+.bl-sunday-unavailable-v20-3{
   color:#d8d3d6!important;background:transparent!important;
   border-color:transparent!important;box-shadow:none!important;
   cursor:not-allowed!important;pointer-events:none!important;
-  text-decoration:none!important;opacity:1!important
+  opacity:1!important
 }
+#bl-contact-error-summary-v20-3{
+  display:none;margin:0 0 16px;padding:13px 15px;border:1px solid #e7a8bd;
+  border-radius:12px;background:#fff0f5;color:#8d204d;font-size:14px;font-weight:800
+}
+#bl-contact-error-summary-v20-3[data-visible="true"]{display:block}
+.bl-contact-invalid-v20-3{border-color:#c73770!important;box-shadow:0 0 0 3px rgba(199,55,112,.12)!important}
+.bl-field-error-v20-3{display:none;margin:6px 0 0;color:#a32659;font-size:13px;font-weight:800}
+.bl-field-error-v20-3[data-visible="true"]{display:block}
+.bl-required-mark-v20-3{color:#b52f66;font-weight:900;margin-left:3px}
+.bl-optional-mark-v20-3{color:#82727a;font-size:12px;font-weight:600;margin-left:5px}
 </style>
-<script id="bl-gray-sundays-v20-2-1-script">
+<script id="bl-v20-3-validation-sundays-script">
 (function(){
 'use strict';
-if(window.__BL_GRAY_SUNDAYS_V20_2_1__)return;
-window.__BL_GRAY_SUNDAYS_V20_2_1__=true;
+if(window.__BL_V20_3_VALIDATION_SUNDAYS__)return;
+window.__BL_V20_3_VALIDATION_SUNDAYS__=true;
+const booking=document.getElementById('bl-booking-v14');
 const dateInput=document.getElementById('bl-date');
-if(!dateInput)return;
-function findCalendar(){
- return document.getElementById('bl-date-calendar-v2')||
-        dateInput.closest('section,article,div')?.querySelector('[role="grid"],.bl-calendar-grid,.bl-cal-grid,[data-calendar-grid]')||
-        document.querySelector('[role="grid"],.bl-calendar-grid,.bl-cal-grid,[data-calendar-grid]');
+if(!booking||!dateInput)return;
+const clean=value=>String(value||'').replace(/\s+/g,' ').trim();
+function pick(ids,names){
+ for(const id of ids){const el=document.getElementById(id);if(el)return el}
+ for(const name of names){const el=booking.querySelector('[name="'+name+'"]');if(el)return el}
+ return null
 }
-function graySundays(){
- const grid=findCalendar();if(!grid)return;
- const children=[...grid.children];
- children.forEach((cell,index)=>{
-   const column=index%7;
-   if(column!==0)return;
-   const control=cell.matches('button,[data-date],[data-value]')?cell:cell.querySelector('button,[data-date],[data-value]');
-   const target=control||cell;
-   target.classList.add('bl-sunday-cell-v20-2-1');
-   target.setAttribute('aria-disabled','true');
-   if(target.tagName==='BUTTON')target.disabled=true;
- });
+const fields={
+ name:pick(['bl-name'],['name','customerName']),
+ phone:pick(['bl-phone'],['phone']),
+ email:pick(['bl-email'],['email']),
+ notes:pick(['bl-notes'],['notes'])
+};
+
+function decorateLabel(field,required){
+ if(!field)return;
+ const container=field.closest('label,.bl-field,.form-field,div');
+ let label=container&&container.querySelector('label');
+ if(!label&&field.id)label=booking.querySelector('label[for="'+field.id+'"]');
+ if(!label)return;
+ if(required&&!label.querySelector('.bl-required-mark-v20-3'))label.insertAdjacentHTML('beforeend','<span class="bl-required-mark-v20-3" aria-hidden="true">*</span>');
+ if(!required&&!label.querySelector('.bl-optional-mark-v20-3'))label.insertAdjacentHTML('beforeend','<span class="bl-optional-mark-v20-3">(optional)</span>');
 }
+function ensureError(field,key){
+ if(!field)return null;
+ let error=document.getElementById('bl-'+key+'-error-v20-3');
+ if(!error){error=document.createElement('div');error.id='bl-'+key+'-error-v20-3';error.className='bl-field-error-v20-3';error.setAttribute('role','alert');field.insertAdjacentElement('afterend',error)}
+ field.setAttribute('aria-describedby',error.id);
+ return error
+}
+Object.entries(fields).forEach(([key,field])=>{if(field){field.required=key!=='notes';decorateLabel(field,key!=='notes');ensureError(field,key)}});
+if(fields.email)fields.email.type='email';
+if(fields.phone)fields.phone.setAttribute('inputmode','tel');
+
+let summary=document.getElementById('bl-contact-error-summary-v20-3');
+if(!summary){
+ summary=document.createElement('div');summary.id='bl-contact-error-summary-v20-3';summary.setAttribute('role','alert');summary.setAttribute('aria-live','assertive');
+ const first=fields.name||fields.phone||fields.email;
+ if(first)first.parentElement.insertAdjacentElement('beforebegin',summary);
+}
+function setError(field,key,message){
+ const error=ensureError(field,key);field.classList.toggle('bl-contact-invalid-v20-3',Boolean(message));field.setAttribute('aria-invalid',message?'true':'false');
+ if(error){error.textContent=message||'';error.dataset.visible=message?'true':'false'}
+}
+function emailValid(value){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)}
+function phoneValid(value){return value.replace(/\D/g,'').length>=10}
+function validateContact(){
+ const errors=[];
+ const name=clean(fields.name&&fields.name.value),phone=clean(fields.phone&&fields.phone.value),email=clean(fields.email&&fields.email.value);
+ if(!name){setError(fields.name,'name','Name is required.');errors.push(fields.name)}else setError(fields.name,'name','');
+ if(!phone){setError(fields.phone,'phone','Phone is required.');errors.push(fields.phone)}
+ else if(!phoneValid(phone)){setError(fields.phone,'phone','Please enter a valid phone number.');errors.push(fields.phone)}else setError(fields.phone,'phone','');
+ if(!email){setError(fields.email,'email','Email is required.');errors.push(fields.email)}
+ else if(!emailValid(email)){setError(fields.email,'email','Please enter a valid email address.');errors.push(fields.email)}else setError(fields.email,'email','');
+ if(errors.length){summary.textContent='Please complete the required contact information before continuing.';summary.dataset.visible='true';errors[0].scrollIntoView({behavior:'smooth',block:'center'});errors[0].focus({preventScroll:true});return false}
+ summary.dataset.visible='false';return true
+}
+window.blValidateRequiredContactV20_3=validateContact;
+['name','phone','email'].forEach(key=>{const field=fields[key];if(field)field.addEventListener('input',()=>{if(field.getAttribute('aria-invalid')==='true')validateContact()})});
+
 function isSunday(value){
  if(!/^\d{4}-\d{2}-\d{2}$/.test(value||''))return false;
- const parts=value.split('-').map(Number);
- return new Date(parts[0],parts[1]-1,parts[2]).getDay()===0;
+ const p=value.split('-').map(Number);return new Date(p[0],p[1]-1,p[2]).getDay()===0
 }
-const calendarRegion=dateInput.closest('section,article,div')||document;
-calendarRegion.addEventListener('click',event=>{
- const control=event.target.closest('button,[data-date],[data-value]');if(!control)return;
- const raw=control.dataset.date||control.getAttribute('data-value')||control.value||'';
- if(!isSunday(raw))return;
- event.preventDefault();event.stopImmediatePropagation();
- const message=document.getElementById('bl-sunday-message-v20-1');if(message)message.dataset.visible='true';
- dateInput.focus();
-},true);
-// Apply once initially and after the existing previous/next month buttons are used.
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',graySundays,{once:true});else graySundays();
-calendarRegion.addEventListener('click',event=>{
- const label=String(event.target.closest('button')?.getAttribute('aria-label')||event.target.textContent||'').toLowerCase();
- if(label.includes('previous')||label.includes('next'))requestAnimationFrame(graySundays);
-});
+function calendarScope(){
+ return dateInput.closest('.bl-card,section,article')||dateInput.parentElement?.parentElement||booking
+}
+function dateFromControl(control){return control.dataset.date||control.getAttribute('data-value')||control.value||''}
+function graySundayControls(){
+ const scope=calendarScope();
+ scope.querySelectorAll('button,[data-date],[data-value]').forEach(control=>{
+   const raw=dateFromControl(control);
+   if(!isSunday(raw))return;
+   control.classList.add('bl-sunday-unavailable-v20-3');control.setAttribute('aria-disabled','true');control.setAttribute('tabindex','-1');
+   if(control.tagName==='BUTTON')control.disabled=true;
+ });
+ // Fallback for calendars without date attributes: map visible date buttons by column.
+ const grid=scope.querySelector('[role="grid"],.bl-calendar-grid,.bl-cal-grid,[data-calendar-grid]');
+ if(grid){[...grid.children].forEach((cell,index)=>{if(index%7!==0)return;const control=cell.matches('button')?cell:cell.querySelector('button');if(control){control.classList.add('bl-sunday-unavailable-v20-3');control.setAttribute('aria-disabled','true');control.disabled=true}})}
+}
+function applyAfterCalendarNavigation(event){
+ const button=event.target.closest('button');if(!button)return;
+ const label=clean(button.getAttribute('aria-label')||button.textContent).toLowerCase();
+ if(label.includes('previous')||label.includes('next'))requestAnimationFrame(graySundayControls)
+}
+const scope=calendarScope();
+scope.addEventListener('click',applyAfterCalendarNavigation);
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',graySundayControls,{once:true});else graySundayControls();
 })();
 </script>
-<!-- END BL_GRAY_SUNDAYS_V20_2_1 -->
+<!-- END BL_V20_3_VALIDATION_SUNDAYS -->
 </body></html>
