@@ -965,104 +965,93 @@ body {
 @media(max-width:760px){.bl-review-gallery-v16-quote{font-size:19px!important;line-height:1.5!important}.bl-review-gallery-v16-card{padding:21px!important}}
 </style>
 <!-- END BL_REVIEW_TEXT_SIZE_V16_2 -->
-<!-- BLOOMING_LOTUS_BOOKING_FRAME_V21_3_START -->
-<style id="blooming-lotus-booking-frame-v21-3">
-  /* The one visible, fully closed Lotus Glow frame. */
-  [data-lotus-frame-v21-3="true"] {
-    box-sizing: border-box !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    position: relative !important;
-    overflow: hidden !important;
-    border: 2px solid #c33d78 !important;
-    border-radius: 24px !important;
-    background: #fff !important;
-    box-shadow:
-      0 0 0 7px rgba(195,61,120,.10),
-      0 16px 38px rgba(195,61,120,.16) !important;
+<!-- BLOOMING_LOTUS_SAFE_FRAME_V21_4_START -->
+<style id="blooming-lotus-safe-frame-v21-4">
+  /* Never clip content below the booking form. */
+  [data-lotus-frame-v21-4="true"] {
+    box-sizing:border-box !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    position:relative !important;
+    overflow:visible !important;
+    border:2px solid #c33d78 !important;
+    border-radius:24px !important;
+    background:#fff !important;
+    box-shadow:0 0 0 7px rgba(195,61,120,.10),0 16px 38px rgba(195,61,120,.16) !important;
   }
-
-  /* Remove the redundant beige/white frames outside the pink frame. */
-  [data-lotus-outer-v21-3="true"] {
-    border: 0 !important;
-    outline: 0 !important;
-    box-shadow: none !important;
-    background: transparent !important;
+  /* Remove only wrappers proven by JavaScript to closely surround the booking card. */
+  [data-lotus-tight-wrapper-v21-4="true"] {
+    border-color:transparent !important;
+    outline:0 !important;
+    box-shadow:none !important;
+    background:transparent !important;
   }
-
-  /* Bold both field names and field values. */
-  [data-lotus-frame-v21-3="true"] label,
-  [data-lotus-frame-v21-3="true"] legend,
-  [data-lotus-bold-v21-3="true"] {
-    color: #38242e !important;
-    font-weight: 800 !important;
+  [data-lotus-frame-v21-4="true"] label,
+  [data-lotus-frame-v21-4="true"] legend,
+  [data-lotus-bold-v21-4="true"] {
+    color:#38242e !important;
+    font-weight:800 !important;
   }
-  [data-lotus-frame-v21-3="true"] select,
-  [data-lotus-frame-v21-3="true"] input,
-  [data-lotus-frame-v21-3="true"] textarea,
-  [data-lotus-frame-v21-3="true"] option {
-    color: #382f33 !important;
-    font-weight: 800 !important;
+  [data-lotus-frame-v21-4="true"] select,
+  [data-lotus-frame-v21-4="true"] input,
+  [data-lotus-frame-v21-4="true"] textarea,
+  [data-lotus-frame-v21-4="true"] option {
+    color:#382f33 !important;
+    font-weight:800 !important;
   }
-  [data-lotus-frame-v21-3="true"] input::placeholder,
-  [data-lotus-frame-v21-3="true"] textarea::placeholder {
-    color: #756d70 !important;
-    font-weight: 700 !important;
-    opacity: 1 !important;
+  [data-lotus-frame-v21-4="true"] input::placeholder,
+  [data-lotus-frame-v21-4="true"] textarea::placeholder {
+    color:#756d70 !important;font-weight:700 !important;opacity:1 !important;
   }
-
-  @media (max-width:760px) {
-    [data-lotus-frame-v21-3="true"] {
-      border-radius: 18px !important;
-      box-shadow: 0 0 0 5px rgba(195,61,120,.10),0 12px 28px rgba(195,61,120,.14) !important;
-    }
-  }
+  @media(max-width:760px){[data-lotus-frame-v21-4="true"]{border-radius:18px !important;}}
 </style>
-<script id="blooming-lotus-booking-frame-script-v21-3">
+<script id="blooming-lotus-safe-frame-script-v21-4">
 (function(){
-  'use strict';
-  var monthRx=/^(january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{4}$/i;
-  var fieldNames=['session length','service','therapist','time of day','name','phone','email','notes'];
-  function txt(el){return (el&&el.textContent||'').replace(/\s+/g,' ').trim();}
-  function norm(el){return txt(el).toLowerCase().replace(/[\s:*()]+$/g,'').trim();}
-  function monthNode(){return Array.from(document.querySelectorAll('h1,h2,h3,h4,div,span')).find(function(el){return el.children.length===0&&monthRx.test(txt(el));});}
-  function sessionNode(){return Array.from(document.querySelectorAll('label,legend,div,span,p')).find(function(el){return el.children.length<=2&&norm(el)==='session length';});}
-  function chain(el){var a=[];while(el&&el!==document.body){a.push(el);el=el.parentElement;}return a;}
-  function frameFor(month,session){
-    if(!month||!session)return null;
-    var commons=chain(month).filter(function(el){return el.contains(session);});
-    return commons.find(function(el){
-      var r=el.getBoundingClientRect(),m=month.getBoundingClientRect(),s=session.getBoundingClientRect();
-      return r.height>350 && r.width>600 && r.left<=m.left && r.right>=s.right;
-    })||commons[0]||null;
-  }
-  function apply(){
-    var month=monthNode(),session=sessionNode(),frame=frameFor(month,session);
-    document.querySelectorAll('[data-lotus-frame-v21-3]').forEach(function(el){el.removeAttribute('data-lotus-frame-v21-3');});
-    document.querySelectorAll('[data-lotus-outer-v21-3]').forEach(function(el){el.removeAttribute('data-lotus-outer-v21-3');});
-    if(!frame){console.warn('Blooming Lotus V21.3: booking frame not found');return;}
-    frame.setAttribute('data-lotus-frame-v21-3','true');
-    /* Only remove decoration from the two immediate wrappers outside the frame. */
-    var outer=frame.parentElement,count=0;
-    while(outer&&outer!==document.body&&count<2){
-      outer.setAttribute('data-lotus-outer-v21-3','true');
-      outer=outer.parentElement;count++;
-    }
-    document.querySelectorAll('label,legend,div,span,p').forEach(function(el){
-      var n=norm(el);
-      if(fieldNames.some(function(name){return n===name||n.indexOf(name+' ')===0;}))el.setAttribute('data-lotus-bold-v21-3','true');
-    });
-  }
-  var timer;function schedule(){clearTimeout(timer);timer=setTimeout(apply,100);}
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});else apply();
-  new MutationObserver(schedule).observe(document.documentElement,{childList:true,subtree:true});
-  window.addEventListener('resize',schedule);
+ 'use strict';
+ var monthRx=/^(january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{4}$/i;
+ var names=['session length','service','therapist','time of day','name','phone','email','notes'];
+ function text(e){return(e&&e.textContent||'').replace(/\s+/g,' ').trim();}
+ function norm(e){return text(e).toLowerCase().replace(/[\s:*()]+$/g,'').trim();}
+ function findMonth(){return Array.from(document.querySelectorAll('h1,h2,h3,h4,div,span')).find(function(e){return e.children.length===0&&monthRx.test(text(e));});}
+ function findSession(){return Array.from(document.querySelectorAll('label,legend,div,span,p')).find(function(e){return e.children.length<=2&&norm(e)==='session length';});}
+ function chain(e){var a=[];while(e&&e!==document.body){a.push(e);e=e.parentElement;}return a;}
+ function commonFrame(m,s){
+   var common=chain(m).filter(function(e){return e.contains(s);});
+   /* Always choose the lowest common ancestor. Do not use page-size geometry. */
+   return common[0]||null;
+ }
+ function reset(){
+   document.querySelectorAll('[data-lotus-frame-v21-4]').forEach(function(e){e.removeAttribute('data-lotus-frame-v21-4');});
+   document.querySelectorAll('[data-lotus-tight-wrapper-v21-4]').forEach(function(e){e.removeAttribute('data-lotus-tight-wrapper-v21-4');});
+ }
+ function apply(){
+   reset();
+   var m=findMonth(),s=findSession();if(!m||!s)return;
+   var frame=commonFrame(m,s);if(!frame)return;
+   frame.setAttribute('data-lotus-frame-v21-4','true');
+   /* A removable outer wrapper must be only slightly larger than the booking card.
+      This prevents Contact, Visit, or Footer containers from being altered. */
+   var fr=frame.getBoundingClientRect(),outer=frame.parentElement,checked=0;
+   while(outer&&outer!==document.body&&checked<2){
+     var r=outer.getBoundingClientRect();
+     var closeWidth=r.width<=fr.width+140;
+     var closeHeight=r.height<=fr.height+140;
+     if(closeWidth&&closeHeight)outer.setAttribute('data-lotus-tight-wrapper-v21-4','true');
+     else break;
+     outer=outer.parentElement;checked++;
+   }
+   document.querySelectorAll('label,legend,div,span,p').forEach(function(e){
+     var n=norm(e);if(names.some(function(x){return n===x||n.indexOf(x+' ')===0;}))e.setAttribute('data-lotus-bold-v21-4','true');
+   });
+ }
+ var timer;function schedule(){clearTimeout(timer);timer=setTimeout(apply,100);}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});else apply();
+ new MutationObserver(schedule).observe(document.documentElement,{childList:true,subtree:true});
+ window.addEventListener('resize',schedule);
 })();
 </script>
-<!-- BLOOMING_LOTUS_BOOKING_FRAME_V21_3_END -->
+<!-- BLOOMING_LOTUS_SAFE_FRAME_V21_4_END -->
 </head>
 <body>
 <div class="preview"><strong>Concept Preview</strong> — unofficial demo for Blooming Lotus Oriental Massage. Confirm business details before launch.</div>
