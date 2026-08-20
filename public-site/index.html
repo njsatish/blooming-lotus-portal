@@ -2253,4 +2253,135 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 </script>
 <!-- END BL_REMOVE_STANDALONE_CTA_V19_3 -->
+
+<!-- BEGIN BL_V19_PART4_CONFIRMATION -->
+<style id="bl-v19-part4-confirmation-style">
+/* CSS-only spacing refinement. No booking elements are moved or reparented. */
+#bl-booking-v14{margin-top:0!important}
+#bl-booking-v14>.bl-grid{gap:22px!important}
+#bl-booking-v14 .bl-card{box-sizing:border-box!important}
+.bl-v19-part4-heading{margin-bottom:20px!important}
+
+#bl-confirm-overlay-v19-4{
+  position:fixed;inset:0;z-index:2147483000;display:none;
+  align-items:center;justify-content:center;padding:20px;
+  background:rgba(42,15,29,.62);backdrop-filter:blur(4px)
+}
+#bl-confirm-overlay-v19-4[aria-hidden="false"]{display:flex}
+#bl-confirm-dialog-v19-4{
+  width:min(560px,100%);max-height:90vh;overflow:auto;
+  border:1px solid #ead5df;border-radius:24px;background:#fff;
+  box-shadow:0 28px 80px rgba(45,13,29,.28);padding:28px
+}
+#bl-confirm-dialog-v19-4 h2{margin:6px 0 8px;color:#581638;font-family:Georgia,serif;font-size:30px}
+#bl-confirm-dialog-v19-4 p{margin:0 0 18px;color:#705b65;line-height:1.55}
+.bl-v19-4-kicker{color:#bd3c71;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+#bl-confirm-summary-v19-4{margin:18px 0;border:1px solid #ead9e1;border-radius:16px;overflow:hidden;background:#fffafc}
+.bl-v19-4-row{display:grid;grid-template-columns:145px 1fr;border-top:1px solid #efe2e8}
+.bl-v19-4-row:first-child{border-top:0}
+.bl-v19-4-label,.bl-v19-4-value{padding:12px 14px;font-size:14px}
+.bl-v19-4-label{color:#806b75;font-weight:800}.bl-v19-4-value{color:#49333d;font-weight:700}
+.bl-v19-4-actions{display:flex;gap:12px;justify-content:flex-end;margin-top:22px}
+.bl-v19-4-action{border-radius:999px;padding:12px 20px;font-weight:800;cursor:pointer}
+#bl-confirm-change-v19-4{border:1px solid #bd3c71;background:#fff;color:#9e2f60}
+#bl-confirm-continue-v19-4{border:1px solid #bd3c71;background:#bd3c71;color:#fff}
+#bl-confirmed-note-v19-4{display:none;margin:14px 0 0;padding:12px 14px;border:1px solid #cee5bf;border-radius:12px;background:#f2f9ed;color:#416b35;font-size:14px;font-weight:800}
+#bl-confirmed-note-v19-4[data-visible="true"]{display:block}
+@media(max-width:760px){
+  #bl-booking-v14>.bl-grid{gap:16px!important}.bl-v19-part4-heading{margin-bottom:15px!important}
+  #bl-confirm-dialog-v19-4{padding:22px 18px;border-radius:18px}
+  .bl-v19-4-row{grid-template-columns:1fr}.bl-v19-4-label{padding-bottom:3px}.bl-v19-4-value{padding-top:3px}
+  .bl-v19-4-actions{flex-direction:column-reverse}.bl-v19-4-action{width:100%}
+}
+</style>
+<div id="bl-confirm-overlay-v19-4" aria-hidden="true">
+  <div id="bl-confirm-dialog-v19-4" role="dialog" aria-modal="true" aria-labelledby="bl-confirm-title-v19-4">
+    <div class="bl-v19-4-kicker">Review your selections</div>
+    <h2 id="bl-confirm-title-v19-4">Confirm appointment details</h2>
+    <p>Please confirm these selections before continuing. Choose “Change selections” to go back and make adjustments.</p>
+    <div id="bl-confirm-summary-v19-4"></div>
+    <div class="bl-v19-4-actions">
+      <button id="bl-confirm-change-v19-4" class="bl-v19-4-action" type="button">Change selections</button>
+      <button id="bl-confirm-continue-v19-4" class="bl-v19-4-action" type="button">Confirm &amp; continue</button>
+    </div>
+  </div>
+</div>
+<script id="bl-v19-part4-confirmation-script">
+(function(){
+'use strict';
+if(window.__BL_V19_PART4_CONFIRMATION__)return;
+window.__BL_V19_PART4_CONFIRMATION__=true;
+const booking=document.getElementById('bl-booking-v14');
+if(!booking)return;
+const byId=id=>document.getElementById(id);
+const overlay=byId('bl-confirm-overlay-v19-4');
+const dialog=byId('bl-confirm-dialog-v19-4');
+const summary=byId('bl-confirm-summary-v19-4');
+const changeButton=byId('bl-confirm-change-v19-4');
+const continueButton=byId('bl-confirm-continue-v19-4');
+const submit=byId('bl-submit');
+let selectedTime='';
+let confirmedSignature='';
+let lastFocus=null;
+
+function value(id){const el=byId(id);return el?String(el.value||'').trim():''}
+function selectedText(id){const el=byId(id);if(!el)return '';const option=el.options&&el.selectedIndex>=0?el.options[el.selectedIndex]:null;return String(option?option.textContent:el.value||'').replace(/\s+/g,' ').trim()}
+function timeFromControl(control){
+ return String(control.dataset.time||control.dataset.value||control.getAttribute('data-slot')||control.textContent||'').replace(/\s+/g,' ').trim();
+}
+function validTime(text){return /\b(?:1[0-2]|0?[1-9]):[0-5]\d\s*(?:am|pm)\b/i.test(text)||/^\d{2}:\d{2}$/.test(text)}
+function signature(){return [value('bl-date'),value('bl-duration'),value('bl-service'),value('bl-therapist'),selectedTime].join('|')}
+function complete(){return value('bl-date')&&value('bl-duration')&&value('bl-service')&&value('bl-therapist')&&selectedTime}
+function escapeHtml(text){return String(text).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function formatDate(raw){
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(raw))return raw;
+ const [year,month,day]=raw.split('-').map(Number);
+ return new Intl.DateTimeFormat('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).format(new Date(year,month-1,day));
+}
+function rows(){return [
+ ['Date',formatDate(value('bl-date'))],['Time',selectedTime],['Session length',selectedText('bl-duration')],
+ ['Service',selectedText('bl-service')],['Therapist',selectedText('bl-therapist')]
+]}
+function populate(){summary.innerHTML=rows().map(([label,val])=>'<div class="bl-v19-4-row"><div class="bl-v19-4-label">'+escapeHtml(label)+'</div><div class="bl-v19-4-value">'+escapeHtml(val)+'</div></div>').join('')}
+function openDialog(){
+ if(!complete())return;
+ lastFocus=document.activeElement;populate();overlay.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';continueButton.focus();
+}
+function closeDialog(){overlay.setAttribute('aria-hidden','true');document.body.style.overflow='';if(lastFocus&&lastFocus.focus)lastFocus.focus()}
+function markConfirmed(){
+ confirmedSignature=signature();closeDialog();
+ let note=byId('bl-confirmed-note-v19-4');
+ if(!note){note=document.createElement('div');note.id='bl-confirmed-note-v19-4';note.setAttribute('role','status');booking.appendChild(note)}
+ note.textContent='Selections confirmed. Complete your contact details and submit the appointment request.';note.dataset.visible='true';
+ const firstContact=byId('bl-name')||booking.querySelector('input[name="name"],input[type="text"]');
+ if(firstContact){firstContact.scrollIntoView({behavior:'smooth',block:'center'});firstContact.focus({preventScroll:true})}
+}
+function invalidate(){
+ if(confirmedSignature&&confirmedSignature!==signature()){
+   confirmedSignature='';const note=byId('bl-confirmed-note-v19-4');if(note)note.dataset.visible='false';
+ }
+}
+
+booking.addEventListener('click',event=>{
+ const control=event.target.closest('button,[data-time],[data-slot]');
+ if(!control||control===submit||control.closest('#bl-confirm-overlay-v19-4'))return;
+ const text=timeFromControl(control);
+ if(validTime(text)){selectedTime=text;invalidate();openDialog()}
+});
+['bl-date','bl-duration','bl-service','bl-therapist'].forEach(id=>{const el=byId(id);if(el)el.addEventListener('change',invalidate)});
+changeButton.addEventListener('click',closeDialog);
+continueButton.addEventListener('click',markConfirmed);
+overlay.addEventListener('click',event=>{if(event.target===overlay)closeDialog()});
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&overlay.getAttribute('aria-hidden')==='false')closeDialog()});
+if(submit)submit.addEventListener('click',event=>{
+ if(complete()&&confirmedSignature!==signature()){
+   event.preventDefault();event.stopImmediatePropagation();openDialog();
+ }
+},true);
+
+const heading=[...document.querySelectorAll('h1,h2,h3')].find(node=>node.textContent.trim().toLowerCase()==='request an appointment.');
+if(heading&&heading.parentElement)heading.parentElement.classList.add('bl-v19-part4-heading');
+})();
+</script>
+<!-- END BL_V19_PART4_CONFIRMATION -->
 </body></html>
