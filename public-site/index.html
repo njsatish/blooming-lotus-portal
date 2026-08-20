@@ -1159,6 +1159,76 @@ body {
   }
 </style>
 <!-- BLOOMING_LOTUS_BOTTOM_SPACE_V21_9_END -->
+<!-- BLOOMING_LOTUS_COMPACT_SECTION_V21_10_START -->
+<style id="blooming-lotus-compact-section-v21-10">
+  /* Height is measured from visible booking content and updates dynamically. */
+  [data-lotus-frame-v21-5="true"][data-bl-compact-v21-10="true"] {
+    min-height:0 !important;
+    height:var(--bl-booking-height-v21-10) !important;
+    max-height:none !important;
+    overflow:visible !important;
+  }
+
+  /* Remove the large green-space tail after the booking card only. */
+  [data-bl-booking-section-v21-10="true"] {
+    min-height:0 !important;
+    padding-bottom:52px !important;
+  }
+
+  @media(max-width:760px){
+    [data-lotus-frame-v21-5="true"][data-bl-compact-v21-10="true"] {
+      height:auto !important;
+    }
+    [data-bl-booking-section-v21-10="true"] {
+      padding-bottom:36px !important;
+    }
+  }
+</style>
+<script id="blooming-lotus-compact-section-script-v21-10">
+(function(){
+  'use strict';
+  function visible(el){
+    var s=getComputedStyle(el),r=el.getBoundingClientRect();
+    return s.display!=='none'&&s.visibility!=='hidden'&&r.width>0&&r.height>0;
+  }
+  function nearestSection(frame){
+    var node=frame.parentElement;
+    while(node&&node!==document.body){
+      if((node.tagName==='SECTION'||node.tagName==='MAIN')&&node.contains(frame))return node;
+      node=node.parentElement;
+    }
+    return null;
+  }
+  function apply(){
+    var frame=document.querySelector('[data-lotus-frame-v21-5="true"]');
+    if(!frame)return;
+    var fr=frame.getBoundingClientRect();
+    var maxBottom=fr.top;
+    /* Measure visible leaf controls/text, not stretching layout wrappers. */
+    frame.querySelectorAll('input,select,textarea,button,label,legend,p,h1,h2,h3,h4,small,[role="button"]').forEach(function(el){
+      if(!visible(el))return;
+      var r=el.getBoundingClientRect();
+      if(r.bottom>maxBottom)maxBottom=r.bottom;
+    });
+    /* Keep 32px below the lowest visible control and never shrink below 560px. */
+    var required=Math.max(560,Math.ceil(maxBottom-fr.top+32));
+    frame.style.setProperty('--bl-booking-height-v21-10',required+'px');
+    frame.setAttribute('data-bl-compact-v21-10','true');
+
+    document.querySelectorAll('[data-bl-booking-section-v21-10]').forEach(function(el){
+      el.removeAttribute('data-bl-booking-section-v21-10');
+    });
+    var section=nearestSection(frame);
+    if(section)section.setAttribute('data-bl-booking-section-v21-10','true');
+  }
+  var timer;
+  function schedule(){clearTimeout(timer);timer=setTimeout(apply,120);}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});else apply();
+  new MutationObserver(schedule).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['class','style','disabled']});
+  window.addEventListener('resize',schedule);
+})();
+</script>
+<!-- BLOOMING_LOTUS_COMPACT_SECTION_V21_10_END -->
 </head>
 <body>
 <div class="preview"><strong>Concept Preview</strong> — unofficial demo for Blooming Lotus Oriental Massage. Confirm business details before launch.</div>
