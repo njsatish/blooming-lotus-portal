@@ -210,6 +210,22 @@ def build_availability(date, requested_duration=60, service=None):
     return slots
 
 
+def send_ses_with_retry(message_kwargs, label):
+    for attempt in range(3):
+        try:
+            result = ses.send_email(**message_kwargs)
+            message_id = result.get("MessageId")
+            print(f"{label} email queued successfully: {message_id}")
+            return True, message_id
+        except Exception as exc:
+            code = getattr(exc, "response", {}).get("Error", {}).get("Code", "")
+            retryable = code in {"Throttling", "ThrottlingException", "TooManyRequestsException"} or "rate" in str(exc).lower()
+            print(f"{label} email attempt {attempt + 1} failed: {repr(exc)}")
+            if not retryable or attempt == 2:
+                return False, str(exc)
+            time.sleep(1.25 * (attempt + 1))
+    return False, "Email retry exhausted."
+
 def customer_acknowledgement_subject(appointment_id):
     flower = "\U0001F338"
     return f"{flower} Blooming Lotus — Appointment Request Received — {appointment_id} {flower}"
@@ -248,8 +264,7 @@ def send_customer_acknowledgement(item):
     if not destination: return False,"Customer email was not provided."
     if destination != sandbox_recipient: return False,"SES sandbox: customer email is not the verified test recipient."
     try:
-        result=ses.send_email(Source=sandbox_recipient,Destination={"ToAddresses":[destination]},ReplyToAddresses=[sandbox_recipient],Message={"Subject":{"Data":customer_acknowledgement_subject(item["appointmentId"]),"Charset":"UTF-8"},"Body":{"Text":{"Data":customer_acknowledgement_text(item),"Charset":"UTF-8"},"Html":{"Data":customer_acknowledgement_html(item),"Charset":"UTF-8"}}})
-        return True,result.get("MessageId")
+        return send_ses_with_retry(dict(Source=sandbox_recipient,Destination={"ToAddresses":[destination]},ReplyToAddresses=[sandbox_recipient],Message={"Subject":{"Data":customer_acknowledgement_subject(item["appointmentId"]),"Charset":"UTF-8"},"Body":{"Text":{"Data":customer_acknowledgement_text(item),"Charset":"UTF-8"},"Html":{"Data":customer_acknowledgement_html(item),"Charset":"UTF-8"}}}), "Customer")
     except Exception as exc:
         print("Customer acknowledgement email failed:",repr(exc)); return False,str(exc)
 
@@ -322,7 +337,7 @@ def business_notification_html(item):
 def send_business_html_notification(item):
     business_email = "njsatish@gmail.com"
     try:
-        result = ses.send_email(
+        return send_ses_with_retry(dict(
             Source=business_email,
             Destination={"ToAddresses": [business_email]},
             ReplyToAddresses=[business_email],
@@ -333,8 +348,7 @@ def send_business_html_notification(item):
                     "Html": {"Data": business_notification_html(item), "Charset": "UTF-8"},
                 },
             },
-        )
-        return True, result.get("MessageId")
+        ), "Business")
     except Exception as exc:
         print("Business HTML email failed:", repr(exc))
         return False, str(exc)
@@ -462,7 +476,9 @@ def handle_appointment(event):
     plainBusinessNotificationDisabled=True
     print("Legacy SNS business notification disabled; SES HTML business email remains enabled.")
     business_email_sent,business_email_result=send_business_html_notification(saved)
+    time.sleep(1.25)
     customer_email_sent,customer_email_result=send_customer_acknowledgement(saved)
+    print("Appointment email results:", {"businessEmailSent": business_email_sent, "businessMessageId": business_email_result, "customerEmailSent": customer_email_sent, "customerMessageId": customer_email_result})
     return response(201,{"plainBusinessNotificationDisabled":plainBusinessNotificationDisabled,"businessEmailSent":business_email_sent,"businessEmailResult":business_email_result,"customerEmailSent":customer_email_sent,"customerEmailResult":customer_email_result,"appointmentId":aid,"status":"REQUESTED","therapist":saved["therapist"],"notificationPublished":published,"message":"Appointment request received and the selected time is being held pending confirmation."})
 
 def handler(event, context):
