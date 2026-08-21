@@ -3043,4 +3043,69 @@ var attempts=0,timer=setInterval(function(){attempts++;if(apply()||attempts>=40)
 })();
 </script>
 <!-- BLOOMING_LOTUS_THIRD_REVIEW_V21_23_END -->
+<!-- BLOOMING_LOTUS_ROUND_FIRST_IMPRESSION_V21_24_START -->
+<style id="blooming-lotus-round-first-impression-v21-24">
+[data-bl-first-impression-v21-24="true"] {
+  transition:border-radius .2s ease,width .2s ease !important;
+}
+</style>
+<script id="blooming-lotus-round-first-impression-script-v21-24">
+(function(){
+'use strict';
+if(window.__BL_ROUND_FIRST_IMPRESSION_V21_24__)return;
+window.__BL_ROUND_FIRST_IMPRESSION_V21_24__=true;
+
+var headingText='warm, polished, and unmistakably blooming lotus';
+function clean(value){return String(value||'').replace(/\s+/g,' ').trim().toLowerCase().replace(/[.]+$/,'');}
+function important(el,name,value){if(el)el.style.setProperty(name,value,'important');}
+function visible(el){if(!el)return false;var r=el.getBoundingClientRect(),s=getComputedStyle(el);return r.width>0&&r.height>0&&s.display!=='none'&&s.visibility!=='hidden';}
+function findHeading(){
+ return Array.from(document.querySelectorAll('h1,h2,h3')).find(function(el){
+   return clean(el.textContent)===headingText;
+ });
+}
+function findSection(heading){
+ var node=heading;
+ while(node&&node!==document.body){
+   var text=clean(node.textContent);
+   if((node.tagName==='SECTION'||node.tagName==='ARTICLE'||node.tagName==='DIV')&&
+      text.indexOf('a better first impression')>=0&&
+      text.indexOf('see the booking experience')>=0&&
+      node.getBoundingClientRect().width>700){
+     return node;
+   }
+   node=node.parentElement;
+ }
+ return heading.closest('section')||heading.parentElement;
+}
+function apply(){
+ var heading=findHeading();
+ if(!heading||!visible(heading))return false;
+ var section=findSection(heading);
+ if(!section)return false;
+ section.setAttribute('data-bl-first-impression-v21-24','true');
+ var mobile=window.matchMedia('(max-width:680px)').matches;
+ var tablet=window.matchMedia('(max-width:1120px)').matches;
+ important(section,'width',mobile?'calc(100% - 18px)':tablet?'calc(100% - 34px)':'calc(100% - 48px)');
+ important(section,'max-width','none');
+ important(section,'margin-left','auto');
+ important(section,'margin-right','auto');
+ important(section,'border-radius',mobile?'20px':tablet?'28px':'38px');
+ important(section,'overflow','hidden');
+ important(section,'background-clip','padding-box');
+ important(section,'box-sizing','border-box');
+ important(section,'isolation','isolate');
+ important(section,'transform','translateZ(0)');
+ section.dataset.blFirstImpressionAppliedV21_24='true';
+ return true;
+}
+function schedule(){requestAnimationFrame(apply);}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule,{once:true});else schedule();
+window.addEventListener('load',schedule,{once:true});
+window.addEventListener('resize',schedule);
+new MutationObserver(schedule).observe(document.documentElement,{childList:true,subtree:true});
+var attempts=0,timer=setInterval(function(){attempts++;if(apply()||attempts>=50)clearInterval(timer);},100);
+})();
+</script>
+<!-- BLOOMING_LOTUS_ROUND_FIRST_IMPRESSION_V21_24_END -->
 </body></html>
