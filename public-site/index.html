@@ -3212,85 +3212,60 @@ var tries=0,t=setInterval(function(){tries++;if(apply()||tries>=60)clearInterval
 })();
 </script>
 <!-- BLOOMING_LOTUS_BURGUNDY_THERAPIST_CARDS_V21_26_END -->
-<!-- BLOOMING_LOTUS_CUPPING_SERVICE_V21_31_1_START -->
-<script id="blooming-lotus-cupping-service-v21-31-1">
+<!-- BLOOMING_LOTUS_FIX_DUPLICATE_CUPPING_V21_32_START -->
+<script id="blooming-lotus-fix-duplicate-cupping-v21-32">
 (function(){
 'use strict';
-if(window.__BL_CUPPING_SERVICE_V21_31_1__)return;
-window.__BL_CUPPING_SERVICE_V21_31_1__=true;
-
-var imageUrl='assets/blooming-lotus-cupping-service-photo-v21-31.png?v=21.31';
+if(window.__BL_FIX_DUPLICATE_CUPPING_V21_32__)return;
+window.__BL_FIX_DUPLICATE_CUPPING_V21_32__=true;
+var imageUrl='assets/blooming-lotus-cupping-service-photo-v21-32.png?v=21.32';
 var description='A focused wellness service using professional therapy cups to complement the massage experience.';
-function clean(value){return String(value||'').replace(/\s+/g,' ').trim().toLowerCase();}
-function replaceAllNames(){
-  var walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
-  var node;
-  while((node=walker.nextNode())){
-    if(/couples\s+massage/i.test(node.nodeValue)){
-      node.nodeValue=node.nodeValue.replace(/couples\s+massage/gi,'Cupping');
-    }
+function clean(v){return String(v||'').replace(/\s+/g,' ').trim().toLowerCase();}
+function cards(){
+ var scope=document.querySelector('#massage-services-gallery-v34, .massage-services-gallery-v34, [class*="services-gallery"]')||document;
+ var result=[];
+ Array.from(scope.querySelectorAll('a,button')).forEach(function(button){
+  if(clean(button.textContent).indexOf('request appointment')<0)return;
+  var node=button;
+  while(node&&node!==scope&&node!==document.body){
+   if(node.querySelector&&node.querySelector('img')&&node.querySelector('h2,h3,h4')){result.push(node);break;}
+   node=node.parentElement;
   }
-  document.querySelectorAll('option').forEach(function(option){
-    if(/couples\s+massage/i.test(option.textContent))option.textContent='Cupping';
-    if(/couples\s+massage/i.test(option.value))option.value='Cupping';
-  });
-}
-function findServiceCards(){
-  var gallery=document.querySelector('#massage-services-gallery-v34, .massage-services-gallery-v34, [class*="services-gallery"]');
-  var scope=gallery||document;
-  var buttons=Array.from(scope.querySelectorAll('a,button')).filter(function(el){return clean(el.textContent).indexOf('request appointment')>=0;});
-  var cards=[];
-  buttons.forEach(function(button){
-    var node=button;
-    while(node&&node!==scope&&node!==document.body){
-      if(node.querySelector&&node.querySelector('img')&&node.querySelector('h2,h3,h4')){cards.push(node);break;}
-      node=node.parentElement;
-    }
-  });
-  return Array.from(new Set(cards));
+ });
+ return Array.from(new Set(result));
 }
 function apply(){
-  replaceAllNames();
-  var cards=findServiceCards();
-  if(cards.length<4)return false;
+ var list=cards();
+ if(list.length<6)return false;
 
-  // The existing Couples Massage tile is the fourth service card.
-  var card=cards[3];
-  var heading=card.querySelector('h2,h3,h4');
-  if(heading)heading.textContent='Cupping';
+ // Restore the authentic fourth card. Earlier V21.31 changed this card at runtime.
+ var hotStone=list[3];
+ var hotHeading=hotStone.querySelector('h2,h3,h4');
+ if(hotHeading)hotHeading.textContent='Hot Stone Massage';
+ hotStone.removeAttribute('data-bl-cupping-v21-31');
+ hotStone.removeAttribute('data-bl-cupping-v21-31-1');
 
-  var img=card.querySelector('img');
-  if(img){
-    img.src=imageUrl;
-    img.removeAttribute('srcset');
-    img.removeAttribute('sizes');
-    img.alt='Professional cupping therapy cups arranged on burgundy spa towels with candles, orchids, and spa stones';
-    img.style.setProperty('object-fit','cover','important');
-    img.style.setProperty('object-position','center','important');
-  }
+ // The original Couples Massage tile is the sixth card in the current gallery.
+ var cupping=list[5];
+ var heading=cupping.querySelector('h2,h3,h4');
+ if(heading)heading.textContent='Cupping';
+ var img=cupping.querySelector('img');
+ if(img){img.src=imageUrl;img.removeAttribute('srcset');img.removeAttribute('sizes');img.alt='Professional cupping therapy cups arranged on burgundy spa towels with candles, orchids, and spa stones';img.style.setProperty('object-fit','cover','important');img.style.setProperty('object-position','center','important');}
+ var desc=Array.from(cupping.querySelectorAll('p')).find(function(p){var x=clean(p.textContent);return x.indexOf('two prepared treatment spaces')>=0||x.indexOf('two-person')>=0||x.indexOf('therapy cups')>=0;});
+ if(desc)desc.textContent=description;
+ Array.from(cupping.querySelectorAll('*')).forEach(function(el){var x=clean(el.textContent);if(el.children.length===0&&(x==='60 or 90 minutes'||x==='60 or 90 minute'))el.textContent='30 or 60 minutes';});
+ cupping.setAttribute('data-bl-cupping-v21-32','true');
 
-  var paragraphs=Array.from(card.querySelectorAll('p'));
-  var desc=paragraphs.find(function(p){
-    var value=clean(p.textContent);
-    return value.indexOf('two-person')>=0||value.indexOf('therapy cups')>=0||value.indexOf('massage experience')>=0;
-  });
-  if(desc)desc.textContent=description;
-
-  Array.from(card.querySelectorAll('*')).forEach(function(el){
-    var value=clean(el.textContent);
-    if(el.children.length===0&&(value==='60 or 90 minutes'||value==='60 or 90 minute')){
-      el.textContent='30 or 60 minutes';
-    }
-  });
-  card.setAttribute('data-bl-cupping-v21-31-1','true');
-  return true;
+ // Preserve Cupping in booking dropdowns/configured option labels.
+ document.querySelectorAll('option').forEach(function(option){if(/couples\s+massage/i.test(option.textContent))option.textContent='Cupping';if(/couples\s+massage/i.test(option.value))option.value='Cupping';});
+ return clean(hotHeading&&hotHeading.textContent)==='hot stone massage'&&clean(heading&&heading.textContent)==='cupping';
 }
 function schedule(){requestAnimationFrame(apply);}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule,{once:true});else schedule();
 window.addEventListener('load',schedule,{once:true});
-new MutationObserver(schedule).observe(document.documentElement,{childList:true,subtree:true,characterData:true});
+new MutationObserver(schedule).observe(document.documentElement,{childList:true,subtree:true});
 var attempts=0,timer=setInterval(function(){attempts++;if(apply()&&attempts>10)clearInterval(timer);if(attempts>=80)clearInterval(timer);},100);
 })();
 </script>
-<!-- BLOOMING_LOTUS_CUPPING_SERVICE_V21_31_1_END -->
+<!-- BLOOMING_LOTUS_FIX_DUPLICATE_CUPPING_V21_32_END -->
 </body></html>
