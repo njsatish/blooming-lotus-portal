@@ -3117,4 +3117,99 @@ var attempts=0,timer=setInterval(function(){attempts++;if(apply()||attempts>=60)
 })();
 </script>
 <!-- BLOOMING_LOTUS_ROUND_FIRST_IMPRESSION_OUTER_V21_25_END -->
+<!-- BLOOMING_LOTUS_BURGUNDY_THERAPIST_CARDS_V21_26_START -->
+<style id="blooming-lotus-burgundy-therapist-cards-v21-26">
+html body [data-bl-therapists-v21-26="true"]{
+  width:calc(100% - 48px) !important;
+  margin:44px auto !important;
+  padding:76px clamp(28px,6vw,92px) !important;
+  border-radius:38px !important;
+  overflow:hidden !important;
+  box-sizing:border-box !important;
+  background:linear-gradient(145deg,#4d1630 0%,#651a40 100%) !important;
+  color:#fff !important;
+  isolation:isolate !important;
+}
+html body [data-bl-therapists-v21-26="true"] [data-bl-team-heading-v21-26="true"],
+html body [data-bl-therapists-v21-26="true"] h2,
+html body [data-bl-therapists-v21-26="true"] .kicker,
+html body [data-bl-therapists-v21-26="true"] [data-bl-team-intro-v21-26="true"]{
+  color:#fff !important;
+}
+html body [data-bl-therapists-v21-26="true"] [data-bl-team-intro-v21-26="true"]{
+  opacity:.82 !important;
+}
+html body [data-bl-therapists-v21-26="true"] [data-bl-team-grid-v21-26="true"]{
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:24px !important;
+  align-items:stretch !important;
+}
+html body [data-bl-therapists-v21-26="true"] [data-bl-team-card-v21-26="true"]{
+  min-width:0 !important;
+  min-height:350px !important;
+  padding:32px 28px !important;
+  border:1px solid rgba(255,255,255,.72) !important;
+  border-radius:30px !important;
+  background:#fff !important;
+  color:#382a31 !important;
+  box-shadow:0 20px 42px rgba(21,2,12,.24) !important;
+  box-sizing:border-box !important;
+  display:flex !important;
+  flex-direction:column !important;
+}
+html body [data-bl-therapists-v21-26="true"] [data-bl-team-card-v21-26="true"] h3{
+  color:#531632 !important;
+}
+html body [data-bl-therapists-v21-26="true"] [data-bl-team-card-v21-26="true"] p{
+  color:#786a71 !important;
+}
+html body [data-bl-therapists-v21-26="true"] [data-bl-team-card-v21-26="true"] a,
+html body [data-bl-therapists-v21-26="true"] [data-bl-team-card-v21-26="true"] button{
+  color:#bd2465 !important;
+}
+html body [data-bl-therapists-v21-26="true"] [data-bl-team-avatar-v21-26="true"]{
+  background:linear-gradient(145deg,#ffd9e7,#eff7e8) !important;
+  color:#b21d5d !important;
+  border-radius:50% !important;
+}
+@media(max-width:960px){
+  html body [data-bl-therapists-v21-26="true"]{width:calc(100% - 34px)!important;border-radius:28px!important;padding:58px 28px!important}
+  html body [data-bl-therapists-v21-26="true"] [data-bl-team-grid-v21-26="true"]{grid-template-columns:1fr!important}
+  html body [data-bl-therapists-v21-26="true"] [data-bl-team-card-v21-26="true"]{min-height:0!important}
+}
+@media(max-width:680px){
+  html body [data-bl-therapists-v21-26="true"]{width:calc(100% - 18px)!important;margin:26px auto!important;padding:46px 18px!important;border-radius:20px!important}
+  html body [data-bl-therapists-v21-26="true"] [data-bl-team-card-v21-26="true"]{padding:24px 21px!important;border-radius:22px!important}
+}
+</style>
+<script id="blooming-lotus-burgundy-therapist-cards-script-v21-26">
+(function(){
+'use strict';
+if(window.__BL_BURGUNDY_THERAPISTS_V21_26__)return;
+window.__BL_BURGUNDY_THERAPISTS_V21_26__=true;
+function clean(v){return String(v||'').replace(/\s+/g,' ').trim().toLowerCase();}
+function findHeading(){return Array.from(document.querySelectorAll('h1,h2,h3')).find(function(el){var x=clean(el.textContent);return x.indexOf('request the therapist')>=0&&x.indexOf('prefer')>=0;});}
+function findSection(h){var n=h;while(n&&n!==document.body){var x=clean(n.textContent);if((n.tagName==='SECTION'||n.tagName==='DIV')&&x.indexOf('jack')>=0&&x.indexOf('rose')>=0&&x.indexOf('mike')>=0&&n.getBoundingClientRect().width>700)return n;n=n.parentElement;}return h.closest('section');}
+function directCommonParent(nodes,section){var n=nodes[0].parentElement;while(n&&n!==section){if(nodes.every(function(x){return n.contains(x);})){return n;}n=n.parentElement;}return section;}
+function apply(){
+ var h=findHeading();if(!h)return false;var section=findSection(h);if(!section)return false;
+ var names=['jack','rose','mike'];var nameHeads=Array.from(section.querySelectorAll('h2,h3,h4')).filter(function(el){return names.indexOf(clean(el.textContent))>=0;});
+ if(nameHeads.length<3)return false;
+ var cards=nameHeads.map(function(el){var n=el;while(n.parentElement&&n.parentElement!==section){var text=clean(n.textContent);if(text.indexOf('book with')>=0||text.indexOf('massage therapist')>=0)return n;n=n.parentElement;}return n;});
+ cards=Array.from(new Set(cards));if(cards.length<3)return false;
+ var grid=directCommonParent(cards,section);
+ section.setAttribute('data-bl-therapists-v21-26','true');h.setAttribute('data-bl-team-heading-v21-26','true');grid.setAttribute('data-bl-team-grid-v21-26','true');
+ var intro=Array.from(section.querySelectorAll('p')).find(function(p){return clean(p.textContent).indexOf('choose a preferred therapist')>=0;});if(intro)intro.setAttribute('data-bl-team-intro-v21-26','true');
+ cards.forEach(function(card){card.setAttribute('data-bl-team-card-v21-26','true');var avatar=card.querySelector('[class*="avatar"], [class*="initial"]');if(avatar)avatar.setAttribute('data-bl-team-avatar-v21-26','true');});
+ return true;
+}
+function schedule(){requestAnimationFrame(apply);}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule,{once:true});else schedule();
+window.addEventListener('load',schedule,{once:true});window.addEventListener('resize',schedule);
+new MutationObserver(schedule).observe(document.documentElement,{childList:true,subtree:true});
+var tries=0,t=setInterval(function(){tries++;if(apply()||tries>=60)clearInterval(t);},100);
+})();
+</script>
+<!-- BLOOMING_LOTUS_BURGUNDY_THERAPIST_CARDS_V21_26_END -->
 </body></html>
