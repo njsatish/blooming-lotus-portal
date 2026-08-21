@@ -26,6 +26,14 @@ serializer = TypeSerializer()
 ACTIVE_STATUSES = {"REQUESTED", "CONTACTED", "CONFIRMED", "RESCHEDULE_NEEDED"}
 
 DEFAULT_THERAPISTS = ["Jack", "Rose", "Mike"]
+# BEGIN BLOOMING_LOTUS_SES_SANDBOX_V21_16
+EMAIL_FROM = os.environ.get('EMAIL_FROM', 'thenuthulapatis@gmail.com')
+REPLY_TO = os.environ.get('REPLY_TO', EMAIL_FROM)
+BUSINESS_EMAIL = os.environ.get('BUSINESS_EMAIL', 'thenuthulapatis@gmail.com')
+DEMO_CUSTOMER_RECIPIENT = os.environ.get('DEMO_CUSTOMER_RECIPIENT', 'thenuthulapatis@gmail.com')
+SES_SANDBOX_MODE = os.environ.get('SES_SANDBOX_MODE', 'true').lower() == 'true'
+# END BLOOMING_LOTUS_SES_SANDBOX_V21_16
+
 
 def therapist_records():
     records = scan_all(therapist_table, ConsistentRead=True)
@@ -259,14 +267,21 @@ def customer_acknowledgement_html(item):
       "</div></div></body></html>")
 
 def send_customer_acknowledgement(item):
-    destination=str(item.get("email") or "").strip().lower()
-    sandbox_recipient="njsatish@gmail.com"
-    if not destination: return False,"Customer email was not provided."
-    if destination != sandbox_recipient: return False,"SES sandbox: customer email is not the verified test recipient."
+    intended_destination = str(item.get('email') or '').strip().lower()
+    if not intended_destination:
+        return False, 'Customer email was not provided.'
+    destination = DEMO_CUSTOMER_RECIPIENT if SES_SANDBOX_MODE else intended_destination
+    text_body = customer_acknowledgement_text(item)
+    html_body = customer_acknowledgement_html(item)
+    if SES_SANDBOX_MODE:
+        notice = 'SES sandbox demo: delivered to the verified test inbox. Intended customer email: ' + intended_destination
+        text_body = notice + '\n\n' + text_body
+        banner = "<div style='padding:14px;background:#fff3cd;color:#6b592f;font-weight:bold'>" + html.escape(notice) + "</div>"
+        html_body = html_body.replace("<div style='max-width:680px", banner + "<div style='max-width:680px", 1)
     try:
-        return send_ses_with_retry(dict(Source=sandbox_recipient,Destination={"ToAddresses":[destination]},ReplyToAddresses=[sandbox_recipient],Message={"Subject":{"Data":customer_acknowledgement_subject(item["appointmentId"]),"Charset":"UTF-8"},"Body":{"Text":{"Data":customer_acknowledgement_text(item),"Charset":"UTF-8"},"Html":{"Data":customer_acknowledgement_html(item),"Charset":"UTF-8"}}}), "Customer")
+        return send_ses_with_retry(dict(Source=EMAIL_FROM,Destination={'ToAddresses':[destination]},ReplyToAddresses=[REPLY_TO],Message={'Subject':{'Data':customer_acknowledgement_subject(item['appointmentId']),'Charset':'UTF-8'},'Body':{'Text':{'Data':text_body,'Charset':'UTF-8'},'Html':{'Data':html_body,'Charset':'UTF-8'}}}), 'Customer')
     except Exception as exc:
-        print("Customer acknowledgement email failed:",repr(exc)); return False,str(exc)
+        print('Customer acknowledgement email failed:',repr(exc)); return False,str(exc)
 
 def business_notification_subject(appointment_id):
     flower = "\U0001F338"
@@ -335,12 +350,12 @@ def business_notification_html(item):
     )
 
 def send_business_html_notification(item):
-    business_email = "njsatish@gmail.com"
+    business_email = BUSINESS_EMAIL
     try:
         return send_ses_with_retry(dict(
-            Source=business_email,
+            Source=EMAIL_FROM,
             Destination={"ToAddresses": [business_email]},
-            ReplyToAddresses=[business_email],
+            ReplyToAddresses=[REPLY_TO],
             Message={
                 "Subject": {"Data": business_notification_subject(item["appointmentId"]), "Charset": "UTF-8"},
                 "Body": {
