@@ -3014,4 +3014,33 @@ var attempts=0,timer=setInterval(function(){attempts++;if(apply()||attempts>=40)
 })();
 </script>
 <!-- BLOOMING_LOTUS_REVIEW_RUNTIME_COMPACT_V21_22_END -->
+<!-- BLOOMING_LOTUS_THIRD_REVIEW_V21_23_START -->
+<script id="blooming-lotus-third-review-script-v21-23">
+(function(){
+'use strict';
+if(window.__BL_THIRD_REVIEW_V21_23__)return;
+window.__BL_THIRD_REVIEW_V21_23__=true;
+
+var replacement="Jackie was the masseuse and wow, what a great experience. Polite, professional, and gave me one of the best massages I've had in awhile. Went in with stiff muscles and came out relaxed and so calm.";
+
+function apply(){
+  var cards=document.querySelectorAll('.bl-review-gallery-v16-card');
+  if(cards.length<3)return false;
+  var quote=cards[2].querySelector('.bl-review-gallery-v16-quote');
+  if(!quote)return false;
+  if(quote.textContent.trim()!==replacement){
+    quote.textContent=replacement;
+  }
+  cards[2].setAttribute('data-bl-third-review-v21-23','true');
+  return true;
+}
+
+function schedule(){requestAnimationFrame(apply);}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule,{once:true});else schedule();
+window.addEventListener('load',schedule,{once:true});
+new MutationObserver(schedule).observe(document.documentElement,{childList:true,subtree:true});
+var attempts=0,timer=setInterval(function(){attempts++;if(apply()||attempts>=40)clearInterval(timer);},100);
+})();
+</script>
+<!-- BLOOMING_LOTUS_THIRD_REVIEW_V21_23_END -->
 </body></html>
