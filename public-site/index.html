@@ -1282,6 +1282,77 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 </script>
 <!-- BLOOMING_LOTUS_INITIAL_CLOSURE_V21_15_END -->
+<!-- BLOOMING_LOTUS_COMPACT_ROUNDED_REVIEWS_V21_19_START -->
+<style id="blooming-lotus-compact-rounded-reviews-v21-19">
+/*
+  Make the review gallery slightly smaller and give the complete burgundy
+  section softly rounded, inset outer edges similar to the service cards.
+*/
+.bl-rating-aligned-v12,
+section:has(.bl-review-gallery-v16-card) {
+  width:min(1760px,calc(100% - 96px)) !important;
+  max-width:1760px !important;
+  margin:46px auto !important;
+  border-radius:30px !important;
+  overflow:hidden !important;
+  box-sizing:border-box !important;
+}
+
+/* Reduce the section heading and rating scale slightly. */
+.bl-rating-aligned-v12 h2,
+section:has(.bl-review-gallery-v16-card) h2 {
+  font-size:clamp(42px,4.4vw,66px) !important;
+  line-height:1.02 !important;
+}
+.bl-rating-aligned-v12 .rating-num,
+section:has(.bl-review-gallery-v16-card) .rating-num {
+  font-size:74px !important;
+}
+
+/* Shorter cards with slightly smaller review text. */
+.bl-review-gallery-v16-card {
+  min-height:225px !important;
+  padding:22px !important;
+  border-radius:24px !important;
+}
+.bl-review-gallery-v16-quote {
+  font-size:clamp(18px,1.55vw,24px) !important;
+  line-height:1.42 !important;
+}
+.bl-review-gallery-v16-card [class*="star"],
+.bl-review-gallery-v16-card [aria-label*="star" i] {
+  font-size:22px !important;
+}
+
+@media(max-width:1120px){
+  .bl-rating-aligned-v12,
+  section:has(.bl-review-gallery-v16-card) {
+    width:calc(100% - 40px) !important;
+    border-radius:26px !important;
+  }
+  .bl-review-gallery-v16-card {
+    min-height:210px !important;
+    padding:20px !important;
+  }
+}
+@media(max-width:680px){
+  .bl-rating-aligned-v12,
+  section:has(.bl-review-gallery-v16-card) {
+    width:calc(100% - 20px) !important;
+    margin:28px auto !important;
+    border-radius:20px !important;
+  }
+  .bl-review-gallery-v16-card {
+    min-height:0 !important;
+    padding:19px !important;
+    border-radius:18px !important;
+  }
+  .bl-review-gallery-v16-quote {
+    font-size:18px !important;
+  }
+}
+</style>
+<!-- BLOOMING_LOTUS_COMPACT_ROUNDED_REVIEWS_V21_19_END -->
 </head>
 <body>
 <div class="preview"><strong>Concept Preview</strong> — unofficial demo for Blooming Lotus Oriental Massage. Confirm business details before launch.</div>
