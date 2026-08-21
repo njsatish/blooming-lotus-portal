@@ -1346,7 +1346,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
       <article class="service featured"><div class="service-icon">✦</div><h3>Deep Tissue Massage</h3><p>Focused pressure for areas carrying persistent tightness and muscular tension.</p><a href="#booking">Request this service →</a></article>
       <article class="service"><div class="service-icon">♨</div><h3>Hot Stone Massage</h3><p>Warm stone therapy paired with massage techniques for a deeply soothing experience.</p><a href="#booking">Request this service →</a></article>
       <article class="service"><div class="service-icon">✿</div><h3>Relaxing & Full Body</h3><p>A restorative full-body session designed to help you slow down, rest, and reset.</p><a href="#booking">Request this service →</a></article>
-      <article class="service"><div class="service-icon">♡</div><h3>Couples Massage</h3><p>A calm shared experience for two. Call ahead for current scheduling options.</p><a href="#booking">Request this service →</a></article>
+      <article class="service"><div class="service-icon">♡</div><h3>Cupping</h3><p>A calm shared experience for two. Call ahead for current scheduling options.</p><a href="#booking">Request this service →</a></article>
       <article class="service"><div class="service-icon">◎</div><h3>Foot Massage & Reflexology</h3><p>Targeted work for tired feet with techniques centered on comfort and relaxation.</p><a href="#booking">Request this service →</a></article>
       <article class="service"><div class="service-icon">◌</div><h3>Acupressure & Cupping</h3><p>Holistic techniques offered as part of the business's broader wellness services.</p><a href="#booking">Request this service →</a></article>
     </div>
@@ -1398,7 +1398,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
             <label>Email<input name="email" type="email" placeholder="you@example.com"></label>
             <label>Preferred Date<input name="date" type="date"></label>
             <label>Preferred Time<select name="time"><option value="">Select time</option><option>Morning</option><option>Afternoon</option><option>Evening</option></select></label>
-            <label>Service<select required name="service"><option value="">Choose service</option><option>Deep Tissue Massage</option><option>Hot Stone Massage</option><option>Relaxing / Full Body Massage</option><option>Couples Massage</option><option>Foot Massage / Reflexology</option><option>Acupressure / Cupping</option><option>Other / Ask front desk</option></select></label>
+            <label>Service<select required name="service"><option value="">Choose service</option><option>Deep Tissue Massage</option><option>Hot Stone Massage</option><option>Relaxing / Full Body Massage</option><option>Cupping</option><option>Foot Massage / Reflexology</option><option>Acupressure / Cupping</option><option>Other / Ask front desk</option></select></label>
             <label>Preferred Therapist<select required name="therapist"><option value="">Choose therapist</option><option>Jack</option><option>Rose</option><option>Mike</option><option>No preference</option></select></label>
             <label>Session Length<select name="length"><option value="">Choose duration</option><option>30 Minutes</option><option>60 Minutes</option><option>90 Minutes</option><option>Ask for options</option></select></label>
             <label class="full">Notes or Special Requests<textarea name="notes" placeholder="Optional notes for the appointment request. Please avoid medical or highly sensitive information in this demo."></textarea></label>
@@ -1537,7 +1537,7 @@ form?.addEventListener('submit',async e=>{
     <div><label for="bl-duration">Session length</label><select id="bl-duration">
 <option value="45">45 Minutes</option>
 <option selected value="60">60 Minutes</option><option value="90">90 Minutes</option><option value="120">120 Minutes</option></select></div>
-    <div><label for="bl-service">Service</label><select id="bl-service"><option>Deep Tissue Massage</option><option>Hot Stone Massage</option><option>Relaxing / Full Body Massage</option><option>Couples Massage</option><option>Foot Massage / Reflexology</option><option>Acupressure / Cupping</option><option>Other / Ask front desk</option></select></div>
+    <div><label for="bl-service">Service</label><select id="bl-service"><option>Deep Tissue Massage</option><option>Hot Stone Massage</option><option>Relaxing / Full Body Massage</option><option>Cupping</option><option>Foot Massage / Reflexology</option><option>Acupressure / Cupping</option><option>Other / Ask front desk</option></select></div>
   </div>
   <div id="bl-status" class="bl-status">Select a date to view available appointments.</div>
   <div id="bl-slots" class="bl-slots" aria-live="polite"></div>
@@ -3212,4 +3212,27 @@ var tries=0,t=setInterval(function(){tries++;if(apply()||tries>=60)clearInterval
 })();
 </script>
 <!-- BLOOMING_LOTUS_BURGUNDY_THERAPIST_CARDS_V21_26_END -->
+<!-- BLOOMING_LOTUS_CUPPING_SERVICE_V21_29_START -->
+<script id="blooming-lotus-cupping-service-v21-29">
+(function(){
+'use strict';
+if(window.__BL_CUPPING_V21_29__)return;window.__BL_CUPPING_V21_29__=true;
+var imagePath='assets/cupping-service-v21-29.png';
+var description='A focused wellness service using professional therapy cups to complement the massage experience.';
+function clean(v){return String(v||'').replace(/\s+/g,' ').trim().toLowerCase();}
+function apply(){
+ var heading=Array.from(document.querySelectorAll('h2,h3,h4')).find(function(el){return clean(el.textContent)==='cupping';});
+ if(!heading)return false;
+ var card=heading;
+ while(card&&card!==document.body){var x=clean(card.textContent);if((card.tagName==='ARTICLE'||card.tagName==='DIV')&&x.indexOf('request appointment')>=0&&card.querySelector('img'))break;card=card.parentElement;}
+ if(!card||card===document.body)return false;
+ var img=card.querySelector('img');img.src=imagePath;img.alt='Professional cupping therapy cups arranged on burgundy spa towels with candles, orchids, and spa stones';img.style.setProperty('object-fit','cover','important');img.style.setProperty('object-position','center','important');
+ var desc=Array.from(card.querySelectorAll('p')).find(function(el){var x=clean(el.textContent);return x.indexOf('two-person')>=0||x.indexOf('therapy cups')>=0;});if(desc)desc.textContent=description;
+ var duration=Array.from(card.querySelectorAll('*')).find(function(el){var x=clean(el.textContent);return el.children.length===0&&(x==='60 or 90 minutes'||x==='60 or 90 minute');});if(duration)duration.textContent='30 or 60 minutes';
+ card.setAttribute('data-bl-cupping-v21-29','true');return true;
+}
+function schedule(){requestAnimationFrame(apply);}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule,{once:true});else schedule();window.addEventListener('load',schedule,{once:true});new MutationObserver(schedule).observe(document.documentElement,{childList:true,subtree:true});var tries=0,timer=setInterval(function(){tries++;if(apply()||tries>=50)clearInterval(timer);},100);
+})();
+</script>
+<!-- BLOOMING_LOTUS_CUPPING_SERVICE_V21_29_END -->
 </body></html>
