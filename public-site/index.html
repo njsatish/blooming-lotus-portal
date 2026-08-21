@@ -1282,85 +1282,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 </script>
 <!-- BLOOMING_LOTUS_INITIAL_CLOSURE_V21_15_END -->
-<!-- BLOOMING_LOTUS_REVIEW_COMPACT_EDGES_V21_20_START -->
-<style id="blooming-lotus-review-compact-edges-v21-20">
-/* Match the narrower visual width of the service-card gallery. */
-.bl-rating-aligned-v12 {
-  width:min(1280px,calc(100% - 64px)) !important;
-  max-width:1280px !important;
-  margin:42px auto !important;
-  border-radius:30px !important;
-  overflow:hidden !important;
-  box-sizing:border-box !important;
-  isolation:isolate !important;
-}
-
-/* Ensure the burgundy background itself follows the rounded outer edge. */
-.bl-rating-aligned-v12,
-.bl-rating-aligned-v12 > *,
-.bl-rating-aligned-v12 .bl-review-gallery-v16 {
-  background-clip:padding-box !important;
-}
-
-/* Reduce the large title/rating block without changing wording. */
-.bl-rating-aligned-v12 h2 {
-  font-size:clamp(38px,3.8vw,56px) !important;
-  line-height:1.04 !important;
-}
-.bl-rating-aligned-v12 .rating-num {
-  font-size:68px !important;
-  line-height:.92 !important;
-}
-
-/* Compact each review card and its quotation. */
-.bl-rating-aligned-v12 .bl-review-gallery-v16-card {
-  min-height:205px !important;
-  padding:20px 22px !important;
-  border-radius:22px !important;
-}
-.bl-rating-aligned-v12 .bl-review-gallery-v16-quote {
-  font-size:clamp(17px,1.35vw,21px) !important;
-  line-height:1.42 !important;
-}
-.bl-rating-aligned-v12 .bl-review-gallery-v16-card [class*="star"],
-.bl-rating-aligned-v12 .bl-review-gallery-v16-card [aria-label*="star" i] {
-  font-size:20px !important;
-}
-
-@media(max-width:1120px){
-  .bl-rating-aligned-v12 {
-    width:calc(100% - 36px) !important;
-    margin:34px auto !important;
-    border-radius:26px !important;
-  }
-  .bl-rating-aligned-v12 .bl-review-gallery-v16-card {
-    min-height:195px !important;
-    padding:19px !important;
-  }
-}
-@media(max-width:680px){
-  .bl-rating-aligned-v12 {
-    width:calc(100% - 18px) !important;
-    margin:26px auto !important;
-    border-radius:20px !important;
-  }
-  .bl-rating-aligned-v12 h2 {
-    font-size:34px !important;
-  }
-  .bl-rating-aligned-v12 .rating-num {
-    font-size:58px !important;
-  }
-  .bl-rating-aligned-v12 .bl-review-gallery-v16-card {
-    min-height:0 !important;
-    padding:18px !important;
-    border-radius:18px !important;
-  }
-  .bl-rating-aligned-v12 .bl-review-gallery-v16-quote {
-    font-size:17px !important;
-  }
-}
-</style>
-<!-- BLOOMING_LOTUS_REVIEW_COMPACT_EDGES_V21_20_END -->
 </head>
 <body>
 <div class="preview"><strong>Concept Preview</strong> — unofficial demo for Blooming Lotus Oriental Massage. Confirm business details before launch.</div>
@@ -3019,4 +2940,88 @@ WrappedXHR.prototype=NativeXHR.prototype;Object.getOwnPropertyNames(NativeXHR).f
 })();
 </script>
 <!-- END BL_V20_6_1_SUBMISSION -->
+<!-- BLOOMING_LOTUS_REVIEW_FINAL_OVERRIDE_V21_21_START -->
+<style id="blooming-lotus-review-final-override-v21-21">
+/*
+  This override is intentionally placed at the very end of BODY. Several
+  older review-gallery styles are loaded inside BODY after HEAD, so the
+  earlier V21.19/V21.20 HEAD overrides were superseded by later !important
+  declarations. These selectors are both later and more specific.
+*/
+html body .bl-rating-aligned-v12 {
+  width:min(1180px,calc(100% - 80px)) !important;
+  max-width:1180px !important;
+  margin:42px auto !important;
+  border-radius:34px !important;
+  overflow:hidden !important;
+  box-sizing:border-box !important;
+  isolation:isolate !important;
+  transform:translateZ(0) !important;
+}
+
+html body .bl-rating-aligned-v12 > .container,
+html body .bl-rating-aligned-v12 > [class*="container"],
+html body .bl-rating-aligned-v12 .bl-rating-inner-v12 {
+  width:calc(100% - 52px) !important;
+  max-width:1080px !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+}
+
+html body .bl-rating-aligned-v12 h2 {
+  font-size:clamp(36px,3.4vw,52px) !important;
+  line-height:1.04 !important;
+}
+html body .bl-rating-aligned-v12 .rating-num {
+  font-size:64px !important;
+  line-height:.9 !important;
+}
+
+html body .bl-rating-aligned-v12 .bl-review-gallery-v16-card {
+  min-height:185px !important;
+  padding:18px 20px !important;
+  border-radius:22px !important;
+}
+html body .bl-rating-aligned-v12 .bl-review-gallery-v16-quote {
+  font-size:clamp(16px,1.2vw,19px) !important;
+  line-height:1.40 !important;
+}
+html body .bl-rating-aligned-v12 .bl-review-gallery-v16-card [class*="star"],
+html body .bl-rating-aligned-v12 .bl-review-gallery-v16-card [aria-label*="star" i] {
+  font-size:19px !important;
+}
+
+@media(max-width:1120px){
+  html body .bl-rating-aligned-v12 {
+    width:calc(100% - 34px) !important;
+    border-radius:27px !important;
+  }
+  html body .bl-rating-aligned-v12 .bl-review-gallery-v16-card {
+    min-height:180px !important;
+  }
+}
+@media(max-width:680px){
+  html body .bl-rating-aligned-v12 {
+    width:calc(100% - 18px) !important;
+    margin:26px auto !important;
+    border-radius:20px !important;
+  }
+  html body .bl-rating-aligned-v12 > .container,
+  html body .bl-rating-aligned-v12 > [class*="container"],
+  html body .bl-rating-aligned-v12 .bl-rating-inner-v12 {
+    width:calc(100% - 24px) !important;
+  }
+  html body .bl-rating-aligned-v12 h2 { font-size:32px !important; }
+  html body .bl-rating-aligned-v12 .rating-num { font-size:54px !important; }
+  html body .bl-rating-aligned-v12 .bl-review-gallery-v16-card {
+    min-height:0 !important;
+    padding:17px !important;
+    border-radius:18px !important;
+  }
+  html body .bl-rating-aligned-v12 .bl-review-gallery-v16-quote {
+    font-size:16px !important;
+  }
+}
+</style>
+<!-- BLOOMING_LOTUS_REVIEW_FINAL_OVERRIDE_V21_21_END -->
 </body></html>
