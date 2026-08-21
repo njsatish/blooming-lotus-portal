@@ -2940,88 +2940,78 @@ WrappedXHR.prototype=NativeXHR.prototype;Object.getOwnPropertyNames(NativeXHR).f
 })();
 </script>
 <!-- END BL_V20_6_1_SUBMISSION -->
-<!-- BLOOMING_LOTUS_REVIEW_FINAL_OVERRIDE_V21_21_START -->
-<style id="blooming-lotus-review-final-override-v21-21">
-/*
-  This override is intentionally placed at the very end of BODY. Several
-  older review-gallery styles are loaded inside BODY after HEAD, so the
-  earlier V21.19/V21.20 HEAD overrides were superseded by later !important
-  declarations. These selectors are both later and more specific.
-*/
-html body .bl-rating-aligned-v12 {
-  width:min(1180px,calc(100% - 80px)) !important;
-  max-width:1180px !important;
-  margin:42px auto !important;
-  border-radius:34px !important;
-  overflow:hidden !important;
-  box-sizing:border-box !important;
-  isolation:isolate !important;
-  transform:translateZ(0) !important;
-}
-
-html body .bl-rating-aligned-v12 > .container,
-html body .bl-rating-aligned-v12 > [class*="container"],
-html body .bl-rating-aligned-v12 .bl-rating-inner-v12 {
-  width:calc(100% - 52px) !important;
-  max-width:1080px !important;
-  margin-left:auto !important;
-  margin-right:auto !important;
-}
-
-html body .bl-rating-aligned-v12 h2 {
-  font-size:clamp(36px,3.4vw,52px) !important;
-  line-height:1.04 !important;
-}
-html body .bl-rating-aligned-v12 .rating-num {
-  font-size:64px !important;
-  line-height:.9 !important;
-}
-
-html body .bl-rating-aligned-v12 .bl-review-gallery-v16-card {
-  min-height:185px !important;
-  padding:18px 20px !important;
-  border-radius:22px !important;
-}
-html body .bl-rating-aligned-v12 .bl-review-gallery-v16-quote {
-  font-size:clamp(16px,1.2vw,19px) !important;
-  line-height:1.40 !important;
-}
-html body .bl-rating-aligned-v12 .bl-review-gallery-v16-card [class*="star"],
-html body .bl-rating-aligned-v12 .bl-review-gallery-v16-card [aria-label*="star" i] {
-  font-size:19px !important;
-}
-
-@media(max-width:1120px){
-  html body .bl-rating-aligned-v12 {
-    width:calc(100% - 34px) !important;
-    border-radius:27px !important;
+<!-- BLOOMING_LOTUS_REVIEW_RUNTIME_COMPACT_V21_22_START -->
+<style id="blooming-lotus-review-runtime-compact-v21-22">
+  [data-bl-review-section-v21-22="true"] {
+    transition:width .2s ease,border-radius .2s ease !important;
   }
-  html body .bl-rating-aligned-v12 .bl-review-gallery-v16-card {
-    min-height:180px !important;
-  }
-}
-@media(max-width:680px){
-  html body .bl-rating-aligned-v12 {
-    width:calc(100% - 18px) !important;
-    margin:26px auto !important;
-    border-radius:20px !important;
-  }
-  html body .bl-rating-aligned-v12 > .container,
-  html body .bl-rating-aligned-v12 > [class*="container"],
-  html body .bl-rating-aligned-v12 .bl-rating-inner-v12 {
-    width:calc(100% - 24px) !important;
-  }
-  html body .bl-rating-aligned-v12 h2 { font-size:32px !important; }
-  html body .bl-rating-aligned-v12 .rating-num { font-size:54px !important; }
-  html body .bl-rating-aligned-v12 .bl-review-gallery-v16-card {
-    min-height:0 !important;
-    padding:17px !important;
-    border-radius:18px !important;
-  }
-  html body .bl-rating-aligned-v12 .bl-review-gallery-v16-quote {
-    font-size:16px !important;
-  }
-}
 </style>
-<!-- BLOOMING_LOTUS_REVIEW_FINAL_OVERRIDE_V21_21_END -->
+<script id="blooming-lotus-review-runtime-compact-script-v21-22">
+(function(){
+'use strict';
+if(window.__BL_REVIEW_RUNTIME_COMPACT_V21_22__)return;
+window.__BL_REVIEW_RUNTIME_COMPACT_V21_22__=true;
+
+function important(el,name,value){
+  if(el)el.style.setProperty(name,value,'important');
+}
+function smallestSection(card){
+  var node=card;
+  while(node&&node!==document.body){
+    if(node.tagName==='SECTION')return node;
+    node=node.parentElement;
+  }
+  return card.closest('.bl-rating-aligned-v12')||card.parentElement;
+}
+function apply(){
+  var cards=Array.from(document.querySelectorAll('.bl-review-gallery-v16-card'));
+  if(!cards.length)return false;
+  var section=document.querySelector('.bl-rating-aligned-v12')||smallestSection(cards[0]);
+  if(!section)return false;
+  section.setAttribute('data-bl-review-section-v21-22','true');
+
+  var mobile=window.matchMedia('(max-width:680px)').matches;
+  var tablet=window.matchMedia('(max-width:1120px)').matches;
+  important(section,'width',mobile?'calc(100% - 18px)':tablet?'calc(100% - 34px)':'min(1180px, calc(100% - 80px))');
+  important(section,'max-width',mobile?'none':tablet?'none':'1180px');
+  important(section,'margin',mobile?'26px auto':tablet?'34px auto':'42px auto');
+  important(section,'border-radius',mobile?'20px':tablet?'27px':'34px');
+  important(section,'overflow','hidden');
+  important(section,'box-sizing','border-box');
+  important(section,'isolation','isolate');
+
+  Array.from(section.children).forEach(function(child){
+    important(child,'max-width','100%');
+    important(child,'box-sizing','border-box');
+  });
+
+  cards.forEach(function(card){
+    important(card,'min-height',mobile?'0':tablet?'180px':'185px');
+    important(card,'padding',mobile?'17px':'18px 20px');
+    important(card,'border-radius',mobile?'18px':'22px');
+    important(card,'box-sizing','border-box');
+    var quote=card.querySelector('.bl-review-gallery-v16-quote');
+    important(quote,'font-size',mobile?'16px':tablet?'17px':'19px');
+    important(quote,'line-height','1.4');
+  });
+
+  var title=section.querySelector('h2');
+  important(title,'font-size',mobile?'32px':tablet?'42px':'52px');
+  important(title,'line-height','1.04');
+  var rating=section.querySelector('.rating-num');
+  important(rating,'font-size',mobile?'54px':tablet?'60px':'64px');
+  important(rating,'line-height','.9');
+
+  section.dataset.blReviewAppliedV21_22='true';
+  return true;
+}
+function schedule(){requestAnimationFrame(function(){apply();});}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule,{once:true});else schedule();
+window.addEventListener('load',schedule,{once:true});
+window.addEventListener('resize',schedule);
+new MutationObserver(schedule).observe(document.documentElement,{childList:true,subtree:true});
+var attempts=0,timer=setInterval(function(){attempts++;if(apply()||attempts>=40)clearInterval(timer);},100);
+})();
+</script>
+<!-- BLOOMING_LOTUS_REVIEW_RUNTIME_COMPACT_V21_22_END -->
 </body></html>
