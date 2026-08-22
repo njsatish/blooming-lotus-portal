@@ -3648,4 +3648,84 @@ var attempts=0,timer=setInterval(function(){attempts++;if(apply()||attempts>=40)
 })();
 </script>
 <!-- BLOOMING_LOTUS_MATCH_THERAPISTS_REVIEWS_V21_43_1_END -->
+<!-- BLOOMING_LOTUS_MATCH_SECTIONS_TO_SERVICES_V21_44_START -->
+<style id="blooming-lotus-match-sections-to-services-v21-44">
+html body [data-bl-services-width-reference-v21-44="true"],
+html body [data-bl-reviews-match-services-v21-44="true"],
+html body [data-bl-therapists-match-services-v21-44="true"] {
+  box-sizing:border-box !important;
+}
+</style>
+<script id="blooming-lotus-match-sections-to-services-script-v21-44">
+(function(){
+'use strict';
+if(window.__BL_MATCH_SECTIONS_TO_SERVICES_V21_44__)return;
+window.__BL_MATCH_SECTIONS_TO_SERVICES_V21_44__=true;
+function clean(v){return String(v||'').replace(/\s+/g,' ').trim().toLowerCase();}
+function heading(needle){return Array.from(document.querySelectorAll('h1,h2,h3')).find(function(el){return clean(el.textContent).indexOf(needle)>=0;});}
+function sectionFromHeading(el,terms){
+ var node=el;
+ while(node&&node!==document.body){
+  var text=clean(node.textContent);
+  if((node.tagName==='SECTION'||node.tagName==='DIV')&&node.getBoundingClientRect().width>500&&terms.every(function(term){return text.indexOf(term)>=0;}))return node;
+  node=node.parentElement;
+ }
+ return null;
+}
+function findServices(){
+ var gallery=document.querySelector('#massage-services-gallery-v34,.massage-services-gallery-v34,[data-bl-services-gallery-v34="true"]');
+ if(!gallery){var h=heading('choose the experience');gallery=h&&sectionFromHeading(h,['foot reflexology','cupping']);}
+ if(!gallery)return null;
+ var node=gallery;
+ while(node&&node!==document.body){
+  var r=node.getBoundingClientRect();
+  var text=clean(node.textContent);
+  if(r.width>700&&text.indexOf('foot reflexology')>=0&&text.indexOf('cupping')>=0)return node;
+  node=node.parentElement;
+ }
+ return gallery;
+}
+function findReviews(){
+ var card=document.querySelector('.bl-review-gallery-v16-card,[data-bl-review-card-v21-22="true"]');
+ var h=heading('trusted throughout roanoke')||heading('customer reviews');
+ return (h&&sectionFromHeading(h,['4.9','review']))||(card&&sectionFromHeading(card,['4.9','review']));
+}
+function findTherapists(){
+ var section=document.querySelector('[data-bl-therapists-v21-26="true"]');
+ if(section)return section;
+ var h=heading('request the therapist');
+ return h&&sectionFromHeading(h,['jack','rose','mike']);
+}
+function centerToWidth(node,width,attribute){
+ var safe=Math.max(0,Math.min(width,document.documentElement.clientWidth-24));
+ node.style.setProperty('width',safe+'px','important');
+ node.style.setProperty('max-width','calc(100% - 24px)','important');
+ node.style.setProperty('margin-left','auto','important');
+ node.style.setProperty('margin-right','auto','important');
+ node.style.setProperty('left','auto','important');
+ node.style.setProperty('right','auto','important');
+ node.style.setProperty('transform','none','important');
+ node.setAttribute(attribute,'true');
+ return safe;
+}
+function apply(){
+ var services=findServices(),reviews=findReviews(),therapists=findTherapists();
+ if(!services||!reviews||!therapists)return false;
+ var reference=services.getBoundingClientRect();
+ if(reference.width<700)return false;
+ services.setAttribute('data-bl-services-width-reference-v21-44','true');
+ var reviewWidth=centerToWidth(reviews,reference.width,'data-bl-reviews-match-services-v21-44');
+ var therapistWidth=centerToWidth(therapists,reference.width,'data-bl-therapists-match-services-v21-44');
+ var rr=reviews.getBoundingClientRect(),tr=therapists.getBoundingClientRect();
+ var viewport=document.documentElement.clientWidth;
+ return Math.abs(rr.width-reviewWidth)<2&&Math.abs(tr.width-therapistWidth)<2&&Math.abs((rr.left+rr.right)-viewport)<4&&Math.abs((tr.left+tr.right)-viewport)<4;
+}
+function schedule(){requestAnimationFrame(apply);}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule,{once:true});else schedule();
+window.addEventListener('load',schedule,{once:true});
+window.addEventListener('resize',schedule,{passive:true});
+var attempts=0,timer=setInterval(function(){attempts++;if(apply()||attempts>=40)clearInterval(timer);},100);
+})();
+</script>
+<!-- BLOOMING_LOTUS_MATCH_SECTIONS_TO_SERVICES_V21_44_END -->
 </body></html>
