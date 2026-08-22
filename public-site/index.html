@@ -3394,19 +3394,20 @@ html body #bl-booking-v14 > .bl-grid > .bl-v3-right-panel {
 }
 </style>
 <!-- BLOOMING_LOTUS_EXPANDED_CLEAN_BOOKING_V21_37_1_END -->
-<!-- BLOOMING_LOTUS_REMOVE_FINAL_WHITE_BOOKING_BORDER_V21_38_1_START -->
-<style id="blooming-lotus-remove-final-white-booking-border-v21-38-1">
+<!-- BLOOMING_LOTUS_EXPAND_PINK_FRAME_V21_39_START -->
+<style id="blooming-lotus-expand-pink-frame-v21-39">
 /*
-  The remaining white band is the inherited padding/surface of #bl-booking-v14
-  outside the approved pink Lotus Gradient grid. Collapse only that outer gap.
+  Expand the approved pink/green frame outward to occupy the former white
+  border footprint. Keep the gradient band itself clean and proportional.
 */
 html body #bl-booking-v14 {
+  width:min(1560px,calc(100% - 12px)) !important;
+  max-width:1560px !important;
   padding:0 !important;
   background:transparent !important;
   border:0 !important;
   outline:0 !important;
   box-shadow:none !important;
-  border-radius:0 !important;
 }
 html body #bl-booking-v14::before,
 html body #bl-booking-v14::after {
@@ -3414,14 +3415,40 @@ html body #bl-booking-v14::after {
   display:none !important;
 }
 
-/* Keep the approved V21.37.1 width and the single pink/green frame unchanged. */
 html body #bl-booking-v14 > .bl-grid {
+  width:100% !important;
   margin:0 !important;
+  padding:12px !important;
+  gap:10px !important;
+  border-radius:39px !important;
+  grid-template-columns:minmax(0,1.10fr) minmax(0,1fr) !important;
+}
+html body #bl-booking-v14 > .bl-grid > #bl-date-calendar-v2,
+html body #bl-booking-v14 > .bl-grid > .bl-v3-right-panel {
+  border-radius:27px !important;
 }
 
+@media(max-width:1180px){
+  html body #bl-booking-v14 {width:calc(100% - 14px) !important;}
+  html body #bl-booking-v14 > .bl-grid {grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;}
+}
 @media(max-width:980px){
-  html body #bl-booking-v14 {padding:0 !important;}
+  html body #bl-booking-v14 {width:calc(100% - 12px) !important;}
+  html body #bl-booking-v14 > .bl-grid {
+    grid-template-columns:1fr !important;
+    padding:8px !important;
+    gap:8px !important;
+    border-radius:28px !important;
+  }
+  html body #bl-booking-v14 > .bl-grid > #bl-date-calendar-v2,
+  html body #bl-booking-v14 > .bl-grid > .bl-v3-right-panel {border-radius:20px !important;}
+}
+@media(max-width:680px){
+  html body #bl-booking-v14 {width:calc(100% - 8px) !important;}
+  html body #bl-booking-v14 > .bl-grid {padding:6px !important;gap:6px !important;border-radius:20px !important;}
+  html body #bl-booking-v14 > .bl-grid > #bl-date-calendar-v2,
+  html body #bl-booking-v14 > .bl-grid > .bl-v3-right-panel {border-radius:14px !important;}
 }
 </style>
-<!-- BLOOMING_LOTUS_REMOVE_FINAL_WHITE_BOOKING_BORDER_V21_38_1_END -->
+<!-- BLOOMING_LOTUS_EXPAND_PINK_FRAME_V21_39_END -->
 </body></html>
