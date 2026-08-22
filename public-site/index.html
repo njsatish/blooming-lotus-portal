@@ -3318,31 +3318,4 @@ html body #bl-booking-v14 > .bl-grid > .bl-v3-right-panel {
 }
 </style>
 <!-- BLOOMING_LOTUS_CLEAN_PANEL_GRADIENT_V21_35_END -->
-<!-- BLOOMING_LOTUS_REMOVE_BOOKING_LAYERS_V21_36_1_START -->
-<style id="blooming-lotus-remove-booking-layers-v21-36-1">
-/*
-  Visual surfaces only: remove the legacy card background, border, shadow,
-  and pseudo-element decoration behind the approved V21.35 gradient frame.
-  Width, margin, padding, display, position, order, and DOM are untouched.
-*/
-html body #bl-booking-v14 {
-  background:transparent !important;
-  border-color:transparent !important;
-  box-shadow:none !important;
-  outline:0 !important;
-}
-html body #bl-booking-v14::before,
-html body #bl-booking-v14::after {
-  content:none !important;
-  box-shadow:none !important;
-  background:transparent !important;
-  border:0 !important;
-}
-
-/* Preserve the one approved shadow on the Lotus Gradient grid itself. */
-html body #bl-booking-v14 > .bl-grid {
-  box-shadow:0 16px 38px rgba(84,22,51,.10) !important;
-}
-</style>
-<!-- BLOOMING_LOTUS_REMOVE_BOOKING_LAYERS_V21_36_1_END -->
 </body></html>
