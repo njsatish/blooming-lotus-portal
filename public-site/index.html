@@ -3268,54 +3268,54 @@ var attempts=0,timer=setInterval(function(){attempts++;if(apply()&&attempts>10)c
 })();
 </script>
 <!-- BLOOMING_LOTUS_FIX_DUPLICATE_CUPPING_V21_32_END -->
-<!-- BLOOMING_LOTUS_ISOLATED_PANEL_GRADIENT_V21_34_1_START -->
-<style id="blooming-lotus-isolated-panel-gradient-v21-34-1">
-/*
-  V21.33 confirmed that the calendar and right panel are created at runtime
-  inside #bl-booking-v14 > .bl-grid. Decorate that grid only. Do not change
-  #bl-booking-v14 width, margin, position, order, display, isolation, or overflow.
-*/
+<!-- BLOOMING_LOTUS_CLEAN_PANEL_GRADIENT_V21_35_START -->
+<style id="blooming-lotus-clean-panel-gradient-v21-35">
+/* Clean visual refinement only. Existing placement and DOM scripts are unchanged. */
 html body #bl-booking-v14 > .bl-grid {
-  padding:12px !important;
-  gap:12px !important;
-  border-radius:38px !important;
-  background:linear-gradient(135deg,#c72c6d 0%,#efc4d6 36%,#d8dfb8 70%,#789a60 100%) !important;
-  box-shadow:0 20px 48px rgba(84,22,51,.13) !important;
+  padding:8px !important;
+  gap:8px !important;
+  border:0 !important;
+  border-radius:34px !important;
+  outline:0 !important;
+  background:linear-gradient(135deg,#bd326d 0%,#e8b6cc 35%,#ddd7aa 68%,#78985f 100%) !important;
+  box-shadow:0 16px 38px rgba(84,22,51,.10) !important;
   box-sizing:border-box !important;
 }
 
 html body #bl-booking-v14 > .bl-grid > #bl-date-calendar-v2,
 html body #bl-booking-v14 > .bl-grid > .bl-v3-right-panel {
+  min-height:0 !important;
+  height:auto !important;
   border:0 !important;
-  border-radius:27px !important;
+  outline:0 !important;
+  border-radius:26px !important;
   box-shadow:none !important;
   background:#fff !important;
   background-clip:padding-box !important;
+  overflow:visible !important;
+}
+
+/* Keep both panels visually balanced without forcing the former 860px blank height. */
+html body #bl-booking-v14 > .bl-grid {
+  align-items:stretch !important;
+}
+html body #bl-booking-v14 > .bl-grid > #bl-date-calendar-v2 {
+  align-self:stretch !important;
+}
+html body #bl-booking-v14 > .bl-grid > .bl-v3-right-panel {
+  align-self:stretch !important;
 }
 
 @media(max-width:980px){
-  html body #bl-booking-v14 > .bl-grid {
-    padding:9px !important;
-    gap:9px !important;
-    border-radius:28px !important;
-  }
+  html body #bl-booking-v14 > .bl-grid {padding:7px !important;gap:7px !important;border-radius:26px !important;}
   html body #bl-booking-v14 > .bl-grid > #bl-date-calendar-v2,
-  html body #bl-booking-v14 > .bl-grid > .bl-v3-right-panel {
-    border-radius:20px !important;
-  }
+  html body #bl-booking-v14 > .bl-grid > .bl-v3-right-panel {border-radius:19px !important;}
 }
-
 @media(max-width:680px){
-  html body #bl-booking-v14 > .bl-grid {
-    padding:7px !important;
-    gap:7px !important;
-    border-radius:21px !important;
-  }
+  html body #bl-booking-v14 > .bl-grid {padding:6px !important;gap:6px !important;border-radius:20px !important;}
   html body #bl-booking-v14 > .bl-grid > #bl-date-calendar-v2,
-  html body #bl-booking-v14 > .bl-grid > .bl-v3-right-panel {
-    border-radius:15px !important;
-  }
+  html body #bl-booking-v14 > .bl-grid > .bl-v3-right-panel {border-radius:14px !important;}
 }
 </style>
-<!-- BLOOMING_LOTUS_ISOLATED_PANEL_GRADIENT_V21_34_1_END -->
+<!-- BLOOMING_LOTUS_CLEAN_PANEL_GRADIENT_V21_35_END -->
 </body></html>
