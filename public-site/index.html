@@ -3504,4 +3504,31 @@ html body #bl-booking-v14 > .bl-grid {
 }
 </style>
 <!-- BLOOMING_LOTUS_REMOVE_GREEN_RIGHT_BORDER_V21_41_1_END -->
+<!-- BLOOMING_LOTUS_EXTEND_INNER_FRAME_RIGHT_V21_42_START -->
+<style id="blooming-lotus-extend-inner-frame-right-v21-42">
+/*
+  V21.40 established the correct left, top, and bottom alignment. Keep those
+  offsets unchanged and extend only the inner gradient frame's right edge.
+*/
+html body #bl-booking-v14 > .bl-grid {
+  width:calc(100% + 98px) !important;
+  margin-left:-42px !important;
+  margin-right:-56px !important;
+}
+
+@media(max-width:1180px){
+  html body #bl-booking-v14 > .bl-grid {
+    width:calc(100% + 48px) !important;
+    margin-left:-24px !important;
+    margin-right:-24px !important;
+  }
+}
+@media(max-width:980px){
+  html body #bl-booking-v14 > .bl-grid {
+    width:100% !important;
+    margin:0 !important;
+  }
+}
+</style>
+<!-- BLOOMING_LOTUS_EXTEND_INNER_FRAME_RIGHT_V21_42_END -->
 </body></html>
