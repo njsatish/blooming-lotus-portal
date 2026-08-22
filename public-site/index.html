@@ -3589,4 +3589,63 @@ var attempts=0,timer=setInterval(function(){attempts++;if(apply()||attempts>=40)
 })();
 </script>
 <!-- BLOOMING_LOTUS_MATCH_THERAPISTS_REVIEWS_V21_43_END -->
+<!-- BLOOMING_LOTUS_MATCH_THERAPISTS_REVIEWS_V21_43_1_START -->
+<style id="blooming-lotus-center-therapists-reviews-v21-43-1">
+html body [data-bl-therapists-v21-26="true"][data-bl-match-reviews-v21-43-1="true"] {
+  box-sizing:border-box !important;
+}
+</style>
+<script id="blooming-lotus-match-therapists-reviews-script-v21-43">
+(function(){
+'use strict';
+if(window.__BL_MATCH_THERAPISTS_REVIEWS_V21_43_1__)return;
+window.__BL_MATCH_THERAPISTS_REVIEWS_V21_43_1__=true;
+function clean(v){return String(v||'').replace(/\s+/g,' ').trim().toLowerCase();}
+function findHeading(needle){
+ return Array.from(document.querySelectorAll('h1,h2,h3')).find(function(el){return clean(el.textContent).indexOf(needle)>=0;});
+}
+function findSection(heading,requiredTerms){
+ var node=heading;
+ while(node&&node!==document.body){
+  var text=clean(node.textContent);
+  var ok=requiredTerms.every(function(term){return text.indexOf(term)>=0;});
+  if(ok&&(node.tagName==='SECTION'||node.tagName==='DIV')&&node.getBoundingClientRect().width>500)return node;
+  node=node.parentElement;
+ }
+ return null;
+}
+function apply(){
+ var therapist=document.querySelector('[data-bl-therapists-v21-26="true"]');
+ if(!therapist){
+  var therapistHeading=findHeading('request the therapist');
+  therapist=therapistHeading&&findSection(therapistHeading,['jack','rose','mike']);
+ }
+ var reviewCard=document.querySelector('.bl-review-gallery-v16-card,[data-bl-review-card-v21-22="true"]');
+ var reviews=reviewCard&&reviewCard.closest('section,div');
+ if(!reviews){
+  var reviewHeading=findHeading('customer reviews');
+  reviews=reviewHeading&&findSection(reviewHeading,['4.9','review']);
+ }
+ if(!therapist||!reviews||therapist===reviews)return false;
+ var rr=reviews.getBoundingClientRect();
+ if(rr.width<500)return false;
+ var safeWidth=Math.min(rr.width,document.documentElement.clientWidth-24);
+ therapist.style.setProperty('width',safeWidth+'px','important');
+ therapist.style.setProperty('max-width','calc(100% - 24px)','important');
+ therapist.style.setProperty('margin-left','auto','important');
+ therapist.style.setProperty('margin-right','auto','important');
+ therapist.style.setProperty('transform','none','important');
+ therapist.style.setProperty('left','auto','important');
+ therapist.style.setProperty('right','auto','important');
+ therapist.setAttribute('data-bl-match-reviews-v21-43-1','true');
+ var tr=therapist.getBoundingClientRect();return Math.abs(tr.width-safeWidth)<2&&Math.abs((tr.left+tr.right)-(document.documentElement.clientWidth))<4;
+}
+function schedule(){requestAnimationFrame(apply);}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule,{once:true});else schedule();
+window.addEventListener('load',schedule,{once:true});
+window.addEventListener('resize',schedule,{passive:true});
+var attempts=0,timer=setInterval(function(){attempts++;if(apply()||attempts>=40)clearInterval(timer);},100);
+})();
+</script>
+<!-- BLOOMING_LOTUS_MATCH_THERAPISTS_REVIEWS_V21_43_1_END -->
 </body></html>
