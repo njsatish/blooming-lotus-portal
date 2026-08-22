@@ -3531,143 +3531,24 @@ html body #bl-booking-v14 > .bl-grid {
 }
 </style>
 <!-- BLOOMING_LOTUS_EXTEND_INNER_FRAME_RIGHT_V21_42_END -->
-<!-- BLOOMING_LOTUS_MATCH_THERAPISTS_REVIEWS_V21_43_START -->
-<style id="blooming-lotus-match-therapists-reviews-v21-43">
-html body [data-bl-therapists-v21-26="true"][data-bl-match-reviews-v21-43="true"] {
+<!-- BLOOMING_LOTUS_MATCH_ONLY_THERAPISTS_TO_SERVICES_V21_44_1_START -->
+<style id="blooming-lotus-match-only-therapists-to-services-v21-44-1">
+html body [data-bl-therapists-match-services-v21-44-1="true"] {
   box-sizing:border-box !important;
 }
 </style>
-<script id="blooming-lotus-match-therapists-reviews-script-v21-43">
+<script id="blooming-lotus-match-only-therapists-to-services-script-v21-44-1">
 (function(){
 'use strict';
-if(window.__BL_MATCH_THERAPISTS_REVIEWS_V21_43__)return;
-window.__BL_MATCH_THERAPISTS_REVIEWS_V21_43__=true;
-function clean(v){return String(v||'').replace(/\s+/g,' ').trim().toLowerCase();}
-function findHeading(needle){
- return Array.from(document.querySelectorAll('h1,h2,h3')).find(function(el){return clean(el.textContent).indexOf(needle)>=0;});
-}
-function findSection(heading,requiredTerms){
- var node=heading;
- while(node&&node!==document.body){
-  var text=clean(node.textContent);
-  var ok=requiredTerms.every(function(term){return text.indexOf(term)>=0;});
-  if(ok&&(node.tagName==='SECTION'||node.tagName==='DIV')&&node.getBoundingClientRect().width>500)return node;
-  node=node.parentElement;
- }
- return null;
-}
-function apply(){
- var therapist=document.querySelector('[data-bl-therapists-v21-26="true"]');
- if(!therapist){
-  var therapistHeading=findHeading('request the therapist');
-  therapist=therapistHeading&&findSection(therapistHeading,['jack','rose','mike']);
- }
- var reviewCard=document.querySelector('.bl-review-gallery-v16-card,[data-bl-review-card-v21-22="true"]');
- var reviews=reviewCard&&reviewCard.closest('section,div');
- if(!reviews){
-  var reviewHeading=findHeading('customer reviews');
-  reviews=reviewHeading&&findSection(reviewHeading,['4.9','review']);
- }
- if(!therapist||!reviews||therapist===reviews)return false;
- var rr=reviews.getBoundingClientRect();
- if(rr.width<500)return false;
- var viewport=document.documentElement.clientWidth;
- var left=Math.max(0,rr.left);
- var right=Math.max(0,viewport-rr.right);
- therapist.style.setProperty('width',rr.width+'px','important');
- therapist.style.setProperty('max-width',rr.width+'px','important');
- therapist.style.setProperty('margin-left',left+'px','important');
- therapist.style.setProperty('margin-right',right+'px','important');
- therapist.setAttribute('data-bl-match-reviews-v21-43','true');
- return Math.abs(therapist.getBoundingClientRect().width-rr.width)<2;
-}
-function schedule(){requestAnimationFrame(apply);}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule,{once:true});else schedule();
-window.addEventListener('load',schedule,{once:true});
-window.addEventListener('resize',schedule,{passive:true});
-var attempts=0,timer=setInterval(function(){attempts++;if(apply()||attempts>=40)clearInterval(timer);},100);
-})();
-</script>
-<!-- BLOOMING_LOTUS_MATCH_THERAPISTS_REVIEWS_V21_43_END -->
-<!-- BLOOMING_LOTUS_MATCH_THERAPISTS_REVIEWS_V21_43_1_START -->
-<style id="blooming-lotus-center-therapists-reviews-v21-43-1">
-html body [data-bl-therapists-v21-26="true"][data-bl-match-reviews-v21-43-1="true"] {
-  box-sizing:border-box !important;
-}
-</style>
-<script id="blooming-lotus-match-therapists-reviews-script-v21-43">
-(function(){
-'use strict';
-if(window.__BL_MATCH_THERAPISTS_REVIEWS_V21_43_1__)return;
-window.__BL_MATCH_THERAPISTS_REVIEWS_V21_43_1__=true;
-function clean(v){return String(v||'').replace(/\s+/g,' ').trim().toLowerCase();}
-function findHeading(needle){
- return Array.from(document.querySelectorAll('h1,h2,h3')).find(function(el){return clean(el.textContent).indexOf(needle)>=0;});
-}
-function findSection(heading,requiredTerms){
- var node=heading;
- while(node&&node!==document.body){
-  var text=clean(node.textContent);
-  var ok=requiredTerms.every(function(term){return text.indexOf(term)>=0;});
-  if(ok&&(node.tagName==='SECTION'||node.tagName==='DIV')&&node.getBoundingClientRect().width>500)return node;
-  node=node.parentElement;
- }
- return null;
-}
-function apply(){
- var therapist=document.querySelector('[data-bl-therapists-v21-26="true"]');
- if(!therapist){
-  var therapistHeading=findHeading('request the therapist');
-  therapist=therapistHeading&&findSection(therapistHeading,['jack','rose','mike']);
- }
- var reviewCard=document.querySelector('.bl-review-gallery-v16-card,[data-bl-review-card-v21-22="true"]');
- var reviews=reviewCard&&reviewCard.closest('section,div');
- if(!reviews){
-  var reviewHeading=findHeading('customer reviews');
-  reviews=reviewHeading&&findSection(reviewHeading,['4.9','review']);
- }
- if(!therapist||!reviews||therapist===reviews)return false;
- var rr=reviews.getBoundingClientRect();
- if(rr.width<500)return false;
- var safeWidth=Math.min(rr.width,document.documentElement.clientWidth-24);
- therapist.style.setProperty('width',safeWidth+'px','important');
- therapist.style.setProperty('max-width','calc(100% - 24px)','important');
- therapist.style.setProperty('margin-left','auto','important');
- therapist.style.setProperty('margin-right','auto','important');
- therapist.style.setProperty('transform','none','important');
- therapist.style.setProperty('left','auto','important');
- therapist.style.setProperty('right','auto','important');
- therapist.setAttribute('data-bl-match-reviews-v21-43-1','true');
- var tr=therapist.getBoundingClientRect();return Math.abs(tr.width-safeWidth)<2&&Math.abs((tr.left+tr.right)-(document.documentElement.clientWidth))<4;
-}
-function schedule(){requestAnimationFrame(apply);}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule,{once:true});else schedule();
-window.addEventListener('load',schedule,{once:true});
-window.addEventListener('resize',schedule,{passive:true});
-var attempts=0,timer=setInterval(function(){attempts++;if(apply()||attempts>=40)clearInterval(timer);},100);
-})();
-</script>
-<!-- BLOOMING_LOTUS_MATCH_THERAPISTS_REVIEWS_V21_43_1_END -->
-<!-- BLOOMING_LOTUS_MATCH_SECTIONS_TO_SERVICES_V21_44_START -->
-<style id="blooming-lotus-match-sections-to-services-v21-44">
-html body [data-bl-services-width-reference-v21-44="true"],
-html body [data-bl-reviews-match-services-v21-44="true"],
-html body [data-bl-therapists-match-services-v21-44="true"] {
-  box-sizing:border-box !important;
-}
-</style>
-<script id="blooming-lotus-match-sections-to-services-script-v21-44">
-(function(){
-'use strict';
-if(window.__BL_MATCH_SECTIONS_TO_SERVICES_V21_44__)return;
-window.__BL_MATCH_SECTIONS_TO_SERVICES_V21_44__=true;
+if(window.__BL_MATCH_ONLY_THERAPISTS_TO_SERVICES_V21_44_1__)return;
+window.__BL_MATCH_ONLY_THERAPISTS_TO_SERVICES_V21_44_1__=true;
 function clean(v){return String(v||'').replace(/\s+/g,' ').trim().toLowerCase();}
 function heading(needle){return Array.from(document.querySelectorAll('h1,h2,h3')).find(function(el){return clean(el.textContent).indexOf(needle)>=0;});}
 function sectionFromHeading(el,terms){
  var node=el;
  while(node&&node!==document.body){
-  var text=clean(node.textContent);
-  if((node.tagName==='SECTION'||node.tagName==='DIV')&&node.getBoundingClientRect().width>500&&terms.every(function(term){return text.indexOf(term)>=0;}))return node;
+  var text=clean(node.textContent),r=node.getBoundingClientRect();
+  if((node.tagName==='SECTION'||node.tagName==='DIV')&&r.width>500&&terms.every(function(term){return text.indexOf(term)>=0;}))return node;
   node=node.parentElement;
  }
  return null;
@@ -3678,17 +3559,11 @@ function findServices(){
  if(!gallery)return null;
  var node=gallery;
  while(node&&node!==document.body){
-  var r=node.getBoundingClientRect();
-  var text=clean(node.textContent);
+  var r=node.getBoundingClientRect(),text=clean(node.textContent);
   if(r.width>700&&text.indexOf('foot reflexology')>=0&&text.indexOf('cupping')>=0)return node;
   node=node.parentElement;
  }
  return gallery;
-}
-function findReviews(){
- var card=document.querySelector('.bl-review-gallery-v16-card,[data-bl-review-card-v21-22="true"]');
- var h=heading('trusted throughout roanoke')||heading('customer reviews');
- return (h&&sectionFromHeading(h,['4.9','review']))||(card&&sectionFromHeading(card,['4.9','review']));
 }
 function findTherapists(){
  var section=document.querySelector('[data-bl-therapists-v21-26="true"]');
@@ -3696,29 +3571,21 @@ function findTherapists(){
  var h=heading('request the therapist');
  return h&&sectionFromHeading(h,['jack','rose','mike']);
 }
-function centerToWidth(node,width,attribute){
- var safe=Math.max(0,Math.min(width,document.documentElement.clientWidth-24));
- node.style.setProperty('width',safe+'px','important');
- node.style.setProperty('max-width','calc(100% - 24px)','important');
- node.style.setProperty('margin-left','auto','important');
- node.style.setProperty('margin-right','auto','important');
- node.style.setProperty('left','auto','important');
- node.style.setProperty('right','auto','important');
- node.style.setProperty('transform','none','important');
- node.setAttribute(attribute,'true');
- return safe;
-}
 function apply(){
- var services=findServices(),reviews=findReviews(),therapists=findTherapists();
- if(!services||!reviews||!therapists)return false;
- var reference=services.getBoundingClientRect();
- if(reference.width<700)return false;
- services.setAttribute('data-bl-services-width-reference-v21-44','true');
- var reviewWidth=centerToWidth(reviews,reference.width,'data-bl-reviews-match-services-v21-44');
- var therapistWidth=centerToWidth(therapists,reference.width,'data-bl-therapists-match-services-v21-44');
- var rr=reviews.getBoundingClientRect(),tr=therapists.getBoundingClientRect();
- var viewport=document.documentElement.clientWidth;
- return Math.abs(rr.width-reviewWidth)<2&&Math.abs(tr.width-therapistWidth)<2&&Math.abs((rr.left+rr.right)-viewport)<4&&Math.abs((tr.left+tr.right)-viewport)<4;
+ var services=findServices(),therapists=findTherapists();
+ if(!services||!therapists||services===therapists)return false;
+ var width=Math.min(services.getBoundingClientRect().width,document.documentElement.clientWidth-24);
+ if(width<700)return false;
+ therapists.style.setProperty('width',width+'px','important');
+ therapists.style.setProperty('max-width','calc(100% - 24px)','important');
+ therapists.style.setProperty('margin-left','auto','important');
+ therapists.style.setProperty('margin-right','auto','important');
+ therapists.style.setProperty('left','auto','important');
+ therapists.style.setProperty('right','auto','important');
+ therapists.style.setProperty('transform','none','important');
+ therapists.setAttribute('data-bl-therapists-match-services-v21-44-1','true');
+ var tr=therapists.getBoundingClientRect(),viewport=document.documentElement.clientWidth;
+ return Math.abs(tr.width-width)<2&&Math.abs((tr.left+tr.right)-viewport)<4;
 }
 function schedule(){requestAnimationFrame(apply);}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule,{once:true});else schedule();
@@ -3727,5 +3594,5 @@ window.addEventListener('resize',schedule,{passive:true});
 var attempts=0,timer=setInterval(function(){attempts++;if(apply()||attempts>=40)clearInterval(timer);},100);
 })();
 </script>
-<!-- BLOOMING_LOTUS_MATCH_SECTIONS_TO_SERVICES_V21_44_END -->
+<!-- BLOOMING_LOTUS_MATCH_ONLY_THERAPISTS_TO_SERVICES_V21_44_1_END -->
 </body></html>
