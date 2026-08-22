@@ -3531,68 +3531,40 @@ html body #bl-booking-v14 > .bl-grid {
 }
 </style>
 <!-- BLOOMING_LOTUS_EXTEND_INNER_FRAME_RIGHT_V21_42_END -->
-<!-- BLOOMING_LOTUS_MATCH_ONLY_THERAPISTS_TO_SERVICES_V21_44_1_START -->
-<style id="blooming-lotus-match-only-therapists-to-services-v21-44-1">
-html body [data-bl-therapists-match-services-v21-44-1="true"] {
-  box-sizing:border-box !important;
-}
+<!-- BLOOMING_LOTUS_INSET_THERAPISTS_V21_44_2_START -->
+<style id="blooming-lotus-inset-therapists-v21-44-2">
+html body [data-bl-therapists-inset-v21-44-2="true"] { box-sizing:border-box !important; }
 </style>
-<script id="blooming-lotus-match-only-therapists-to-services-script-v21-44-1">
+<script id="blooming-lotus-inset-therapists-script-v21-44-2">
 (function(){
 'use strict';
-if(window.__BL_MATCH_ONLY_THERAPISTS_TO_SERVICES_V21_44_1__)return;
-window.__BL_MATCH_ONLY_THERAPISTS_TO_SERVICES_V21_44_1__=true;
+if(window.__BL_INSET_THERAPISTS_V21_44_2__)return;
+window.__BL_INSET_THERAPISTS_V21_44_2__=true;
+var totalInset=140;
 function clean(v){return String(v||'').replace(/\s+/g,' ').trim().toLowerCase();}
 function heading(needle){return Array.from(document.querySelectorAll('h1,h2,h3')).find(function(el){return clean(el.textContent).indexOf(needle)>=0;});}
-function sectionFromHeading(el,terms){
- var node=el;
- while(node&&node!==document.body){
-  var text=clean(node.textContent),r=node.getBoundingClientRect();
-  if((node.tagName==='SECTION'||node.tagName==='DIV')&&r.width>500&&terms.every(function(term){return text.indexOf(term)>=0;}))return node;
-  node=node.parentElement;
- }
- return null;
-}
-function findServices(){
- var gallery=document.querySelector('#massage-services-gallery-v34,.massage-services-gallery-v34,[data-bl-services-gallery-v34="true"]');
- if(!gallery){var h=heading('choose the experience');gallery=h&&sectionFromHeading(h,['foot reflexology','cupping']);}
- if(!gallery)return null;
- var node=gallery;
- while(node&&node!==document.body){
-  var r=node.getBoundingClientRect(),text=clean(node.textContent);
-  if(r.width>700&&text.indexOf('foot reflexology')>=0&&text.indexOf('cupping')>=0)return node;
-  node=node.parentElement;
- }
- return gallery;
-}
-function findTherapists(){
- var section=document.querySelector('[data-bl-therapists-v21-26="true"]');
- if(section)return section;
- var h=heading('request the therapist');
- return h&&sectionFromHeading(h,['jack','rose','mike']);
-}
+function sectionFromHeading(el,terms){var n=el;while(n&&n!==document.body){var x=clean(n.textContent),r=n.getBoundingClientRect();if((n.tagName==='SECTION'||n.tagName==='DIV')&&r.width>500&&terms.every(function(t){return x.indexOf(t)>=0;}))return n;n=n.parentElement;}return null;}
+function services(){var g=document.querySelector('#massage-services-gallery-v34,.massage-services-gallery-v34,[data-bl-services-gallery-v34="true"]');if(!g){var h=heading('choose the experience');g=h&&sectionFromHeading(h,['foot reflexology','cupping']);}if(!g)return null;var n=g;while(n&&n!==document.body){var r=n.getBoundingClientRect(),x=clean(n.textContent);if(r.width>700&&x.indexOf('foot reflexology')>=0&&x.indexOf('cupping')>=0)return n;n=n.parentElement;}return g;}
+function therapists(){return document.querySelector('[data-bl-therapists-v21-26="true"]')||(function(){var h=heading('request the therapist');return h&&sectionFromHeading(h,['jack','rose','mike']);})();}
 function apply(){
- var services=findServices(),therapists=findTherapists();
- if(!services||!therapists||services===therapists)return false;
- var width=Math.min(services.getBoundingClientRect().width,document.documentElement.clientWidth-24);
- if(width<700)return false;
- therapists.style.setProperty('width',width+'px','important');
- therapists.style.setProperty('max-width','calc(100% - 24px)','important');
- therapists.style.setProperty('margin-left','auto','important');
- therapists.style.setProperty('margin-right','auto','important');
- therapists.style.setProperty('left','auto','important');
- therapists.style.setProperty('right','auto','important');
- therapists.style.setProperty('transform','none','important');
- therapists.setAttribute('data-bl-therapists-match-services-v21-44-1','true');
- var tr=therapists.getBoundingClientRect(),viewport=document.documentElement.clientWidth;
- return Math.abs(tr.width-width)<2&&Math.abs((tr.left+tr.right)-viewport)<4;
+ var s=services(),t=therapists();if(!s||!t||s===t)return false;
+ var viewport=document.documentElement.clientWidth;
+ var target=Math.min(s.getBoundingClientRect().width-totalInset,viewport-32);
+ if(viewport<=760)target=viewport-24;
+ if(target<640&&viewport>760)return false;
+ t.style.setProperty('width',target+'px','important');
+ t.style.setProperty('max-width','calc(100% - 24px)','important');
+ t.style.setProperty('margin-left','auto','important');
+ t.style.setProperty('margin-right','auto','important');
+ t.style.setProperty('left','auto','important');t.style.setProperty('right','auto','important');t.style.setProperty('transform','none','important');
+ t.setAttribute('data-bl-therapists-inset-v21-44-2','true');
+ var tr=t.getBoundingClientRect();return Math.abs(tr.width-target)<2&&Math.abs((tr.left+tr.right)-viewport)<4;
 }
 function schedule(){requestAnimationFrame(apply);}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule,{once:true});else schedule();
-window.addEventListener('load',schedule,{once:true});
-window.addEventListener('resize',schedule,{passive:true});
+window.addEventListener('load',schedule,{once:true});window.addEventListener('resize',schedule,{passive:true});
 var attempts=0,timer=setInterval(function(){attempts++;if(apply()||attempts>=40)clearInterval(timer);},100);
 })();
 </script>
-<!-- BLOOMING_LOTUS_MATCH_ONLY_THERAPISTS_TO_SERVICES_V21_44_1_END -->
+<!-- BLOOMING_LOTUS_INSET_THERAPISTS_V21_44_2_END -->
 </body></html>
