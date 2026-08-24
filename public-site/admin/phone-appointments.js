@@ -117,3 +117,60 @@
   document.addEventListener('click',e=>{if(e.target?.id==='new-phone-v6')setTimeout(enhance,0)});enhance();
 })();
 /* BLOOMING_PHONE_EXACT_AVAILABILITY_V21_48_END */
+/* BLOOMING_SOURCE_AWARE_PHONE_TIMES_V21_49_START */
+(() => {
+  'use strict';
+  if (window.__BL_SOURCE_AWARE_PHONE_TIMES_V21_49__) return;
+  window.__BL_SOURCE_AWARE_PHONE_TIMES_V21_49__ = true;
+  const API='https://d697dcip2i.execute-api.us-east-1.amazonaws.com/availability';
+  const $=id=>document.getElementById(id);
+  let valid=false, requestSerial=0;
+  const toMinutes=value=>{if(!/^\d{2}:\d{2}$/.test(value||''))return null;const [h,m]=value.split(':').map(Number);return h*60+m;};
+  const hhmm=value=>`${String(Math.floor(value/60)).padStart(2,'0')}:${String(value%60).padStart(2,'0')}`;
+  const label=value=>{let [h,m]=value.split(':').map(Number),suffix=h>=12?'PM':'AM';h=h%12||12;return `${h}:${String(m).padStart(2,'0')} ${suffix}`;};
+  const scheduledOptions=()=>{let out=[];for(let m=600;m<1200;m+=15)out.push([hhmm(m),label(hhmm(m))]);return out;};
+  function msg(text,error=false){let n=$('ph-availability-v21-49');if(!n){n=document.createElement('div');n.id='ph-availability-v21-49';n.style.cssText='margin:10px 0;padding:10px 12px;border-radius:9px;font-weight:700';$('ph-therapist')?.insertAdjacentElement('afterend',n);}n.textContent=text;n.style.background=error?'#fff0f0':'#f1f9eb';n.style.color=error?'#8d2929':'#3d6830';}
+  function therapists(names,current=''){const s=$('ph-therapist');if(!s)return;s.innerHTML='<option value="">Select therapist available for the full session</option>'+names.map(x=>`<option value="${x}">${x}</option>`).join('');if(names.includes(current))s.value=current;}
+  function source(){return $('ph-source')?.value||'PHONE';}
+  function scheduled(){return source()!=='WALK_IN';}
+  function replaceTime(){
+    const old=$('ph-time');if(!old)return;
+    const current=old.value;
+    const replacement=document.createElement(scheduled()?'select':'input');
+    replacement.id='ph-time';replacement.required=true;
+    if(scheduled()) replacement.innerHTML='<option value="">Select appointment time</option>'+scheduledOptions().map(([v,l])=>`<option value="${v}">${l}</option>`).join('');
+    else {replacement.type='time';replacement.step='60';replacement.min='10:00';replacement.max='19:59';replacement.value=current||new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false});}
+    if(scheduled()&&scheduledOptions().some(([v])=>v===current))replacement.value=current;
+    old.replaceWith(replacement);replacement.addEventListener('change',check);
+    valid=false;therapists([]);
+    msg(scheduled()?'Select a 15-minute appointment time.':'Walk-ins may use the actual start minute; availability is checked for the full session.',false);
+  }
+  async function check(){
+    const serial=++requestSerial;valid=false;
+    const service=$('ph-service')?.value,date=$('ph-date')?.value,time=$('ph-time')?.value,length=$('ph-length')?.value,current=$('ph-therapist')?.value||'';
+    if(!service||!date||!time||!length){therapists([]);msg('Select service, date, time, and session length to load therapist availability.',true);return;}
+    const start=toMinutes(time),duration=Number((length.match(/\d+/)||['60'])[0]),end=start+duration;
+    if(start===null||start<600||end>1200){therapists([]);msg('The complete session must fit between 10:00 AM and 8:00 PM.',true);return;}
+    if(scheduled()&&start%15!==0){therapists([]);msg('Scheduled phone and email appointments use 15-minute times.',true);return;}
+    try{
+      const r=await fetch(`${API}?${new URLSearchParams({date,duration,service})}`,{cache:'no-store'}),d=await r.json();
+      if(serial!==requestSerial)return;if(!r.ok||d.closed)throw Error(d.message||'Availability lookup failed');
+      let covered;
+      if(scheduled()) covered=(d.slots||[]).filter(x=>x.time===time);
+      else {const first=Math.floor(start/15)*15,last=Math.ceil(end/15)*15;covered=(d.slots||[]).filter(x=>{const m=toMinutes(x.time);return m>=first&&m<last;});}
+      if(!covered.length){therapists([]);msg('No availability data exists for the selected interval.',true);return;}
+      let names=[...(covered[0].therapists||[])];for(const slot of covered.slice(1))names=names.filter(x=>(slot.therapists||[]).includes(x));
+      therapists(names,current);valid=names.length>0;
+      msg(names.length?`${scheduled()?'Available':'Walk-in available'} for the full ${duration}-minute session: ${names.join(', ')}`:'No therapist is available for the complete selected session.',!names.length);
+    }catch(error){therapists([]);msg(error.message||'Availability lookup failed.',true);}
+  }
+  function enhance(){
+    const form=document.querySelector('#phone-booking-v6 form');if(!form||form.dataset.sourceTimesV2149)return;form.dataset.sourceTimesV2149='true';
+    $('ph-source')?.addEventListener('change',replaceTime);['ph-service','ph-date','ph-length'].forEach(id=>$(id)?.addEventListener('change',check));
+    form.addEventListener('submit',event=>{if(!valid||!$('ph-therapist')?.value){event.preventDefault();event.stopImmediatePropagation();msg('Select a therapist verified for the complete appointment interval before saving.',true);alert('Please choose a therapist available for the full session.');return;}if(source()==='WALK_IN')$('ph-status').value='CONFIRMED';},true);
+    replaceTime();
+  }
+  new MutationObserver(enhance).observe(document.documentElement,{childList:true,subtree:true});
+  document.addEventListener('click',e=>{if(e.target?.id==='new-phone-v6')setTimeout(enhance,0)});enhance();
+})();
+/* BLOOMING_SOURCE_AWARE_PHONE_TIMES_V21_49_END */
