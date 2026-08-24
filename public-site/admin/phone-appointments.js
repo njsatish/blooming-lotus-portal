@@ -84,3 +84,36 @@
   enhance();
 })();
 /* BLOOMING_PHONE_FIELD_OPTIONS_V21_47_1_END */
+/* BLOOMING_PHONE_EXACT_AVAILABILITY_V21_48_START */
+(() => {
+  'use strict';
+  if (window.__BL_PHONE_EXACT_AVAILABILITY_V21_48__) return;
+  window.__BL_PHONE_EXACT_AVAILABILITY_V21_48__ = true;
+  const API='https://d697dcip2i.execute-api.us-east-1.amazonaws.com/availability';
+  const $=id=>document.getElementById(id);
+  let validSelection=false;
+  function minutes(v){if(!/^\d{2}:\d{2}$/.test(v||''))return null;const [h,m]=v.split(':').map(Number);return h*60+m;}
+  function notice(text,error=false){let n=$('ph-availability-v21-48');if(!n){n=document.createElement('div');n.id='ph-availability-v21-48';n.style.cssText='margin:10px 0;padding:10px 12px;border-radius:9px;font-weight:700';$('ph-therapist')?.insertAdjacentElement('afterend',n);}n.textContent=text;n.style.background=error?'#fff0f0':'#f1f9eb';n.style.color=error?'#8d2929':'#3d6830';}
+  function setTherapists(names,current=''){const s=$('ph-therapist');if(!s)return;s.innerHTML='<option value="">Select therapist available at this exact time</option>'+names.map(x=>`<option value="${x}">${x}</option>`).join('');if(names.includes(current))s.value=current;}
+  async function validateExact(){
+    validSelection=false;
+    const service=$('ph-service')?.value,date=$('ph-date')?.value,time=$('ph-time')?.value,length=$('ph-length')?.value,current=$('ph-therapist')?.value||'';
+    const mm=minutes(time);
+    if(mm!==null&&mm%15!==0){setTherapists([]);notice('Appointment time must be on a 15-minute interval, such as 12:15 or 12:30.',true);return;}
+    if(!service||!date||!time||!length){setTherapists([]);notice('Select service, date, time, and session length to load exact therapist availability.',true);return;}
+    const duration=(length.match(/\d+/)||['60'])[0];
+    try{
+      const r=await fetch(`${API}?${new URLSearchParams({date,duration,service})}`,{cache:'no-store'}),d=await r.json();
+      if(!r.ok||d.closed)throw Error(d.message||'Availability lookup failed');
+      const slot=(d.slots||[]).find(x=>x.time===time);
+      const names=slot&&!slot.fullyBooked?(slot.therapists||[]):[];
+      setTherapists(names,current);
+      validSelection=names.length>0;
+      notice(names.length?`Available at ${time}: ${names.join(', ')}`:'No therapist is available for this service, duration, and exact time.',!names.length);
+    }catch(e){setTherapists([]);notice(e.message||'Availability lookup failed.',true);}
+  }
+  function enhance(){const form=document.querySelector('#phone-booking-v6 form');if(!form||form.dataset.exactV2148)return;form.dataset.exactV2148='true';const time=$('ph-time');if(time){time.step='900';time.min='10:00';time.max='19:45';}['ph-service','ph-date','ph-time','ph-length'].forEach(id=>$(id)?.addEventListener('change',validateExact));form.addEventListener('submit',e=>{const therapist=$('ph-therapist')?.value;if(!validSelection||!therapist){e.preventDefault();e.stopImmediatePropagation();notice('Choose a therapist returned for the exact selected time before saving.',true);alert('Please select service, date, a 15-minute time, session length, and an available therapist.');}},true);validateExact();}
+  new MutationObserver(enhance).observe(document.documentElement,{childList:true,subtree:true});
+  document.addEventListener('click',e=>{if(e.target?.id==='new-phone-v6')setTimeout(enhance,0)});enhance();
+})();
+/* BLOOMING_PHONE_EXACT_AVAILABILITY_V21_48_END */
