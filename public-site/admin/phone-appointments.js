@@ -84,39 +84,6 @@
   enhance();
 })();
 /* BLOOMING_PHONE_FIELD_OPTIONS_V21_47_1_END */
-/* BLOOMING_PHONE_EXACT_AVAILABILITY_V21_48_START */
-(() => {
-  'use strict';
-  if (window.__BL_PHONE_EXACT_AVAILABILITY_V21_48__) return;
-  window.__BL_PHONE_EXACT_AVAILABILITY_V21_48__ = true;
-  const API='https://d697dcip2i.execute-api.us-east-1.amazonaws.com/availability';
-  const $=id=>document.getElementById(id);
-  let validSelection=false;
-  function minutes(v){if(!/^\d{2}:\d{2}$/.test(v||''))return null;const [h,m]=v.split(':').map(Number);return h*60+m;}
-  function notice(text,error=false){let n=$('ph-availability-v21-48');if(!n){n=document.createElement('div');n.id='ph-availability-v21-48';n.style.cssText='margin:10px 0;padding:10px 12px;border-radius:9px;font-weight:700';$('ph-therapist')?.insertAdjacentElement('afterend',n);}n.textContent=text;n.style.background=error?'#fff0f0':'#f1f9eb';n.style.color=error?'#8d2929':'#3d6830';}
-  function setTherapists(names,current=''){const s=$('ph-therapist');if(!s)return;s.innerHTML='<option value="">Select therapist available at this exact time</option>'+names.map(x=>`<option value="${x}">${x}</option>`).join('');if(names.includes(current))s.value=current;}
-  async function validateExact(){
-    validSelection=false;
-    const service=$('ph-service')?.value,date=$('ph-date')?.value,time=$('ph-time')?.value,length=$('ph-length')?.value,current=$('ph-therapist')?.value||'';
-    const mm=minutes(time);
-    if(mm!==null&&mm%15!==0){setTherapists([]);notice('Appointment time must be on a 15-minute interval, such as 12:15 or 12:30.',true);return;}
-    if(!service||!date||!time||!length){setTherapists([]);notice('Select service, date, time, and session length to load exact therapist availability.',true);return;}
-    const duration=(length.match(/\d+/)||['60'])[0];
-    try{
-      const r=await fetch(`${API}?${new URLSearchParams({date,duration,service})}`,{cache:'no-store'}),d=await r.json();
-      if(!r.ok||d.closed)throw Error(d.message||'Availability lookup failed');
-      const slot=(d.slots||[]).find(x=>x.time===time);
-      const names=slot&&!slot.fullyBooked?(slot.therapists||[]):[];
-      setTherapists(names,current);
-      validSelection=names.length>0;
-      notice(names.length?`Available at ${time}: ${names.join(', ')}`:'No therapist is available for this service, duration, and exact time.',!names.length);
-    }catch(e){setTherapists([]);notice(e.message||'Availability lookup failed.',true);}
-  }
-  function enhance(){const form=document.querySelector('#phone-booking-v6 form');if(!form||form.dataset.exactV2148)return;form.dataset.exactV2148='true';const time=$('ph-time');if(time){time.step='900';time.min='10:00';time.max='19:45';}['ph-service','ph-date','ph-time','ph-length'].forEach(id=>$(id)?.addEventListener('change',validateExact));form.addEventListener('submit',e=>{const therapist=$('ph-therapist')?.value;if(!validSelection||!therapist){e.preventDefault();e.stopImmediatePropagation();notice('Choose a therapist returned for the exact selected time before saving.',true);alert('Please select service, date, a 15-minute time, session length, and an available therapist.');}},true);validateExact();}
-  new MutationObserver(enhance).observe(document.documentElement,{childList:true,subtree:true});
-  document.addEventListener('click',e=>{if(e.target?.id==='new-phone-v6')setTimeout(enhance,0)});enhance();
-})();
-/* BLOOMING_PHONE_EXACT_AVAILABILITY_V21_48_END */
 /* BLOOMING_SOURCE_AWARE_PHONE_TIMES_V21_49_START */
 (() => {
   'use strict';
@@ -174,3 +141,36 @@
   document.addEventListener('click',e=>{if(e.target?.id==='new-phone-v6')setTimeout(enhance,0)});enhance();
 })();
 /* BLOOMING_SOURCE_AWARE_PHONE_TIMES_V21_49_END */
+/* BLOOMING_HIDE_PAST_PHONE_TIMES_V21_50_START */
+(() => {
+  'use strict';
+  if (window.__BL_HIDE_PAST_PHONE_TIMES_V21_50__) return;
+  window.__BL_HIDE_PAST_PHONE_TIMES_V21_50__ = true;
+  const $=id=>document.getElementById(id);
+  const localDate=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+  const localMinutes=()=>{const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date());const value=Object.fromEntries(parts.map(x=>[x.type,x.value]));return Number(value.hour)*60+Number(value.minute);};
+  const toMinutes=value=>{if(!/^\d{2}:\d{2}$/.test(value||''))return null;const [h,m]=value.split(':').map(Number);return h*60+m;};
+  function notice(text){let n=$('ph-past-time-v21-50');if(!n){n=document.createElement('div');n.id='ph-past-time-v21-50';n.style.cssText='margin:10px 0;padding:10px 12px;border-radius:9px;font-weight:700;background:#fff8e8;color:#6b592f';$('ph-time')?.insertAdjacentElement('afterend',n);}n.textContent=text;}
+  function apply(){
+    const form=document.querySelector('#phone-booking-v6 form'),date=$('ph-date'),time=$('ph-time'),source=$('ph-source');
+    if(!form||!date||!time||!source)return;
+    const today=localDate();date.min=today;
+    if(date.value && date.value<today){date.value=today;time.value='';}
+    const isToday=date.value===today;
+    if(time.tagName==='SELECT'){
+      let visible=0,first='';const current=time.value,now=localMinutes();
+      [...time.options].forEach((option,index)=>{if(index===0)return;const future=!isToday||toMinutes(option.value)>now;option.hidden=!future;option.disabled=!future;if(future){visible++;if(!first)first=option.value;}});
+      if(current&&[...time.options].some(o=>o.value===current&&o.disabled)){time.value='';time.dispatchEvent(new Event('change',{bubbles:true}));}
+      notice(isToday?(visible?`Past times are hidden. Select a remaining time for today.`:'No appointment times remain today. Please choose a future date.'):'All business-hour times are available to check for this future date.');
+    } else {
+      const now=localMinutes(),current=toMinutes(time.value);
+      time.min=isToday?`${String(Math.floor(now/60)).padStart(2,'0')}:${String(now%60).padStart(2,'0')}`:'10:00';
+      if(isToday&&current!==null&&current<now){time.value=time.min;time.dispatchEvent(new Event('change',{bubbles:true}));}
+      notice(isToday?'Walk-in time cannot be earlier than the current Roanoke time.':'Walk-in time must fit within business hours.');
+    }
+  }
+  function enhance(){const form=document.querySelector('#phone-booking-v6 form');if(!form)return;if(!form.dataset.pastTimesV2150){form.dataset.pastTimesV2150='true';['ph-date','ph-source'].forEach(id=>$(id)?.addEventListener('change',()=>setTimeout(apply,0)));}apply();}
+  new MutationObserver(enhance).observe(document.documentElement,{childList:true,subtree:true});
+  document.addEventListener('click',e=>{if(e.target?.id==='new-phone-v6')setTimeout(enhance,0)});enhance();
+})();
+/* BLOOMING_HIDE_PAST_PHONE_TIMES_V21_50_END */
